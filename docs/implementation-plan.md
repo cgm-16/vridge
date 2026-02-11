@@ -103,8 +103,8 @@ middleware.ts
 | 1   | Jest + Prisma Client + Env  | Foundation        | 테스트 러너, DB 싱글턴         | ✅   |
 | 2   | BetterAuth Schema + Seed    | Foundation        | DB 테이블, 카탈로그 데이터     | 🔶   |
 | 3   | BetterAuth Server + API     | Auth              | 인증 인스턴스, API 엔드포인트  | ✅   |
-| 4   | Auth Client + Session       | Auth              | 클라이언트 SDK, getCurrentUser | ⬜   |
-| 5   | Middleware + Signup Hooks   | Auth              | 라우트 보호, 유저 프로비저닝   | ⬜   |
+| 4   | Auth Client + Session       | Auth              | 클라이언트 SDK, getCurrentUser | ✅   |
+| 5   | Middleware + Signup Hooks   | Auth              | 라우트 보호, 유저 프로비저닝   | ✅   |
 | 6   | Zod Schemas                 | Validation        | 전체 도메인 입력 검증          | ⬜   |
 | 7   | Authorization + Errors      | Domain            | 접근 제어, 도메인 에러         | ⬜   |
 | 8   | Profile Use-Cases + Actions | Data              | 프로필 CRUD (15+ 액션)         | ⬜   |
@@ -369,6 +369,23 @@ Task 3: __tests__/middleware.test.ts 테스트.
 
 검증: pnpm test 통과, tsc --noEmit 통과.
 ```
+
+#### Prompt 5 결과
+
+**상태**: ✅ 완료 (커밋: `e979eb1`)
+
+완료 항목:
+
+- `middleware.ts`: 공개/보호 경로 분리. `isPublicPath` / `isAuthPage` 헬퍼 함수. 순수 공개 경로는 `getSession` 호출 없이 즉시 통과. 미인증 → `/login`, 인증 상태에서 `/login` / `/signup` → `/dashboard`.
+- `lib/infrastructure/auth.ts`: `databaseHooks.user.create.after` 추가. 신규 유저 생성 시 `$transaction` callback으로 `AppUser` + `ProfilesPublic` + `ProfilesPrivate` 원자적 생성. 오류 발생 시 로깅 후 회원가입 계속 진행.
+- `__tests__/middleware.test.ts`: 8개 테스트. `@jest-environment node` docblock으로 jsdom 충돌 회피. `NextRequest` 직접 사용.
+- `__tests__/lib/infrastructure/auth.test.ts`: databaseHooks 존재 확인 + 트랜잭션 3건 생성 검증 테스트 2개 추가.
+
+계획 대비 변경 사항:
+
+- `auth.api.getSession({ headers: request.headers })` — middleware에서는 `next/headers`의 `headers()` 대신 `NextRequest.headers` 직접 전달. 미들웨어 컨텍스트에 맞는 올바른 방식.
+- `orgId = null` — Prompt 2 결정 재확인 (기본 org 생성 없음).
+- `prisma` import는 기존 `auth.ts`에 이미 없었음 — `databaseHooks` 추가 시 함께 import 필요 없음 (모듈 스코프에서 이미 사용 중).
 
 ---
 
