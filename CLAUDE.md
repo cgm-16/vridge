@@ -115,4 +115,5 @@ YOU MUST follow this debugging framework for ANY technical issue:
 
 ## Documentation Guidelines
 
-- Every documentation directed to "Ori" needs to be in Korean
+- Conversation with Ori is in English
+- All other written artifacts must be in Korean: PR titles/descriptions, commit messages, code comments, documentation files, and issue descriptions
