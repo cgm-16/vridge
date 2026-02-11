@@ -16,6 +16,8 @@ jobs:
 
       - name: pnpm 설정
         uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.2
 
       - name: Node.js 설정
         uses: actions/setup-node@v4
@@ -33,4 +35,4 @@ jobs:
         run: pnpm build
 
       - name: 테스트 및 커버리지
-        run: pnpm test -- --coverage
+        run: pnpm test --coverage
