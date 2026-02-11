@@ -335,6 +335,21 @@ Task 3: __tests__/lib/infrastructure/auth-utils.test.ts 테스트.
 검증: pnpm test 통과.
 ```
 
+#### Prompt 4 결과
+
+**상태**: ✅ 완료 (커밋: `561eb12`)
+
+완료 항목:
+
+- `lib/infrastructure/auth-client.ts`: `createAuthClient` from `better-auth/react`. `useSession`, `signIn`, `signUp`, `signOut` export.
+- `lib/infrastructure/auth-utils.ts`: `getCurrentUser` (세션 없음/appUser 없음 시 null), `requireUser` (미인증 시 throw), `requireRole` (역할 불일치 시 throw). `UserContext` 타입 export.
+- `__tests__/lib/infrastructure/auth-utils.test.ts`: 7개 테스트 모두 통과.
+
+계획 대비 변경 사항:
+
+- `AppRole` import: 계획에서 `@/lib/generated/prisma`로 명시했으나 실제 출력 구조상 `@/lib/generated/prisma/enums`에서 import. Prisma 7 생성기는 index 없이 개별 파일로 분리 출력.
+- 테스트 mock 캐스팅: `as jest.Mock` → `as unknown as jest.Mock`. TypeScript가 BetterAuth의 `getSession` 타입과 `jest.Mock` 간 오버랩 부족으로 직접 캐스팅 불허.
+
 ---
 
 ### Prompt 5: Auth Middleware + Signup Hooks
@@ -369,6 +384,23 @@ Task 3: __tests__/middleware.test.ts 테스트.
 
 검증: pnpm test 통과, tsc --noEmit 통과.
 ```
+
+#### Prompt 5 결과
+
+**상태**: ✅ 완료 (커밋: `e979eb1`)
+
+완료 항목:
+
+- `middleware.ts`: 공개/보호 경로 분리. `isPublicPath` / `isAuthPage` 헬퍼 함수. 순수 공개 경로는 `getSession` 호출 없이 즉시 통과. 미인증 → `/login`, 인증 상태에서 `/login` / `/signup` → `/dashboard`.
+- `lib/infrastructure/auth.ts`: `databaseHooks.user.create.after` 추가. 신규 유저 생성 시 `$transaction` callback으로 `AppUser` + `ProfilesPublic` + `ProfilesPrivate` 원자적 생성. 오류 발생 시 로깅 후 회원가입 계속 진행.
+- `__tests__/middleware.test.ts`: 8개 테스트. `@jest-environment node` docblock으로 jsdom 충돌 회피. `NextRequest` 직접 사용.
+- `__tests__/lib/infrastructure/auth.test.ts`: databaseHooks 존재 확인 + 트랜잭션 3건 생성 검증 테스트 2개 추가.
+
+계획 대비 변경 사항:
+
+- `auth.api.getSession({ headers: request.headers })` — middleware에서는 `next/headers`의 `headers()` 대신 `NextRequest.headers` 직접 전달. 미들웨어 컨텍스트에 맞는 올바른 방식.
+- `orgId = null` — Prompt 2 결정 재확인 (기본 org 생성 없음).
+- `prisma` import는 기존 `auth.ts`에 이미 없었음 — `databaseHooks` 추가 시 함께 import 필요 없음 (모듈 스코프에서 이미 사용 중).
 
 ---
 
