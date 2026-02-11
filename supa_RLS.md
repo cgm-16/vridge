@@ -503,6 +503,7 @@ with check (public.is_admin());
 - 공개를 끄려면 `is_public=false`. 슬러그로 접근하는 `/profile/{public_slug}` 페이지에서 `profiles_public`만 노출.
 
 ### 슬러그 생성 함수 + 불변 트리거
+
 ```sql
 -- 단어 배열은 필요에 따라 확장 가능
 create or replace function public.generate_profile_slug()
@@ -547,6 +548,7 @@ execute procedure public.profiles_public_slug_immutable();
 ```
 
 ### 공개 읽기 정책 (profiles_public만)
+
 ```sql
 drop policy if exists "profiles_public: public view" on public.profiles_public;
 create policy "profiles_public: public view"
@@ -623,6 +625,7 @@ using (
 ```
 
 ### 적용/테스트 체크리스트
+
 - 실행 권한: `postgres` 또는 `service_role` 세션에서 수행.
 - org_id가 null인 JD의 기대 동작을 결정하고 `coalesce` 줄을 맞게 선택.
 - 검증 시나리오:

@@ -19,4 +19,21 @@ export const auth = betterAuth({
   secret: process.env.BETTER_AUTH_SECRET,
   baseURL: process.env.BETTER_AUTH_URL,
   plugins: [nextCookies()],
+  databaseHooks: {
+    user: {
+      create: {
+        after: async (user) => {
+          try {
+            await prisma.$transaction(async (tx) => {
+              await tx.appUser.create({ data: { id: user.id } });
+              await tx.profilesPublic.create({ data: { userId: user.id } });
+              await tx.profilesPrivate.create({ data: { userId: user.id } });
+            });
+          } catch (error) {
+            console.error('사용자 프로비저닝 실패:', error);
+          }
+        },
+      },
+    },
+  },
 });
