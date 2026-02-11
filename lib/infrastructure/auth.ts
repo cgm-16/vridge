@@ -25,12 +25,12 @@ export const auth = betterAuth({
         after: async (user) => {
           try {
             await prisma.$transaction(async (tx) => {
-              await tx.appUser.create({ data: { id: user.id } })
-              await tx.profilesPublic.create({ data: { userId: user.id } })
-              await tx.profilesPrivate.create({ data: { userId: user.id } })
-            })
+              await tx.appUser.create({ data: { id: user.id } });
+              await tx.profilesPublic.create({ data: { userId: user.id } });
+              await tx.profilesPrivate.create({ data: { userId: user.id } });
+            });
           } catch (error) {
-            console.error('사용자 프로비저닝 실패:', error)
+            console.error('사용자 프로비저닝 실패:', error);
           }
         },
       },
