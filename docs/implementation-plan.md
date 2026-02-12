@@ -959,6 +959,18 @@ Task 4: __tests__/e2e/smoke.test.ts 통합 스모크 테스트.
 
 ---
 
+## 개발 워크플로우
+
+각 프롬프트 완료 후 표준 절차:
+
+1. **TDD**: 실패하는 테스트 먼저 작성 → 구현 → 테스트 통과 확인
+2. **커밋**: 논리적 단위로 자주 커밋 (`git commit`)
+3. **결과 문서화**: `docs/implementation-plan.md`의 해당 프롬프트에 `#### Prompt N 결과` 섹션 추가, 진행 상황 표 업데이트 (⬜ → ✅)
+4. **푸시**: `git push origin <feature-branch>`
+5. **PR 생성**: `gh pr create --base dev` — 제목/본문 한국어, base 브랜치는 `dev`
+
+---
+
 ## 보류 작업
 
 - [ ] README.md에 개발 기준 섹션 추가 (Task #1)
