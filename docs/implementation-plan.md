@@ -106,7 +106,7 @@ middleware.ts
 | 4   | Auth Client + Session       | Auth              | 클라이언트 SDK, getCurrentUser | ✅   |
 | 5   | Middleware + Signup Hooks   | Auth              | 라우트 보호, 유저 프로비저닝   | ✅   |
 | 6   | Zod Schemas                 | Validation        | 전체 도메인 입력 검증          | ✅   |
-| 7   | Authorization + Errors      | Domain            | 접근 제어, 도메인 에러         | ⬜   |
+| 7   | Authorization + Errors      | Domain            | 접근 제어, 도메인 에러         | ✅   |
 | 8   | Profile Use-Cases + Actions | Data              | 프로필 CRUD (15+ 액션)         | ⬜   |
 | 9   | Catalog + JD Queries        | Data              | 카탈로그/채용공고 조회         | ⬜   |
 | 10  | Application Management      | Data              | 지원, 철회, 채용담당자 조회    | ⬜   |
@@ -488,6 +488,23 @@ Task 3: __tests__/lib/domain/authorization.test.ts 테스트.
 
 검증: pnpm test 통과.
 ```
+
+#### Prompt 7 결과
+
+**상태**: ✅ 완료 (커밋: `da8baad`, PR #8)
+
+완료 항목:
+
+- `lib/domain/errors.ts`: `DomainError` 클래스 (`code` 속성, `Error` 확장). `notFound(entity)`, `forbidden()`, `conflict(message)` 팩토리 헬퍼.
+- `lib/domain/authorization.ts`: `assertOwnership`, `assertRole`, `canViewCandidate`, `assertCanViewCandidate` — 인프라 의존 없는 순수 도메인 함수. `ReachabilityChecker` 타입 export.
+- `__tests__/lib/domain/errors.test.ts`: 4개 테스트.
+- `__tests__/lib/domain/authorization.test.ts`: 10개 테스트. Prisma mock 불필요 — stub 함수 주입.
+
+계획 대비 변경 사항:
+
+- `canViewCandidate`의 Prisma 직접 의존 제거. `ReachabilityChecker` 타입을 매개변수로 받아 호출자가 주입하는 방식으로 변경. 도메인 레이어에 인프라 import 없음.
+- 계획에 없던 `__tests__/lib/domain/errors.test.ts` 추가 — TDD 원칙에 따라 DomainError + 팩토리 헬퍼 직접 테스트.
+- 테스트에서 Prisma mock 불필요 — 도달 가능성 체커를 `async () => true/false` stub으로 주입하여 순수 단위 테스트 달성.
 
 ---
 
@@ -939,6 +956,18 @@ Task 4: __tests__/e2e/smoke.test.ts 통합 스모크 테스트.
 | S3 호환 엔드포인트 (optional) | `S3_ENDPOINT`                                                               | Prompt 17 (non-AWS 사용 시) | ⬜   |
 
 > **참고**: `BETTER_AUTH_URL`과 `NEXT_PUBLIC_APP_URL`은 로컬 개발 시 `http://localhost:3000`으로 설정 가능 — 외부 자격 증명 불필요.
+
+---
+
+## 개발 워크플로우
+
+각 프롬프트 완료 후 표준 절차:
+
+1. **TDD**: 실패하는 테스트 먼저 작성 → 구현 → 테스트 통과 확인
+2. **커밋**: 논리적 단위로 자주 커밋 (`git commit`)
+3. **결과 문서화**: `docs/implementation-plan.md`의 해당 프롬프트에 `#### Prompt N 결과` 섹션 추가, 진행 상황 표 업데이트 (⬜ → ✅)
+4. **푸시**: `git push origin <feature-branch>`
+5. **PR 생성**: `gh pr create --base dev` — 제목/본문 한국어, base 브랜치는 `dev`
 
 ---
 
