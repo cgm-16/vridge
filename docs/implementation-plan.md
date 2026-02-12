@@ -107,7 +107,7 @@ middleware.ts
 | 5   | Middleware + Signup Hooks   | Auth              | 라우트 보호, 유저 프로비저닝   | ✅   |
 | 6   | Zod Schemas                 | Validation        | 전체 도메인 입력 검증          | ✅   |
 | 7   | Authorization + Errors      | Domain            | 접근 제어, 도메인 에러         | ✅   |
-| 8   | Profile Use-Cases + Actions | Data              | 프로필 CRUD (15+ 액션)         | ⬜   |
+| 8   | Profile Use-Cases + Actions | Data              | 프로필 CRUD (15+ 액션)         | ✅   |
 | 9   | Catalog + JD Queries        | Data              | 카탈로그/채용공고 조회         | ⬜   |
 | 10  | Application Management      | Data              | 지원, 철회, 채용담당자 조회    | ⬜   |
 | 11  | Layout + Providers + Nav    | UI/Widget         | 프로바이더, 네비게이션 쉘      | ⬜   |
@@ -556,6 +556,22 @@ Task 3: 테스트 작성.
 
 검증: pnpm test 통과.
 ```
+
+#### Prompt 8 결과
+
+**상태**: ✅ 완료
+
+완료 항목:
+
+- `lib/use-cases/profile.ts`: 18개 함수. `getFullProfile`, `getProfileForViewer(mode: 'partial'|'full')`, `updatePublicProfile`, `updatePrivateProfile`, 경력/학력/언어/URL 각 add/update/delete (12개), `addSkill`, `deleteSkill`. update/delete는 `findFirst({ id, userId })`로 소유권 검사 후 처리. `addSkill`은 P2002 에러를 `conflict()` DomainError로 변환.
+- `lib/actions/profile.ts`: 18개 서버 액션. 공통 패턴: `requireUser` → Zod 검증 → use-case 호출 → `revalidatePath`. DomainError/ZodError → `{ error: string }`, 기타 에러는 재throw. `getProfileForRecruiter`는 `assertCanViewCandidate` + `ReachabilityChecker` 패턴 사용.
+- `__tests__/lib/use-cases/profile.test.ts`: 24개 테스트.
+- `__tests__/lib/actions/profile.test.ts`: 16개 테스트.
+
+계획 대비 변경 사항:
+
+- `jest.mock('@/lib/infrastructure/auth-utils')` 자동 모킹 시 better-auth ESM 로드 오류 발생 → 팩토리 함수 방식으로 변경: `jest.mock('@/lib/infrastructure/auth-utils', () => ({ requireUser: jest.fn(), requireRole: jest.fn() }))`. 기존 auth-utils.test.ts와 일관된 방식.
+- 테스트 106개 통과 (기존 66개 → +40개).
 
 ---
 
