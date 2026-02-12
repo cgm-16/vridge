@@ -108,7 +108,7 @@ middleware.ts
 | 6   | Zod Schemas                 | Validation        | 전체 도메인 입력 검증          | ✅   |
 | 7   | Authorization + Errors      | Domain            | 접근 제어, 도메인 에러         | ✅   |
 | 8   | Profile Use-Cases + Actions | Data              | 프로필 CRUD (15+ 액션)         | ✅   |
-| 9   | Catalog + JD Queries        | Data              | 카탈로그/채용공고 조회         | ⬜   |
+| 9   | Catalog + JD Queries        | Data              | 카탈로그/채용공고 조회         | ✅   |
 | 10  | Application Management      | Data              | 지원, 철회, 채용담당자 조회    | ⬜   |
 | 11  | Layout + Providers + Nav    | UI/Widget         | 프로바이더, 네비게이션 쉘      | ⬜   |
 | 12  | Auth Pages                  | UI/Feature        | 로그인, 회원가입               | ⬜   |
@@ -609,6 +609,28 @@ Task 5: 테스트.
 
 검증: pnpm test 통과.
 ```
+
+#### Prompt 9 결과
+
+**상태**: ✅ 완료
+
+완료 항목:
+
+- `lib/use-cases/catalog.ts`: `getJobFamilies`, `getJobs(familyId?)`, `searchSkills(query)` (displayNameEn + aliasNormalized ILIKE, max 20), `getSkillById(id)` (null 반환, throw 없음).
+- `lib/use-cases/jd-queries.ts`: `getJobDescriptions(filters)` — 정의된 필터만 where에 포함, `Promise.all`로 findMany + count 병렬 실행, `{ items, total, page, pageSize }` 반환. `getJobDescriptionById(id)` — 없으면 `notFound('채용공고')` throw. 공통 `JD_INCLUDE` 상수로 중복 제거.
+- `lib/actions/catalog.ts`: `'use server'` 래퍼. `import * as catalogUC`로 use-case 이름 충돌 방지. 인증/Zod 검증 불필요.
+- `lib/actions/jd-queries.ts`: `'use server'` 래퍼. `getJobDescriptions(input: unknown)` — `jobDescriptionFilterSchema.parse()` 검증, ZodError → `{ error: '필터 값이 유효하지 않습니다' }`. `getJobDescriptionById(id: string)`.
+- `__tests__/lib/use-cases/catalog.test.ts`: 6개 테스트.
+- `__tests__/lib/use-cases/jd-queries.test.ts`: 8개 테스트.
+- `__tests__/lib/actions/catalog.test.ts`: 5개 테스트.
+- `__tests__/lib/actions/jd-queries.test.ts`: 5개 테스트.
+- 전체 테스트: 130개 통과 (기존 106개 → +24개).
+
+계획 대비 변경 사항:
+
+- `Promise.all([findMany, count])` 사용 — `$transaction` 대신 (읽기 전용 쿼리에 트랜잭션 불필요, 테스트 mock이 더 단순).
+- `JD_INCLUDE` 상수 도입 — `getJobDescriptions`와 `getJobDescriptionById` 간 include 중복 제거.
+- 액션 테스트에서 use-case 팩토리 mock 사용 — auto-mock 시 Prisma 생성 파일 의존 회피 (profile 액션 테스트의 auth-utils mock과 동일한 패턴).
 
 ---
 

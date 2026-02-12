@@ -1,0 +1,88 @@
+import {
+  getJobDescriptions,
+  getJobDescriptionById,
+} from '@/lib/actions/jd-queries';
+import { DomainError } from '@/lib/domain/errors';
+import * as jdQueriesUC from '@/lib/use-cases/jd-queries';
+
+jest.mock('@/lib/use-cases/jd-queries', () => ({
+  getJobDescriptions: jest.fn(),
+  getJobDescriptionById: jest.fn(),
+}));
+
+beforeEach(() => jest.clearAllMocks());
+
+describe('getJobDescriptions', () => {
+  it('유효한 입력 → use-case 호출 후 데이터 반환', async () => {
+    const mockResult = {
+      items: [{ id: 'jd-1', title: '개발자' }],
+      total: 1,
+      page: 1,
+      pageSize: 20,
+    };
+    (jdQueriesUC.getJobDescriptions as unknown as jest.Mock).mockResolvedValue(
+      mockResult
+    );
+
+    const result = await getJobDescriptions({ page: 1, pageSize: 20 });
+
+    expect(result).toEqual({ success: true, data: mockResult });
+    expect(jdQueriesUC.getJobDescriptions).toHaveBeenCalledWith({
+      page: 1,
+      pageSize: 20,
+    });
+  });
+
+  it('유효하지 않은 입력 (Zod 오류) → { error: ... }', async () => {
+    const result = await getJobDescriptions({ page: -1, pageSize: 100 });
+
+    expect(result).toEqual(
+      expect.objectContaining({ error: expect.any(String) })
+    );
+    expect(jdQueriesUC.getJobDescriptions).not.toHaveBeenCalled();
+  });
+
+  it('입력 없음 (undefined) → 기본값으로 use-case 호출', async () => {
+    (jdQueriesUC.getJobDescriptions as unknown as jest.Mock).mockResolvedValue({
+      items: [],
+      total: 0,
+      page: 1,
+      pageSize: 20,
+    });
+
+    const result = await getJobDescriptions({});
+
+    expect(result).toEqual(expect.objectContaining({ success: true }));
+    expect(jdQueriesUC.getJobDescriptions).toHaveBeenCalledWith(
+      expect.objectContaining({ page: 1, pageSize: 20 })
+    );
+  });
+});
+
+describe('getJobDescriptionById', () => {
+  it('JD 조회 성공 → { success: true, data }', async () => {
+    const mockJd = { id: 'jd-1', title: '개발자' };
+    (
+      jdQueriesUC.getJobDescriptionById as unknown as jest.Mock
+    ).mockResolvedValue(mockJd);
+
+    const result = await getJobDescriptionById('jd-1');
+
+    expect(result).toEqual({ success: true, data: mockJd });
+    expect(jdQueriesUC.getJobDescriptionById).toHaveBeenCalledWith('jd-1');
+  });
+
+  it('DomainError NOT_FOUND → { error: message }', async () => {
+    const domainErr = new DomainError(
+      'NOT_FOUND',
+      '채용공고을(를) 찾을 수 없습니다'
+    );
+    (
+      jdQueriesUC.getJobDescriptionById as unknown as jest.Mock
+    ).mockRejectedValue(domainErr);
+
+    const result = await getJobDescriptionById('nonexistent');
+
+    expect(result).toEqual({ error: '채용공고을(를) 찾을 수 없습니다' });
+  });
+});
