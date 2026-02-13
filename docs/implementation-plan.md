@@ -45,9 +45,8 @@ lib/
     s3.ts                     # S3 클라이언트
   actions/                    # 서버 액션 (얇은 어댑터)
     profile.ts
-    applications.ts
+    applications.ts           # 채용담당자 쿼리 포함 (getApplicationsForJd)
     catalog.ts
-    recruiter.ts
     attachments.ts
   validations/                # Zod 스키마 (서버/클라이언트 공유)
     profile.ts
@@ -84,20 +83,23 @@ app/
   page.tsx                          ← /jobs 리다이렉트
   jobs/page.tsx                     ← 공개 채용공고 목록 (인증 불필요)
   jobs/[id]/page.tsx                ← 공개 채용공고 상세
-  announcement/page.tsx             ← 공개 공지사항 목록
-  announcement/[id]/page.tsx        ← 공개 공지사항 상세
+  announcement/page.tsx             ← 공개 공지사항 목록 (미구현, 별도 계획 예정)
+  announcement/[id]/page.tsx        ← 공개 공지사항 상세 (미구현, 별도 계획 예정)
   (dashboard)/                      ← 좌측 사이드바 레이아웃 적용
     candidate/profile/page.tsx      ← 프로필 조회
     candidate/profile/edit/page.tsx ← 프로필 편집 (별도 라우트)
     candidate/applications/page.tsx ← 내 지원 목록 (Figma: "My Jobs")
-    recruiter/applicants/page.tsx
+    candidate/jobs/page.tsx         ← 인증된 채용공고 목록
+    candidate/jobs/[id]/page.tsx    ← 인증된 채용공고 상세 + 지원 버튼
+    recruiter/page.tsx
+    recruiter/jd/[id]/applicants/page.tsx
     recruiter/candidates/[id]/page.tsx
   api/auth/[...all]/
 # 주: (auth) 라우트 그룹 없음 — 로그인/회원가입은 모달 다이얼로그로 구현
 
 prisma/
   schema.prisma, seed.ts, seed-data/
-middleware.ts
+proxy.ts                              # 미들웨어 (함수명: proxy, 테스트: __tests__/proxy.test.ts)
 ```
 
 **Clean Architecture 흐름**: Server Action → Zod 입력 검증 → 권한 확인 (domain) → use-case 호출 → use-case가 Prisma 호출 → 결과 반환. MVP에서는 use-case가 Prisma를 직접 호출 (repository 레이어 없음).
@@ -125,8 +127,11 @@ middleware.ts
 | 15  | Job Browse + Apply          | UI/Feature+Entity | 채용공고 탐색, 지원            | ✅   |
 | 16  | Recruiter Dashboard         | UI/Feature        | 지원자 조회, 후보자 프로필     | ⬜   |
 | 17  | Uploads + Polish + E2E      | Infra/Polish      | S3, 에러 처리, 스모크 테스트   | ⬜   |
+| 18  | Announcement Pages          | UI/Page           | 공지사항 목록·상세             | ⬜   |
 
 > **범례**: ✅ 완료 / 🔶 부분 완료 (DB 자격 증명 대기) / ⬜ 미착수
+>
+> Prompt 17-18 상세 계획: [docs/implementation-plan-p17.md](./implementation-plan-p17.md)
 
 ---
 
@@ -399,14 +404,14 @@ Task 3: __tests__/middleware.test.ts 테스트.
 
 완료 항목:
 
-- `middleware.ts`: 공개/보호 경로 분리. `isPublicPath` / `isAuthPage` 헬퍼 함수. 순수 공개 경로는 `getSession` 호출 없이 즉시 통과. 미인증 → `/login`, 인증 상태에서 `/login` / `/signup` → `/dashboard`.
+- `proxy.ts`: 공개/보호 경로 분리. `isPublicPath` / `isAuthPage` 헬퍼 함수. 순수 공개 경로는 `getSession` 호출 없이 즉시 통과. 미인증 → `/login`, 인증 상태에서 `/login` / `/signup` → `/dashboard`.
 - `lib/infrastructure/auth.ts`: `databaseHooks.user.create.after` 추가. 신규 유저 생성 시 `$transaction` callback으로 `AppUser` + `ProfilesPublic` + `ProfilesPrivate` 원자적 생성. 오류 발생 시 로깅 후 회원가입 계속 진행.
-- `__tests__/middleware.test.ts`: 8개 테스트. `@jest-environment node` docblock으로 jsdom 충돌 회피. `NextRequest` 직접 사용.
+- `__tests__/proxy.test.ts`: 8개 테스트. `@jest-environment node` docblock으로 jsdom 충돌 회피. `NextRequest` 직접 사용.
 - `__tests__/lib/infrastructure/auth.test.ts`: databaseHooks 존재 확인 + 트랜잭션 3건 생성 검증 테스트 2개 추가.
 
 계획 대비 변경 사항:
 
-- `auth.api.getSession({ headers: request.headers })` — middleware에서는 `next/headers`의 `headers()` 대신 `NextRequest.headers` 직접 전달. 미들웨어 컨텍스트에 맞는 올바른 방식.
+- `auth.api.getSession({ headers: request.headers })` — proxy.ts에서는 `next/headers`의 `headers()` 대신 `NextRequest.headers` 직접 전달. 미들웨어 컨텍스트에 맞는 올바른 방식.
 - `orgId = null` — Prompt 2 결정 재확인 (기본 org 생성 없음).
 - `prisma` import는 기존 `auth.ts`에 이미 없었음 — `databaseHooks` 추가 시 함께 import 필요 없음 (모듈 스코프에서 이미 사용 중).
 
@@ -759,7 +764,7 @@ Task 10: __tests__/widgets/nav/main-nav.test.tsx 작성
 - `widgets/nav/ui/main-nav.tsx`: Jobs/Announcement 탭, 로그인 상태별 UI
 - `widgets/nav/ui/user-menu.tsx`: Avatar 트리거 + DropdownMenu (My Profile / My Jobs / Logout)
 - `app/(dashboard)/layout.tsx` + `dashboard-sidebar.tsx`: 좌측 사이드바 레이아웃
-- `middleware.ts`: /login, /signup 경로 제거; 미인증 → /jobs 리다이렉트
+- `proxy.ts`: /login, /signup 경로 제거; 미인증 → /jobs 리다이렉트
 - `jest.d.ts`: @testing-library/jest-dom 타입 전역 참조
 - 테스트: 149개 통과, tsc --noEmit 클린
 
@@ -1070,49 +1075,12 @@ Task 7: 테스트.
 
 ---
 
-## Phase 5: Polish
+## Phase 5 이후
 
-### Prompt 17: File Uploads + Error Handling + E2E Smoke Test
+Prompt 17 (Uploads + Polish + E2E) 및 Prompt 18 (Announcement Pages) 계획은
+분량 관리를 위해 별도 파일에서 관리합니다.
 
-**목표**: S3 첨부파일, 전역 에러/로딩 상태, 통합 스모크 테스트.
-**생성 파일**: `lib/infrastructure/s3.ts`, `lib/use-cases/attachments.ts`, `lib/actions/attachments.ts`, 에러/로딩/404 페이지, `__tests__/e2e/smoke.test.ts`
-
-```
-이전: 모든 기능 존재. 이 프롬프트는 파일 업로드, 마감, E2E 검증을 추가.
-
-Task 1: lib/infrastructure/s3.ts 생성.
-- 환경 변수에서 S3 클라이언트 (AWS_S3_BUCKET, AWS_REGION, AWS_ACCESS_KEY_ID,
-  AWS_SECRET_ACCESS_KEY, S3_ENDPOINT non-AWS용 optional).
-- generateUploadKey(userId, ext): "users/{userId}/attachments/{uuid}.{ext}".
-- getSignedUploadUrl(key, contentType, maxSize).
-- getSignedDownloadUrl(key).
-- deleteObject(key).
-- .env.example에 S3 변수 추가.
-
-Task 2: lib/use-cases/attachments.ts + lib/actions/attachments.ts 생성.
-- requestUploadUrl(userId, fileName, mimeType): AttachmentType enum 대비 파일 유형 검증,
-  키 생성, profile_attachment 행 생성, signed URL 반환.
-- deleteAttachment(userId, attachmentId): assertOwnership, S3 객체 + DB 행 삭제.
-- getDownloadUrl(viewerId, viewerRole, attachmentId): authorization 체크
-  (소유자 또는 canViewCandidate인 recruiter), signed URL 반환.
-
-Task 3: 에러 처리 및 로딩 상태.
-- app/error.tsx: 전역 에러 바운더리 ("use client"), 친화적 메시지 + 재시도 버튼.
-- app/not-found.tsx: 커스텀 404 + "홈으로" 링크.
-- app/(dashboard)/candidate/profile/loading.tsx: 스켈레톤.
-- app/(dashboard)/candidate/jobs/loading.tsx: 카드 스켈레톤 그리드.
-- app/(dashboard)/recruiter/loading.tsx: 스켈레톤.
-
-Task 4: __tests__/e2e/smoke.test.ts 통합 스모크 테스트.
-- Auth 레이어 모킹 (알려진 유저 세션 설정).
-- 후보자 플로우: getMyProfile → updateProfilePublic → addProfileCareer →
-  getJobDescriptions → createApply → getMyApplications (새 지원 포함).
-- 채용담당자 플로우: getApplicationsForJd → getProfileForRecruiter partial
-  (private 없음) → full (private 포함).
-- Authorization: candidate가 recruiter 액션 호출 불가, recruiter가 프로필 수정 불가.
-
-검증: pnpm test 통과, pnpm build 성공, pnpm lint 통과.
-```
+→ **[docs/implementation-plan-p17.md](./implementation-plan-p17.md)**
 
 ---
 
