@@ -167,6 +167,16 @@ P24 (Polish + E2E) depends on all
 
 **Tests**: Render tests for each component, active state for pagination, icon src correctness.
 
+### Prompt 20 결과
+
+- 28개 파일 변경 (신규 24개, 수정 4개)
+- Tier 1 프리미티브 (14개): Icon, Button brand 변형, TabItem, Chip, FormInput, FormDropdown, SectionTitle, SearchBar, NumberedPagination, PostStatus, ToggleSwitch, DatePicker, LangPicker, DialcodePicker
+- Tier 2 도메인 컴포넌트 (4개): PostingListItem, PostingTitle, SummaryCard, ProfileCard
+- Tier 3 레이아웃 업데이트 (2개): MainNav GNB 리디자인 (Oswald 로고, shadow, 구분선 로그인), Sidebar Figma 스타일 반영
+- Button CVA: brand/brand-outline/brand-disabled 변형 + brand-sm/md/lg 사이즈
+- Figma 디자인 토큰: #ff6000 (brand), #ffefe5 (sub), #fbfbfb (bg), #b3b3b3 (border), #00a600 (success), #e50000 (error)
+- 359개 테스트 통과 (50 suite), `tsc --noEmit` 클린
+
 ---
 
 ## Prompt 21: Jobs Route Merge + UI Redesign
