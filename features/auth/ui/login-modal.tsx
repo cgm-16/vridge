@@ -2,18 +2,18 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
 import { useForm } from '@tanstack/react-form';
 import { z } from 'zod';
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
+  DialogDescription,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
+import { FormInput } from '@/components/ui/form-input';
+import { Icon } from '@/components/ui/icon';
 import { signIn } from '@/lib/infrastructure/auth-client';
 import { useAuthModal } from '../model/use-auth-modal';
 import { PasswordInput } from './password-input';
@@ -54,137 +54,201 @@ export function LoginModal() {
 
   return (
     <Dialog open={isLoginOpen} onOpenChange={(open) => !open && closeAll()}>
-      <DialogContent className="sm:max-w-sm">
-        <DialogHeader>
-          <DialogTitle>로그인</DialogTitle>
-          <p className="text-sm text-muted-foreground">
-            계정이 없으신가요?{' '}
+      <DialogContent
+        showCloseButton={false}
+        className="w-[712px] max-w-[calc(100vw-2rem)] overflow-hidden rounded-[20px] border-0 bg-white p-0 shadow-[0_0_15px_7px_rgba(255,149,84,0.07)]"
+      >
+        <div className="flex flex-col items-center gap-10 px-5 pt-5 pb-20">
+          <div className="flex w-full items-center justify-between">
+            <p className="text-sm text-[#666]">
+              Don&apos;t have an account yet?{' '}
+              <button
+                type="button"
+                onClick={openSignup}
+                className="underline underline-offset-2"
+              >
+                Sign up
+              </button>
+            </p>
             <button
               type="button"
-              onClick={openSignup}
-              className="font-medium text-brand hover:underline"
+              onClick={closeAll}
+              aria-label="Close login modal"
+              className="rounded-sm p-1 text-[#1a1a1a] hover:bg-[#f5f5f5]"
             >
-              Sign Up
+              <Icon name="close" size={16} />
             </button>
-          </p>
-        </DialogHeader>
+          </div>
 
-        <div className="flex flex-col gap-3">
-          <Button
-            variant="outline"
-            type="button"
-            className="w-full gap-2"
-            onClick={() =>
-              signIn.social({
-                provider: 'google',
-                callbackURL: '/candidate/profile',
-              })
-            }
-          >
-            <Image src="/icons/google.svg" alt="" width={20} height={20} />
-            Sign up with Google
-          </Button>
-          <Button
-            variant="outline"
-            type="button"
-            className="w-full gap-2"
-            onClick={() =>
-              signIn.social({
-                provider: 'facebook',
-                callbackURL: '/candidate/profile',
-              })
-            }
-          >
-            <Image src="/icons/facebook.svg" alt="" width={20} height={20} />
-            Sign up with Facebook
-          </Button>
-        </div>
+          <div className="flex w-full max-w-[520px] flex-col items-center gap-10">
+            <DialogTitle className="text-2xl font-bold text-[#1f1f1f]">
+              Login
+            </DialogTitle>
+            <DialogDescription className="sr-only">
+              Log in to access your account.
+            </DialogDescription>
 
-        <div className="relative flex items-center py-2">
-          <div className="grow border-t" />
-          <span className="px-3 text-xs text-muted-foreground">or</span>
-          <div className="grow border-t" />
-        </div>
-
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            form.handleSubmit();
-          }}
-          className="flex flex-col gap-4"
-        >
-          <form.Field name="email">
-            {(field) => (
-              <div className="flex flex-col gap-1.5">
-                <Label htmlFor="login-email">Email</Label>
-                <Input
-                  id="login-email"
-                  type="email"
-                  autoComplete="email"
-                  value={field.state.value}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                  onBlur={field.handleBlur}
-                />
-                {field.state.meta.isTouched &&
-                  field.state.meta.errors.length > 0 && (
-                    <p className="text-xs text-destructive">
-                      {String(
-                        field.state.meta.errors[0] instanceof Object
-                          ? (field.state.meta.errors[0] as { message: string })
-                              .message
-                          : field.state.meta.errors[0]
-                      )}
-                    </p>
-                  )}
-              </div>
-            )}
-          </form.Field>
-
-          <form.Field name="password">
-            {(field) => (
-              <div className="flex flex-col gap-1.5">
-                <Label htmlFor="login-password">Password</Label>
-                <PasswordInput
-                  id="login-password"
-                  autoComplete="current-password"
-                  value={field.state.value}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                  onBlur={field.handleBlur}
-                />
-                {field.state.meta.isTouched &&
-                  field.state.meta.errors.length > 0 && (
-                    <p className="text-xs text-destructive">
-                      {String(
-                        field.state.meta.errors[0] instanceof Object
-                          ? (field.state.meta.errors[0] as { message: string })
-                              .message
-                          : field.state.meta.errors[0]
-                      )}
-                    </p>
-                  )}
-              </div>
-            )}
-          </form.Field>
-
-          <button
-            type="button"
-            className="self-end text-xs text-muted-foreground hover:underline"
-          >
-            Forgot password?
-          </button>
-
-          {serverError && (
-            <p className="text-sm text-destructive">{serverError}</p>
-          )}
-
-          <form.Subscribe selector={(s) => s.isSubmitting}>
-            {(isSubmitting) => (
-              <Button type="submit" disabled={isSubmitting} className="w-full">
-                {isSubmitting ? '로그인 중...' : 'Log in'}
+            <div className="flex w-full flex-col gap-5">
+              <Button
+                variant="outline"
+                type="button"
+                className="h-14 w-full justify-center rounded-[10px] border-[#b3b3b3] px-2.5 py-5 text-[#333]"
+                onClick={() =>
+                  signIn.social({
+                    provider: 'google',
+                    callbackURL: '/candidate/profile',
+                  })
+                }
+              >
+                <span className="flex w-64 items-center gap-5">
+                  <Icon name="google" size={32} alt="Google" />
+                  <span className="flex gap-1 text-lg font-medium">
+                    <span>Log in</span>
+                    <span>with Google</span>
+                  </span>
+                </span>
               </Button>
-            )}
-          </form.Subscribe>
-        </form>
+              <Button
+                variant="outline"
+                type="button"
+                className="h-14 w-full justify-center rounded-[10px] border-[#b3b3b3] px-2.5 py-5 text-[#333]"
+                onClick={() =>
+                  signIn.social({
+                    provider: 'facebook',
+                    callbackURL: '/candidate/profile',
+                  })
+                }
+              >
+                <span className="flex w-64 items-center gap-5">
+                  <Icon name="facebook" size={32} alt="Facebook" />
+                  <span className="flex gap-1 text-lg font-medium">
+                    <span>Log in</span>
+                    <span>with Facebook</span>
+                  </span>
+                </span>
+              </Button>
+            </div>
+
+            <div className="flex w-full items-center gap-2.5 overflow-hidden">
+              <div className="h-px flex-1 bg-[#b3b3b3]" />
+              <span className="text-sm font-medium text-[#999]">or</span>
+              <div className="h-px flex-1 bg-[#b3b3b3]" />
+            </div>
+
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                form.handleSubmit();
+              }}
+              className="flex w-full flex-col gap-5"
+            >
+              <form.Field name="email">
+                {(field) => (
+                  <div className="flex flex-col gap-1.5">
+                    <Label htmlFor="login-email" className="sr-only">
+                      Email
+                    </Label>
+                    <div className="flex items-center gap-2.5">
+                      <Icon name="mail" size={24} />
+                      <FormInput
+                        id="login-email"
+                        type="email"
+                        autoComplete="email"
+                        value={field.state.value}
+                        onChange={(e) => field.handleChange(e.target.value)}
+                        onBlur={field.handleBlur}
+                        placeholder="Vridge1234@gmail.com"
+                        filled
+                        className="h-14 text-lg placeholder:text-[#999]"
+                      />
+                    </div>
+                    {field.state.meta.isTouched &&
+                      field.state.meta.errors.length > 0 && (
+                        <p className="text-xs text-destructive">
+                          {String(
+                            field.state.meta.errors[0] instanceof Object
+                              ? (
+                                  field.state.meta.errors[0] as {
+                                    message: string;
+                                  }
+                                ).message
+                              : field.state.meta.errors[0]
+                          )}
+                        </p>
+                      )}
+                  </div>
+                )}
+              </form.Field>
+
+              <form.Field name="password">
+                {(field) => (
+                  <div className="flex flex-col gap-1.5">
+                    <Label htmlFor="login-password" className="sr-only">
+                      Password
+                    </Label>
+                    <PasswordInput
+                      id="login-password"
+                      autoComplete="current-password"
+                      value={field.state.value}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                      onBlur={field.handleBlur}
+                      placeholder="Password"
+                      className="h-14"
+                    />
+                    {field.state.meta.isTouched &&
+                      field.state.meta.errors.length > 0 && (
+                        <p className="text-xs text-destructive">
+                          {String(
+                            field.state.meta.errors[0] instanceof Object
+                              ? (
+                                  field.state.meta.errors[0] as {
+                                    message: string;
+                                  }
+                                ).message
+                              : field.state.meta.errors[0]
+                          )}
+                        </p>
+                      )}
+                  </div>
+                )}
+              </form.Field>
+
+              <button
+                type="button"
+                className="self-end text-right text-sm font-medium text-[#666] hover:underline"
+              >
+                Forgot password?
+              </button>
+
+              {serverError && (
+                <p className="text-sm text-destructive">{serverError}</p>
+              )}
+
+              <form.Subscribe
+                selector={(s) => ({
+                  isSubmitting: s.isSubmitting,
+                  email: s.values.email,
+                  password: s.values.password,
+                })}
+              >
+                {({ isSubmitting, email, password }) => {
+                  const disabled = isSubmitting || !email || !password;
+                  return (
+                    <Button
+                      type="submit"
+                      variant={disabled ? 'brand-disabled' : 'brand'}
+                      size="brand-lg"
+                      disabled={disabled}
+                      className="w-full"
+                    >
+                      {isSubmitting ? '로그인 중...' : 'Continue'}
+                    </Button>
+                  );
+                }}
+              </form.Subscribe>
+            </form>
+          </div>
+        </div>
       </DialogContent>
     </Dialog>
   );

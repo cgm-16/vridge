@@ -1,18 +1,18 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from '@tanstack/react-form';
 import { z } from 'zod';
-import Image from 'next/image';
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
+  DialogDescription,
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { FormInput } from '@/components/ui/form-input';
+import { Icon } from '@/components/ui/icon';
 import { signIn, signUp } from '@/lib/infrastructure/auth-client';
 import { useAuthModal } from '../model/use-auth-modal';
 import { PasswordInput } from './password-input';
@@ -30,7 +30,6 @@ export function SignupModal() {
   const [privacyChecked, setPrivacyChecked] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
 
-  // 모달 닫힐 때 step 1으로 리셋
   useEffect(() => {
     if (!isSignupOpen) {
       setTimeout(() => {
@@ -51,9 +50,7 @@ export function SignupModal() {
         email: value.email,
         password: value.password,
         fetchOptions: {
-          onSuccess: () => {
-            setStep('success');
-          },
+          onSuccess: () => setStep('success'),
           onError: (ctx) => {
             setServerError(
               (ctx.error as { message?: string })?.message ??
@@ -67,181 +64,240 @@ export function SignupModal() {
 
   return (
     <Dialog open={isSignupOpen} onOpenChange={(open) => !open && closeAll()}>
-      <DialogContent className="sm:max-w-sm">
-        {step === 'method' && (
-          <>
-            <DialogHeader>
-              <DialogTitle>회원가입</DialogTitle>
-              <p className="text-sm text-muted-foreground">
-                이미 계정이 있으신가요?{' '}
-                <button
-                  type="button"
-                  onClick={openLogin}
-                  className="font-medium text-brand hover:underline"
-                >
-                  Log in
-                </button>
-              </p>
-            </DialogHeader>
-
-            <div className="flex flex-col gap-3">
-              <Button
-                variant="outline"
+      <DialogContent
+        showCloseButton={false}
+        className="w-[712px] max-w-[calc(100vw-2rem)] overflow-hidden rounded-[20px] border-0 bg-white p-0 shadow-[0_0_15px_7px_rgba(255,149,84,0.07)]"
+      >
+        <div className="flex flex-col items-center gap-10 px-5 pt-5 pb-20">
+          <div className="flex w-full items-center justify-between">
+            <p className="text-sm text-[#666]">
+              Have an account?{' '}
+              <button
                 type="button"
-                className="w-full gap-2"
-                onClick={() =>
-                  signIn.social({
-                    provider: 'google',
-                    callbackURL: '/candidate/profile',
-                  })
-                }
+                onClick={openLogin}
+                className="underline underline-offset-2"
               >
-                <Image src="/icons/google.svg" alt="" width={20} height={20} />
-                Sign up with Google
-              </Button>
-              <Button
-                variant="outline"
-                type="button"
-                className="w-full gap-2"
-                onClick={() =>
-                  signIn.social({
-                    provider: 'facebook',
-                    callbackURL: '/candidate/profile',
-                  })
-                }
-              >
-                <Image
-                  src="/icons/facebook.svg"
-                  alt=""
-                  width={20}
-                  height={20}
-                />
-                Sign up with Facebook
-              </Button>
-              <Button
-                variant="outline"
-                type="button"
-                className="w-full gap-2"
-                onClick={() => setStep('form')}
-              >
-                <Image
-                  src="/icons/email-at.svg"
-                  alt=""
-                  width={20}
-                  height={20}
-                />
-                Sign up with Email
-              </Button>
-            </div>
-          </>
-        )}
-
-        {step === 'form' && (
-          <>
-            <DialogHeader>
-              <DialogTitle>이메일로 가입</DialogTitle>
-            </DialogHeader>
-
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                form.handleSubmit();
-              }}
-              className="flex flex-col gap-4"
-            >
-              <form.Field name="email">
-                {(field) => (
-                  <div className="flex flex-col gap-1.5">
-                    <Label htmlFor="signup-email">Email</Label>
-                    <Input
-                      id="signup-email"
-                      type="email"
-                      autoComplete="email"
-                      value={field.state.value}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                      onBlur={field.handleBlur}
-                    />
-                    {field.state.meta.isTouched &&
-                      field.state.meta.errors.length > 0 && (
-                        <p className="text-xs text-destructive">
-                          {String(
-                            field.state.meta.errors[0] instanceof Object
-                              ? (
-                                  field.state.meta.errors[0] as {
-                                    message: string;
-                                  }
-                                ).message
-                              : field.state.meta.errors[0]
-                          )}
-                        </p>
-                      )}
-                  </div>
-                )}
-              </form.Field>
-
-              <form.Field name="password">
-                {(field) => (
-                  <div className="flex flex-col gap-1.5">
-                    <Label htmlFor="signup-password">Password</Label>
-                    <PasswordInput
-                      id="signup-password"
-                      autoComplete="new-password"
-                      value={field.state.value}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                      onBlur={field.handleBlur}
-                    />
-                    <p
-                      className={`text-xs ${
-                        field.state.value.length >= 8
-                          ? 'text-green-600'
-                          : 'text-muted-foreground'
-                      }`}
-                    >
-                      {field.state.value.length >= 8 ? '✓' : '✗'} 8자 이상
-                    </p>
-                  </div>
-                )}
-              </form.Field>
-
-              <label className="flex items-center gap-2 text-sm">
-                <input
-                  type="checkbox"
-                  checked={privacyChecked}
-                  onChange={(e) => setPrivacyChecked(e.target.checked)}
-                />
-                개인정보 처리방침에 동의합니다
-              </label>
-
-              {serverError && (
-                <p className="text-sm text-destructive">{serverError}</p>
-              )}
-
-              <form.Subscribe selector={(s) => s.isSubmitting}>
-                {(isSubmitting) => (
-                  <Button
-                    type="submit"
-                    disabled={isSubmitting || !privacyChecked}
-                    className="w-full"
-                  >
-                    {isSubmitting ? '가입 중...' : 'Sign Up'}
-                  </Button>
-                )}
-              </form.Subscribe>
-            </form>
-          </>
-        )}
-
-        {step === 'success' && (
-          <div className="flex flex-col items-center gap-4 py-6">
-            <h2 className="text-lg font-semibold">가입 완료!</h2>
-            <p className="text-sm text-muted-foreground">
-              회원가입이 완료되었습니다.
+                Log in
+              </button>
             </p>
-            <Button onClick={closeAll} className="w-full">
-              닫기
-            </Button>
+            <button
+              type="button"
+              onClick={closeAll}
+              aria-label="Close signup modal"
+              className="rounded-sm p-1 text-[#1a1a1a] hover:bg-[#f5f5f5]"
+            >
+              <Icon name="close" size={16} />
+            </button>
           </div>
-        )}
+
+          <div className="flex w-full max-w-[520px] flex-col items-center gap-10">
+            <DialogDescription className="sr-only">
+              Create an account or continue with a social login provider.
+            </DialogDescription>
+            {step === 'method' && (
+              <>
+                <DialogTitle className="text-2xl font-bold text-[#1f1f1f]">
+                  Sign Up
+                </DialogTitle>
+
+                <div className="flex w-full flex-col gap-5">
+                  <Button
+                    variant="outline"
+                    type="button"
+                    className="h-14 w-full justify-center rounded-[10px] border-[#b3b3b3] px-2.5 py-5 text-[#333]"
+                    onClick={() =>
+                      signIn.social({
+                        provider: 'google',
+                        callbackURL: '/candidate/profile',
+                      })
+                    }
+                  >
+                    <span className="flex w-64 items-center gap-5">
+                      <Icon name="google" size={32} alt="Google" />
+                      <span className="flex gap-1 text-lg font-medium">
+                        <span>Sign up</span>
+                        <span>with Google</span>
+                      </span>
+                    </span>
+                  </Button>
+
+                  <Button
+                    variant="outline"
+                    type="button"
+                    className="h-14 w-full justify-center rounded-[10px] border-[#b3b3b3] px-2.5 py-5 text-[#333]"
+                    onClick={() =>
+                      signIn.social({
+                        provider: 'facebook',
+                        callbackURL: '/candidate/profile',
+                      })
+                    }
+                  >
+                    <span className="flex w-64 items-center gap-5">
+                      <Icon name="facebook" size={32} alt="Facebook" />
+                      <span className="flex gap-1 text-lg font-medium">
+                        <span>Sign up</span>
+                        <span>with Facebook</span>
+                      </span>
+                    </span>
+                  </Button>
+                </div>
+
+                <div className="flex w-full items-center gap-2.5 overflow-hidden">
+                  <div className="h-px flex-1 bg-[#b3b3b3]" />
+                  <span className="text-sm font-medium text-[#999]">or</span>
+                  <div className="h-px flex-1 bg-[#b3b3b3]" />
+                </div>
+
+                <Button
+                  variant="outline"
+                  type="button"
+                  className="h-14 w-full justify-center rounded-[10px] border-[#b3b3b3] px-2.5 py-5 text-[#333]"
+                  onClick={() => setStep('form')}
+                >
+                  <span className="flex w-64 items-center gap-5">
+                    <Icon name="email-at" size={32} alt="Email" />
+                    <span className="flex gap-1 text-lg font-medium">
+                      <span>Sign up</span>
+                      <span>with E-mail</span>
+                    </span>
+                  </span>
+                </Button>
+              </>
+            )}
+
+            {step === 'form' && (
+              <>
+                <DialogTitle className="text-2xl font-bold text-[#1f1f1f]">
+                  Sign Up
+                </DialogTitle>
+
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    form.handleSubmit();
+                  }}
+                  className="flex w-full flex-col gap-5"
+                >
+                  <form.Field name="email">
+                    {(field) => (
+                      <div className="flex flex-col gap-1.5">
+                        <Label htmlFor="signup-email" className="sr-only">
+                          Email
+                        </Label>
+                        <div className="flex items-center gap-2.5">
+                          <Icon name="mail" size={24} />
+                          <FormInput
+                            id="signup-email"
+                            type="email"
+                            autoComplete="email"
+                            value={field.state.value}
+                            onChange={(e) => field.handleChange(e.target.value)}
+                            onBlur={field.handleBlur}
+                            placeholder="E-mail"
+                            filled
+                            className="h-14 text-lg placeholder:text-[#999]"
+                          />
+                        </div>
+                        {field.state.meta.isTouched &&
+                          field.state.meta.errors.length > 0 && (
+                            <p className="text-xs text-destructive">
+                              {String(
+                                field.state.meta.errors[0] instanceof Object
+                                  ? (
+                                      field.state.meta.errors[0] as {
+                                        message: string;
+                                      }
+                                    ).message
+                                  : field.state.meta.errors[0]
+                              )}
+                            </p>
+                          )}
+                      </div>
+                    )}
+                  </form.Field>
+
+                  <form.Field name="password">
+                    {(field) => (
+                      <div className="flex flex-col gap-1.5">
+                        <Label htmlFor="signup-password" className="sr-only">
+                          Password
+                        </Label>
+                        <PasswordInput
+                          id="signup-password"
+                          autoComplete="new-password"
+                          value={field.state.value}
+                          onChange={(e) => field.handleChange(e.target.value)}
+                          onBlur={field.handleBlur}
+                          placeholder="Password"
+                          className="h-14"
+                        />
+                        <p
+                          className={`text-xs ${
+                            field.state.value.length >= 8
+                              ? 'text-green-600'
+                              : 'text-muted-foreground'
+                          }`}
+                        >
+                          {field.state.value.length >= 8 ? '✓' : '✗'} 8자 이상
+                        </p>
+                      </div>
+                    )}
+                  </form.Field>
+
+                  <label className="flex items-center gap-2 text-sm">
+                    <input
+                      type="checkbox"
+                      checked={privacyChecked}
+                      onChange={(e) => setPrivacyChecked(e.target.checked)}
+                    />
+                    개인정보 처리방침에 동의합니다
+                  </label>
+
+                  {serverError && (
+                    <p className="text-sm text-destructive">{serverError}</p>
+                  )}
+
+                  <form.Subscribe selector={(s) => s.isSubmitting}>
+                    {(isSubmitting) => (
+                      <Button
+                        type="submit"
+                        variant={
+                          isSubmitting || !privacyChecked
+                            ? 'brand-disabled'
+                            : 'brand'
+                        }
+                        size="brand-lg"
+                        disabled={isSubmitting || !privacyChecked}
+                        className="w-full"
+                      >
+                        {isSubmitting ? '가입 중...' : 'Sign Up'}
+                      </Button>
+                    )}
+                  </form.Subscribe>
+                </form>
+              </>
+            )}
+
+            {step === 'success' && (
+              <div className="flex w-full flex-col items-center gap-4 py-6">
+                <DialogTitle className="text-lg font-semibold">
+                  가입 완료!
+                </DialogTitle>
+                <p className="text-sm text-muted-foreground">
+                  회원가입이 완료되었습니다.
+                </p>
+                <Button
+                  onClick={closeAll}
+                  variant="brand"
+                  size="brand-lg"
+                  className="w-full"
+                >
+                  닫기
+                </Button>
+              </div>
+            )}
+          </div>
+        </div>
       </DialogContent>
     </Dialog>
   );

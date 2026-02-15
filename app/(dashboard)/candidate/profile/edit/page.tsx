@@ -1,20 +1,10 @@
-import Link from 'next/link';
 import { requireUser } from '@/lib/infrastructure/auth-utils';
 import { getMyProfile } from '@/lib/actions/profile';
 import { getJobFamilies } from '@/lib/actions/catalog';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { SectionTitle } from '@/components/ui/section-title';
-import { ProfilePublicForm } from '@/features/profile-edit/ui/profile-public-form';
-import { ContactForm } from '@/features/profile-edit/ui/contact-form';
-import { CareerSection } from '@/features/profile-edit/ui/career-form';
-import { EducationSection } from '@/features/profile-edit/ui/education-form';
-import { LanguageSection } from '@/features/profile-edit/ui/language-form';
-import { UrlSection } from '@/features/profile-edit/ui/url-form';
-import { SkillPicker } from '@/features/profile-edit/ui/skill-picker';
-import { CertificationSection } from '@/features/profile-edit/ui/certification-form';
+import { ProfileEditPageClient } from '@/features/profile-edit/ui/profile-edit-page-client';
 
 export default async function CandidateProfileEditPage() {
-  await requireUser();
+  const user = await requireUser();
   const [profileResult, familiesResult] = await Promise.all([
     getMyProfile(),
     getJobFamilies(),
@@ -79,85 +69,34 @@ export default async function CandidateProfileEditPage() {
   }));
 
   return (
-    <div className="flex flex-col gap-6 p-6">
-      <Link
-        href="/candidate/profile"
-        className="text-sm text-muted-foreground hover:underline"
-      >
-        ← 프로필로 돌아가기
-      </Link>
-
-      <Card>
-        <CardHeader>
-          <SectionTitle title="기본 정보" />
-        </CardHeader>
-        <CardContent>
-          <ProfilePublicForm initialData={profilePublic ?? undefined} />
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <SectionTitle title="연락처" />
-        </CardHeader>
-        <CardContent>
-          <ContactForm initialData={profilePrivate ?? undefined} />
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <SectionTitle title="스킬" />
-        </CardHeader>
-        <CardContent>
-          <SkillPicker currentSkills={profileSkills} />
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <SectionTitle title="경력" />
-        </CardHeader>
-        <CardContent>
-          <CareerSection careers={careers} jobFamilies={jobFamilies} />
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <SectionTitle title="학력" />
-        </CardHeader>
-        <CardContent>
-          <EducationSection educations={educations} />
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <SectionTitle title="자격증" />
-        </CardHeader>
-        <CardContent>
-          <CertificationSection certifications={certifications} />
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <SectionTitle title="언어" />
-        </CardHeader>
-        <CardContent>
-          <LanguageSection languages={languages} />
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <SectionTitle title="링크" />
-        </CardHeader>
-        <CardContent>
-          <UrlSection urls={urls} />
-        </CardContent>
-      </Card>
-    </div>
+    <ProfileEditPageClient
+      profilePublic={
+        profilePublic
+          ? {
+              firstName: profilePublic.firstName,
+              lastName: profilePublic.lastName,
+              aboutMe: profilePublic.aboutMe,
+              dateOfBirth: profilePublic.dateOfBirth
+                ? profilePublic.dateOfBirth.toISOString().split('T')[0]
+                : undefined,
+              location: profilePublic.location,
+              headline: profilePublic.headline,
+              isOpenToWork: profilePublic.isOpenToWork,
+            }
+          : undefined
+      }
+      profilePrivate={profilePrivate ?? undefined}
+      email={user.email}
+      jobFamilies={jobFamilies}
+      skills={profileSkills.map(({ skill }) => ({
+        id: skill.id,
+        displayNameEn: skill.displayNameEn,
+      }))}
+      careers={careers}
+      educations={educations}
+      certifications={certifications}
+      languages={languages}
+      urls={urls}
+    />
   );
 }
