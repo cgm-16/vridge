@@ -62,7 +62,7 @@ describe('LoginModal', () => {
     fireEvent.change(screen.getByLabelText(/password/i), {
       target: { value: 'password123' },
     });
-    fireEvent.click(screen.getByRole('button', { name: /log in/i }));
+    fireEvent.click(screen.getByRole('button', { name: /continue/i }));
 
     await waitFor(() => {
       expect(signIn.email).toHaveBeenCalledWith(

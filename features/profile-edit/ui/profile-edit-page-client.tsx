@@ -1,0 +1,1549 @@
+'use client';
+
+import { useEffect, useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
+import { Chip } from '@/components/ui/chip';
+import { DatePicker } from '@/components/ui/date-picker';
+import { DialcodePicker } from '@/components/ui/dialcode-picker';
+import { FormDropdown } from '@/components/ui/form-dropdown';
+import { FormInput } from '@/components/ui/form-input';
+import { Icon } from '@/components/ui/icon';
+import { SearchBar } from '@/components/ui/search-bar';
+import { SectionTitle } from '@/components/ui/section-title';
+import { ToggleSwitch } from '@/components/ui/toggle-switch';
+import { searchSkills } from '@/lib/actions/catalog';
+import {
+  EDUCATION_TYPE_LABELS,
+  EMPLOYMENT_TYPE_LABELS,
+  EXPERIENCE_LEVEL_LABELS,
+  GRADUATION_STATUS_LABELS,
+  PROFICIENCY_LABELS,
+} from '@/entities/profile/ui/_utils';
+import {
+  useAddCareer,
+  useAddCertification,
+  useAddEducation,
+  useAddLanguage,
+  useAddSkill,
+  useAddUrl,
+  useDeleteCareer,
+  useDeleteCertification,
+  useDeleteEducation,
+  useDeleteLanguage,
+  useDeleteSkill,
+  useDeleteUrl,
+  useUpdateCareer,
+  useUpdateCertification,
+  useUpdateEducation,
+  useUpdateLanguage,
+  useUpdateProfilePrivate,
+  useUpdateProfilePublic,
+  useUpdateUrl,
+} from '@/features/profile-edit/model/use-profile-mutations';
+import { useUnsavedChangesGuard } from '@/features/profile-edit/model/use-unsaved-changes-guard';
+
+type JobFamily = {
+  id: string;
+  displayNameEn: string;
+  jobs: { id: string; displayNameEn: string }[];
+};
+
+type SkillItem = { id: string; displayNameEn: string };
+type SearchResult = { id: string; displayNameEn: string };
+
+type DraftPublic = {
+  firstName: string;
+  lastName: string;
+  aboutMe: string;
+  dateOfBirth?: string;
+  location: string;
+  headline: string;
+  isOpenToWork: boolean;
+};
+
+type DraftContact = {
+  dialCode: string;
+  phoneNumber: string;
+  email: string;
+};
+
+type DraftCareer = {
+  id: string;
+  companyName: string;
+  positionTitle: string;
+  jobId: string;
+  employmentType: string;
+  startDate: string;
+  endDate?: string;
+  description?: string;
+  experienceLevel?: string;
+};
+
+type DraftEducation = {
+  id: string;
+  institutionName: string;
+  educationType: string;
+  field?: string;
+  graduationStatus: string;
+  startDate: string;
+  endDate?: string;
+};
+
+type DraftCertification = {
+  id: string;
+  name: string;
+  date: string;
+  description?: string;
+  institutionName?: string;
+};
+
+type DraftLanguage = {
+  id: string;
+  language: string;
+  proficiency: string;
+  testName?: string;
+  testScore?: string;
+};
+
+type DraftUrl = {
+  id: string;
+  label: string;
+  url: string;
+};
+
+type ProfileEditDraft = {
+  public: DraftPublic;
+  contact: DraftContact;
+  skills: SkillItem[];
+  careers: DraftCareer[];
+  educations: DraftEducation[];
+  certifications: DraftCertification[];
+  languages: DraftLanguage[];
+  urls: DraftUrl[];
+};
+
+type ProfileEditPageClientProps = {
+  profilePublic?: {
+    firstName: string;
+    lastName: string;
+    aboutMe?: string | null;
+    dateOfBirth?: string | null;
+    location?: string | null;
+    headline?: string | null;
+    isOpenToWork?: boolean | null;
+  } | null;
+  profilePrivate?: { phoneNumber?: string | null } | null;
+  email: string;
+  jobFamilies: JobFamily[];
+  skills: SkillItem[];
+  careers: DraftCareer[];
+  educations: DraftEducation[];
+  certifications: DraftCertification[];
+  languages: DraftLanguage[];
+  urls: DraftUrl[];
+};
+
+const EMPTY_CAREER: Omit<DraftCareer, 'id'> = {
+  companyName: '',
+  positionTitle: '',
+  jobId: '',
+  employmentType: '',
+  startDate: '',
+  endDate: undefined,
+  description: undefined,
+  experienceLevel: undefined,
+};
+
+const EMPTY_EDUCATION: Omit<DraftEducation, 'id'> = {
+  institutionName: '',
+  educationType: '',
+  field: undefined,
+  graduationStatus: 'ENROLLED',
+  startDate: '',
+  endDate: undefined,
+};
+
+const EMPTY_CERTIFICATION: Omit<DraftCertification, 'id'> = {
+  name: '',
+  date: '',
+  description: undefined,
+  institutionName: undefined,
+};
+
+const EMPTY_LANGUAGE: Omit<DraftLanguage, 'id'> = {
+  language: '',
+  proficiency: 'native',
+  testName: undefined,
+  testScore: undefined,
+};
+
+const EMPTY_URL: Omit<DraftUrl, 'id'> = {
+  label: '',
+  url: '',
+};
+
+function createTempId(prefix: string) {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function')
+    return `tmp-${prefix}-${crypto.randomUUID()}`;
+  return `tmp-${prefix}-${Math.random().toString(36).slice(2)}`;
+}
+
+function splitPhoneNumber(value?: string | null) {
+  if (!value) return { dialCode: '+84', phoneNumber: '' };
+  const trimmed = value.trim();
+  const match = trimmed.match(/^(\+\d{1,3})\s*(.*)$/);
+  if (!match) return { dialCode: '+84', phoneNumber: trimmed };
+  return {
+    dialCode: match[1],
+    phoneNumber: match[2],
+  };
+}
+
+function joinPhoneNumber(contact: DraftContact) {
+  const phone = contact.phoneNumber.trim();
+  if (!phone) return undefined;
+  return `${contact.dialCode} ${phone}`.trim();
+}
+
+function toDateString(date: Date) {
+  return date.toISOString().split('T')[0];
+}
+
+function fromDateString(value?: string) {
+  if (!value) return undefined;
+  return new Date(`${value}T00:00:00.000Z`);
+}
+
+function normalizeText(value?: string) {
+  const normalized = value?.trim();
+  return normalized ? normalized : undefined;
+}
+
+function cloneDraft(draft: ProfileEditDraft): ProfileEditDraft {
+  return JSON.parse(JSON.stringify(draft)) as ProfileEditDraft;
+}
+
+function toComparableDraft(draft: ProfileEditDraft) {
+  return {
+    public: {
+      firstName: draft.public.firstName.trim(),
+      lastName: draft.public.lastName.trim(),
+      aboutMe: normalizeText(draft.public.aboutMe),
+      dateOfBirth: draft.public.dateOfBirth || undefined,
+      location: normalizeText(draft.public.location),
+      headline: normalizeText(draft.public.headline),
+      isOpenToWork: Boolean(draft.public.isOpenToWork),
+    },
+    contact: {
+      phoneNumber: joinPhoneNumber(draft.contact),
+    },
+    skills: draft.skills.map((skill) => skill.id).sort(),
+    careers: draft.careers.map((career, index) => ({
+      id: career.id,
+      companyName: career.companyName.trim(),
+      positionTitle: career.positionTitle.trim(),
+      jobId: career.jobId,
+      employmentType: career.employmentType,
+      startDate: career.startDate,
+      endDate: career.endDate || undefined,
+      description: normalizeText(career.description),
+      experienceLevel: career.experienceLevel || undefined,
+      sortOrder: index,
+    })),
+    educations: draft.educations.map((education, index) => ({
+      id: education.id,
+      institutionName: education.institutionName.trim(),
+      educationType: education.educationType,
+      field: normalizeText(education.field),
+      graduationStatus: education.graduationStatus,
+      startDate: education.startDate,
+      endDate: education.endDate || undefined,
+      sortOrder: index,
+    })),
+    certifications: draft.certifications.map((certification, index) => ({
+      id: certification.id,
+      name: certification.name.trim(),
+      date: certification.date,
+      description: normalizeText(certification.description),
+      institutionName: normalizeText(certification.institutionName),
+      sortOrder: index,
+    })),
+    languages: draft.languages.map((language, index) => ({
+      id: language.id,
+      language: language.language.trim(),
+      proficiency: language.proficiency,
+      testName: normalizeText(language.testName),
+      testScore: normalizeText(language.testScore),
+      sortOrder: index,
+    })),
+    urls: draft.urls.map((url, index) => ({
+      id: url.id,
+      label: url.label.trim(),
+      url: url.url.trim(),
+      sortOrder: index,
+    })),
+  };
+}
+
+function buildInitialDraft(
+  props: ProfileEditPageClientProps
+): ProfileEditDraft {
+  const phone = splitPhoneNumber(props.profilePrivate?.phoneNumber);
+
+  return {
+    public: {
+      firstName: props.profilePublic?.firstName ?? '',
+      lastName: props.profilePublic?.lastName ?? '',
+      aboutMe: props.profilePublic?.aboutMe ?? '',
+      dateOfBirth: props.profilePublic?.dateOfBirth ?? undefined,
+      location: props.profilePublic?.location ?? '',
+      headline: props.profilePublic?.headline ?? '',
+      isOpenToWork: Boolean(props.profilePublic?.isOpenToWork),
+    },
+    contact: {
+      dialCode: phone.dialCode,
+      phoneNumber: phone.phoneNumber,
+      email: props.email,
+    },
+    skills: props.skills,
+    careers: props.careers,
+    educations: props.educations,
+    certifications: props.certifications,
+    languages: props.languages,
+    urls: props.urls,
+  };
+}
+
+type SyncCollectionOptions<T extends { id: string }, P> = {
+  baseline: T[];
+  draft: T[];
+  toPayload: (item: T, sortOrder: number) => P;
+  addItem: (payload: P) => Promise<unknown>;
+  updateItem: (id: string, payload: P) => Promise<unknown>;
+  deleteItem: (id: string) => Promise<unknown>;
+};
+
+async function syncCollection<T extends { id: string }, P>({
+  baseline,
+  draft,
+  toPayload,
+  addItem,
+  updateItem,
+  deleteItem,
+}: SyncCollectionOptions<T, P>) {
+  const baselineMap = new Map(
+    baseline.map((item, index) => [item.id, { item, index }])
+  );
+  const draftMap = new Map(
+    draft
+      .filter((item) => !item.id.startsWith('tmp-'))
+      .map((item, index) => [item.id, { item, index }])
+  );
+
+  for (const [id] of baselineMap) {
+    if (!draftMap.has(id)) {
+      await deleteItem(id);
+    }
+  }
+
+  for (const [index, draftItem] of draft.entries()) {
+    const payload = toPayload(draftItem, index);
+    const baselineEntry = baselineMap.get(draftItem.id);
+
+    if (!baselineEntry || draftItem.id.startsWith('tmp-')) {
+      await addItem(payload);
+      continue;
+    }
+
+    const baselinePayload = toPayload(baselineEntry.item, baselineEntry.index);
+    if (JSON.stringify(payload) !== JSON.stringify(baselinePayload)) {
+      await updateItem(draftItem.id, payload);
+    }
+  }
+}
+
+export function ProfileEditPageClient(props: ProfileEditPageClientProps) {
+  const router = useRouter();
+
+  const initialDraft = useMemo(() => buildInitialDraft(props), [props]);
+  const [baseline, setBaseline] = useState<ProfileEditDraft>(
+    cloneDraft(initialDraft)
+  );
+  const [draft, setDraft] = useState<ProfileEditDraft>(
+    cloneDraft(initialDraft)
+  );
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+
+  const updatePublic = useUpdateProfilePublic();
+  const updatePrivate = useUpdateProfilePrivate();
+  const addCareer = useAddCareer();
+  const updateCareer = useUpdateCareer();
+  const deleteCareer = useDeleteCareer();
+  const addEducation = useAddEducation();
+  const updateEducation = useUpdateEducation();
+  const deleteEducation = useDeleteEducation();
+  const addLanguage = useAddLanguage();
+  const updateLanguage = useUpdateLanguage();
+  const deleteLanguage = useDeleteLanguage();
+  const addUrl = useAddUrl();
+  const updateUrl = useUpdateUrl();
+  const deleteUrl = useDeleteUrl();
+  const addSkill = useAddSkill();
+  const deleteSkill = useDeleteSkill();
+  const addCertification = useAddCertification();
+  const updateCertification = useUpdateCertification();
+  const deleteCertification = useDeleteCertification();
+
+  useEffect(() => {
+    setBaseline(cloneDraft(initialDraft));
+    setDraft(cloneDraft(initialDraft));
+  }, [initialDraft]);
+
+  useEffect(() => {
+    const timer = setTimeout(async () => {
+      if (!searchQuery.trim()) {
+        setSearchResults([]);
+        return;
+      }
+      const response = await searchSkills(searchQuery);
+      if (!('error' in response)) {
+        setSearchResults(response.data);
+      }
+    }, 250);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  const comparableBaseline = useMemo(
+    () => toComparableDraft(baseline),
+    [baseline]
+  );
+  const comparableDraft = useMemo(() => toComparableDraft(draft), [draft]);
+  const isDirty =
+    JSON.stringify(comparableBaseline) !== JSON.stringify(comparableDraft);
+
+  useUnsavedChangesGuard(isDirty);
+
+  const selectedSkillIds = useMemo(
+    () => new Set(draft.skills.map((skill) => skill.id)),
+    [draft.skills]
+  );
+  const visibleSearchResults = searchResults.filter(
+    (skill) => !selectedSkillIds.has(skill.id)
+  );
+
+  function updateDraftPublic<K extends keyof DraftPublic>(
+    key: K,
+    value: DraftPublic[K]
+  ) {
+    setDraft((prev) => ({
+      ...prev,
+      public: {
+        ...prev.public,
+        [key]: value,
+      },
+    }));
+  }
+
+  function updateDraftContact<K extends keyof DraftContact>(
+    key: K,
+    value: DraftContact[K]
+  ) {
+    setDraft((prev) => ({
+      ...prev,
+      contact: {
+        ...prev.contact,
+        [key]: value,
+      },
+    }));
+  }
+
+  async function handleSave() {
+    if (!isDirty || isSaving) return;
+    setSaveError(null);
+    setIsSaving(true);
+
+    try {
+      if (
+        JSON.stringify(comparableDraft.public) !==
+        JSON.stringify(comparableBaseline.public)
+      ) {
+        await updatePublic.mutateAsync({
+          firstName: draft.public.firstName.trim(),
+          lastName: draft.public.lastName.trim(),
+          aboutMe: normalizeText(draft.public.aboutMe),
+          dateOfBirth: draft.public.dateOfBirth || undefined,
+          location: normalizeText(draft.public.location),
+          headline: normalizeText(draft.public.headline),
+          isOpenToWork: Boolean(draft.public.isOpenToWork),
+        });
+      }
+
+      if (
+        JSON.stringify(comparableDraft.contact) !==
+        JSON.stringify(comparableBaseline.contact)
+      ) {
+        await updatePrivate.mutateAsync({
+          phoneNumber: joinPhoneNumber(draft.contact),
+        });
+      }
+
+      const baselineSkillIds = new Set(
+        baseline.skills.map((skill) => skill.id)
+      );
+      const draftSkillIds = new Set(draft.skills.map((skill) => skill.id));
+
+      for (const skillId of baselineSkillIds) {
+        if (!draftSkillIds.has(skillId)) {
+          await deleteSkill.mutateAsync(skillId);
+        }
+      }
+
+      for (const skillId of draftSkillIds) {
+        if (!baselineSkillIds.has(skillId)) {
+          await addSkill.mutateAsync(skillId);
+        }
+      }
+
+      await syncCollection({
+        baseline: baseline.careers,
+        draft: draft.careers,
+        toPayload: (career, sortOrder) => ({
+          companyName: career.companyName.trim(),
+          positionTitle: career.positionTitle.trim(),
+          jobId: career.jobId,
+          employmentType: career.employmentType,
+          startDate: career.startDate,
+          endDate: career.endDate || undefined,
+          description: normalizeText(career.description),
+          experienceLevel: career.experienceLevel || undefined,
+          sortOrder,
+        }),
+        addItem: (payload) => addCareer.mutateAsync(payload),
+        updateItem: (id, payload) =>
+          updateCareer.mutateAsync({ id, data: payload }),
+        deleteItem: (id) => deleteCareer.mutateAsync(id),
+      });
+
+      await syncCollection({
+        baseline: baseline.educations,
+        draft: draft.educations,
+        toPayload: (education, sortOrder) => ({
+          institutionName: education.institutionName.trim(),
+          educationType: education.educationType,
+          field: normalizeText(education.field),
+          graduationStatus: education.graduationStatus,
+          startDate: education.startDate,
+          endDate: education.endDate || undefined,
+          sortOrder,
+        }),
+        addItem: (payload) => addEducation.mutateAsync(payload),
+        updateItem: (id, payload) =>
+          updateEducation.mutateAsync({ id, data: payload }),
+        deleteItem: (id) => deleteEducation.mutateAsync(id),
+      });
+
+      await syncCollection({
+        baseline: baseline.certifications,
+        draft: draft.certifications,
+        toPayload: (certification, sortOrder) => ({
+          name: certification.name.trim(),
+          date: certification.date,
+          description: normalizeText(certification.description),
+          institutionName: normalizeText(certification.institutionName),
+          sortOrder,
+        }),
+        addItem: (payload) => addCertification.mutateAsync(payload),
+        updateItem: (id, payload) =>
+          updateCertification.mutateAsync({ id, data: payload }),
+        deleteItem: (id) => deleteCertification.mutateAsync(id),
+      });
+
+      await syncCollection({
+        baseline: baseline.languages,
+        draft: draft.languages,
+        toPayload: (language, sortOrder) => ({
+          language: language.language.trim(),
+          proficiency: language.proficiency,
+          testName: normalizeText(language.testName),
+          testScore: normalizeText(language.testScore),
+          sortOrder,
+        }),
+        addItem: (payload) => addLanguage.mutateAsync(payload),
+        updateItem: (id, payload) =>
+          updateLanguage.mutateAsync({ id, data: payload }),
+        deleteItem: (id) => deleteLanguage.mutateAsync(id),
+      });
+
+      await syncCollection({
+        baseline: baseline.urls,
+        draft: draft.urls,
+        toPayload: (url, sortOrder) => ({
+          label: url.label.trim(),
+          url: url.url.trim(),
+          sortOrder,
+        }),
+        addItem: (payload) => addUrl.mutateAsync(payload),
+        updateItem: (id, payload) =>
+          updateUrl.mutateAsync({ id, data: payload }),
+        deleteItem: (id) => deleteUrl.mutateAsync(id),
+      });
+
+      const nextBaseline = cloneDraft(draft);
+      setBaseline(nextBaseline);
+      setDraft(cloneDraft(nextBaseline));
+      router.refresh();
+    } catch (error) {
+      setSaveError(
+        error instanceof Error
+          ? error.message
+          : '프로필 저장 중 오류가 발생했습니다.'
+      );
+    } finally {
+      setIsSaving(false);
+    }
+  }
+
+  return (
+    <>
+      <div className="mx-auto flex w-full max-w-[1200px] flex-col gap-10 px-6 py-10 pb-32">
+        <section className="w-full rounded-[20px] bg-white px-10 py-5">
+          <SectionTitle title="Basic Profile" />
+
+          <div className="mt-6 flex flex-col gap-6 lg:flex-row lg:items-start">
+            <div className="flex flex-col items-center gap-4">
+              <div className="flex h-48 w-48 items-center justify-center rounded-full bg-[#ffefe5]">
+                <Icon name="profile" size={96} alt="profile placeholder" />
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium text-[#1a1a1a]">
+                  Hiring Status
+                </span>
+                <ToggleSwitch
+                  checked={Boolean(draft.public.isOpenToWork)}
+                  onChange={(checked) =>
+                    updateDraftPublic('isOpenToWork', checked)
+                  }
+                />
+              </div>
+            </div>
+
+            <div className="flex flex-1 flex-col gap-5">
+              <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+                <FormInput
+                  required
+                  placeholder="First Name"
+                  value={draft.public.firstName}
+                  onChange={(event) =>
+                    updateDraftPublic('firstName', event.target.value)
+                  }
+                  filled={draft.public.firstName.length > 0}
+                />
+                <FormInput
+                  required
+                  placeholder="Last Name"
+                  value={draft.public.lastName}
+                  onChange={(event) =>
+                    updateDraftPublic('lastName', event.target.value)
+                  }
+                  filled={draft.public.lastName.length > 0}
+                />
+              </div>
+
+              <div className="flex items-center gap-3">
+                <span className="text-sm font-medium text-[#1a1a1a]">
+                  Date of Birth
+                </span>
+                <DatePicker
+                  type="full"
+                  value={fromDateString(draft.public.dateOfBirth)}
+                  onChange={(date) =>
+                    updateDraftPublic('dateOfBirth', toDateString(date))
+                  }
+                />
+                {draft.public.dateOfBirth && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => updateDraftPublic('dateOfBirth', undefined)}
+                  >
+                    Clear
+                  </Button>
+                )}
+              </div>
+
+              <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+                <div className="flex items-center gap-2 rounded-[10px] bg-[#fbfbfb] px-3 py-2">
+                  <Icon name="mobile" size={20} />
+                  <DialcodePicker
+                    value={draft.contact.dialCode}
+                    onChange={(code) => updateDraftContact('dialCode', code)}
+                  />
+                  <FormInput
+                    className="h-11 bg-transparent"
+                    required
+                    placeholder="Phone Number"
+                    value={draft.contact.phoneNumber}
+                    onChange={(event) =>
+                      updateDraftContact('phoneNumber', event.target.value)
+                    }
+                    filled={draft.contact.phoneNumber.length > 0}
+                  />
+                </div>
+
+                <div className="flex items-center gap-2 rounded-[10px] bg-[#fbfbfb] px-3 py-2">
+                  <Icon name="mail" size={20} />
+                  <FormInput
+                    className="h-11 bg-transparent"
+                    placeholder="E-Mail"
+                    value={draft.contact.email}
+                    filled
+                    disabled
+                    readOnly
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 rounded-[10px] bg-[#fbfbfb] px-3 py-2">
+                <Icon name="location" size={20} />
+                <FormInput
+                  required
+                  className="h-11 bg-transparent"
+                  placeholder="Location (Country/Region City,State)"
+                  value={draft.public.location}
+                  onChange={(event) =>
+                    updateDraftPublic('location', event.target.value)
+                  }
+                  filled={draft.public.location.length > 0}
+                />
+              </div>
+
+              <FormInput
+                required
+                size="lg"
+                placeholder="Headline"
+                value={draft.public.headline}
+                onChange={(event) =>
+                  updateDraftPublic('headline', event.target.value)
+                }
+                filled={draft.public.headline.length > 0}
+              />
+
+              <FormInput
+                size="lg"
+                placeholder="About Me"
+                value={draft.public.aboutMe}
+                onChange={(event) =>
+                  updateDraftPublic('aboutMe', event.target.value)
+                }
+                filled={draft.public.aboutMe.length > 0}
+              />
+            </div>
+          </div>
+        </section>
+
+        <section className="w-full rounded-[20px] bg-white px-10 py-5">
+          <SectionTitle
+            title="Education"
+            onAdd={() =>
+              setDraft((prev) => ({
+                ...prev,
+                educations: [
+                  ...prev.educations,
+                  { id: createTempId('education'), ...EMPTY_EDUCATION },
+                ],
+              }))
+            }
+          />
+
+          <div className="mt-6 flex flex-col gap-6">
+            {draft.educations.map((education) => (
+              <div key={education.id} className="rounded-[10px] border p-4">
+                <div className="mb-3 flex justify-end">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() =>
+                      setDraft((prev) => ({
+                        ...prev,
+                        educations: prev.educations.filter(
+                          (item) => item.id !== education.id
+                        ),
+                      }))
+                    }
+                  >
+                    삭제
+                  </Button>
+                </div>
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <FormInput
+                    required
+                    placeholder="School Name"
+                    value={education.institutionName}
+                    onChange={(event) =>
+                      setDraft((prev) => ({
+                        ...prev,
+                        educations: prev.educations.map((item) =>
+                          item.id === education.id
+                            ? { ...item, institutionName: event.target.value }
+                            : item
+                        ),
+                      }))
+                    }
+                    filled={education.institutionName.length > 0}
+                  />
+                  <FormDropdown
+                    value={education.educationType}
+                    placeholder="Level of Education"
+                    options={Object.entries(EDUCATION_TYPE_LABELS).map(
+                      ([value, label]) => ({ value, label })
+                    )}
+                    onChange={(value) =>
+                      setDraft((prev) => ({
+                        ...prev,
+                        educations: prev.educations.map((item) =>
+                          item.id === education.id
+                            ? { ...item, educationType: value }
+                            : item
+                        ),
+                      }))
+                    }
+                  />
+                </div>
+
+                <div className="mt-4">
+                  <FormInput
+                    placeholder="Field of Study"
+                    value={education.field ?? ''}
+                    onChange={(event) =>
+                      setDraft((prev) => ({
+                        ...prev,
+                        educations: prev.educations.map((item) =>
+                          item.id === education.id
+                            ? {
+                                ...item,
+                                field: event.target.value || undefined,
+                              }
+                            : item
+                        ),
+                      }))
+                    }
+                    filled={Boolean(education.field)}
+                  />
+                </div>
+
+                <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-[1fr_1fr_1fr]">
+                  <div className="flex items-center gap-2">
+                    <DatePicker
+                      type="month"
+                      value={fromDateString(education.startDate)}
+                      onChange={(date) =>
+                        setDraft((prev) => ({
+                          ...prev,
+                          educations: prev.educations.map((item) =>
+                            item.id === education.id
+                              ? { ...item, startDate: toDateString(date) }
+                              : item
+                          ),
+                        }))
+                      }
+                    />
+                    {education.startDate && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() =>
+                          setDraft((prev) => ({
+                            ...prev,
+                            educations: prev.educations.map((item) =>
+                              item.id === education.id
+                                ? { ...item, startDate: '' }
+                                : item
+                            ),
+                          }))
+                        }
+                      >
+                        Clear
+                      </Button>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <DatePicker
+                      type="month"
+                      value={fromDateString(education.endDate)}
+                      onChange={(date) =>
+                        setDraft((prev) => ({
+                          ...prev,
+                          educations: prev.educations.map((item) =>
+                            item.id === education.id
+                              ? { ...item, endDate: toDateString(date) }
+                              : item
+                          ),
+                        }))
+                      }
+                    />
+                    {education.endDate && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() =>
+                          setDraft((prev) => ({
+                            ...prev,
+                            educations: prev.educations.map((item) =>
+                              item.id === education.id
+                                ? { ...item, endDate: undefined }
+                                : item
+                            ),
+                          }))
+                        }
+                      >
+                        Clear
+                      </Button>
+                    )}
+                  </div>
+                  <FormDropdown
+                    value={education.graduationStatus}
+                    placeholder="Graduation Status"
+                    options={Object.entries(GRADUATION_STATUS_LABELS).map(
+                      ([value, label]) => ({ value, label })
+                    )}
+                    onChange={(value) =>
+                      setDraft((prev) => ({
+                        ...prev,
+                        educations: prev.educations.map((item) =>
+                          item.id === education.id
+                            ? { ...item, graduationStatus: value }
+                            : item
+                        ),
+                      }))
+                    }
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="w-full rounded-[20px] bg-white px-10 py-5">
+          <SectionTitle title="Skills" />
+          <div className="mt-6 flex flex-col gap-4">
+            <SearchBar
+              variant="skills"
+              value={searchQuery}
+              onChange={setSearchQuery}
+              placeholder="Skills"
+            />
+            {visibleSearchResults.length > 0 && (
+              <ul className="rounded-[10px] border">
+                {visibleSearchResults.map((skill) => (
+                  <li
+                    key={skill.id}
+                    className="flex items-center justify-between px-4 py-2 text-sm"
+                  >
+                    <span>{skill.displayNameEn}</span>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() =>
+                        setDraft((prev) => ({
+                          ...prev,
+                          skills: [...prev.skills, skill],
+                        }))
+                      }
+                    >
+                      추가
+                    </Button>
+                  </li>
+                ))}
+              </ul>
+            )}
+            <div className="flex flex-wrap gap-2">
+              {draft.skills.map((skill) => (
+                <Chip
+                  key={skill.id}
+                  label={skill.displayNameEn}
+                  variant="searched"
+                  size="md"
+                  onRemove={() =>
+                    setDraft((prev) => ({
+                      ...prev,
+                      skills: prev.skills.filter(
+                        (item) => item.id !== skill.id
+                      ),
+                    }))
+                  }
+                />
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="w-full rounded-[20px] bg-white px-10 py-5">
+          <SectionTitle
+            title="Experience"
+            onAdd={() =>
+              setDraft((prev) => ({
+                ...prev,
+                careers: [
+                  ...prev.careers,
+                  { id: createTempId('career'), ...EMPTY_CAREER },
+                ],
+              }))
+            }
+          />
+          <div className="mt-6 flex flex-col gap-6">
+            {draft.careers.map((career) => (
+              <div key={career.id} className="rounded-[10px] border p-4">
+                <div className="mb-3 flex justify-end">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() =>
+                      setDraft((prev) => ({
+                        ...prev,
+                        careers: prev.careers.filter(
+                          (item) => item.id !== career.id
+                        ),
+                      }))
+                    }
+                  >
+                    삭제
+                  </Button>
+                </div>
+
+                <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1fr_auto]">
+                  <FormInput
+                    placeholder="Company Name"
+                    value={career.companyName}
+                    onChange={(event) =>
+                      setDraft((prev) => ({
+                        ...prev,
+                        careers: prev.careers.map((item) =>
+                          item.id === career.id
+                            ? { ...item, companyName: event.target.value }
+                            : item
+                        ),
+                      }))
+                    }
+                    filled={career.companyName.length > 0}
+                  />
+                  <div className="flex items-center gap-2">
+                    <DatePicker
+                      type="month"
+                      value={fromDateString(career.startDate)}
+                      onChange={(date) =>
+                        setDraft((prev) => ({
+                          ...prev,
+                          careers: prev.careers.map((item) =>
+                            item.id === career.id
+                              ? { ...item, startDate: toDateString(date) }
+                              : item
+                          ),
+                        }))
+                      }
+                    />
+                    <DatePicker
+                      type="month"
+                      value={fromDateString(career.endDate)}
+                      onChange={(date) =>
+                        setDraft((prev) => ({
+                          ...prev,
+                          careers: prev.careers.map((item) =>
+                            item.id === career.id
+                              ? { ...item, endDate: toDateString(date) }
+                              : item
+                          ),
+                        }))
+                      }
+                    />
+                  </div>
+                </div>
+
+                <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-3">
+                  <FormInput
+                    placeholder="Job Role"
+                    value={career.positionTitle}
+                    onChange={(event) =>
+                      setDraft((prev) => ({
+                        ...prev,
+                        careers: prev.careers.map((item) =>
+                          item.id === career.id
+                            ? { ...item, positionTitle: event.target.value }
+                            : item
+                        ),
+                      }))
+                    }
+                    filled={career.positionTitle.length > 0}
+                  />
+
+                  <Select
+                    value={career.jobId}
+                    onValueChange={(value) =>
+                      setDraft((prev) => ({
+                        ...prev,
+                        careers: prev.careers.map((item) =>
+                          item.id === career.id
+                            ? { ...item, jobId: value }
+                            : item
+                        ),
+                      }))
+                    }
+                  >
+                    <SelectTrigger className="h-[52px] rounded-[10px] bg-[#fbfbfb]">
+                      <SelectValue placeholder="Field" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {props.jobFamilies.map((family) => (
+                        <SelectGroup key={family.id}>
+                          <SelectLabel>{family.displayNameEn}</SelectLabel>
+                          {family.jobs.map((job) => (
+                            <SelectItem key={job.id} value={job.id}>
+                              {job.displayNameEn}
+                            </SelectItem>
+                          ))}
+                        </SelectGroup>
+                      ))}
+                    </SelectContent>
+                  </Select>
+
+                  <FormDropdown
+                    value={career.experienceLevel}
+                    placeholder="Experience level"
+                    options={Object.entries(EXPERIENCE_LEVEL_LABELS).map(
+                      ([value, label]) => ({ value, label })
+                    )}
+                    onChange={(value) =>
+                      setDraft((prev) => ({
+                        ...prev,
+                        careers: prev.careers.map((item) =>
+                          item.id === career.id
+                            ? { ...item, experienceLevel: value }
+                            : item
+                        ),
+                      }))
+                    }
+                  />
+                </div>
+
+                <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
+                  <FormDropdown
+                    value={career.employmentType}
+                    placeholder="Employment Type"
+                    options={Object.entries(EMPLOYMENT_TYPE_LABELS).map(
+                      ([value, label]) => ({ value, label })
+                    )}
+                    onChange={(value) =>
+                      setDraft((prev) => ({
+                        ...prev,
+                        careers: prev.careers.map((item) =>
+                          item.id === career.id
+                            ? { ...item, employmentType: value }
+                            : item
+                        ),
+                      }))
+                    }
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() =>
+                      setDraft((prev) => ({
+                        ...prev,
+                        careers: prev.careers.map((item) =>
+                          item.id === career.id
+                            ? { ...item, endDate: undefined }
+                            : item
+                        ),
+                      }))
+                    }
+                  >
+                    종료일 비우기
+                  </Button>
+                </div>
+
+                <div className="mt-4">
+                  <FormInput
+                    size="lg"
+                    placeholder="Description"
+                    value={career.description ?? ''}
+                    onChange={(event) =>
+                      setDraft((prev) => ({
+                        ...prev,
+                        careers: prev.careers.map((item) =>
+                          item.id === career.id
+                            ? {
+                                ...item,
+                                description: event.target.value || undefined,
+                              }
+                            : item
+                        ),
+                      }))
+                    }
+                    filled={Boolean(career.description)}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="w-full rounded-[20px] bg-white px-10 py-5">
+          <SectionTitle
+            title="Certification"
+            onAdd={() =>
+              setDraft((prev) => ({
+                ...prev,
+                certifications: [
+                  ...prev.certifications,
+                  { id: createTempId('certification'), ...EMPTY_CERTIFICATION },
+                ],
+              }))
+            }
+          />
+          <div className="mt-6 flex flex-col gap-6">
+            {draft.certifications.map((certification) => (
+              <div key={certification.id} className="rounded-[10px] border p-4">
+                <div className="mb-3 flex justify-end">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() =>
+                      setDraft((prev) => ({
+                        ...prev,
+                        certifications: prev.certifications.filter(
+                          (item) => item.id !== certification.id
+                        ),
+                      }))
+                    }
+                  >
+                    삭제
+                  </Button>
+                </div>
+
+                <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1fr_auto]">
+                  <FormInput
+                    placeholder="Certification/License"
+                    value={certification.name}
+                    onChange={(event) =>
+                      setDraft((prev) => ({
+                        ...prev,
+                        certifications: prev.certifications.map((item) =>
+                          item.id === certification.id
+                            ? { ...item, name: event.target.value }
+                            : item
+                        ),
+                      }))
+                    }
+                    filled={certification.name.length > 0}
+                  />
+                  <DatePicker
+                    type="month"
+                    value={fromDateString(certification.date)}
+                    onChange={(date) =>
+                      setDraft((prev) => ({
+                        ...prev,
+                        certifications: prev.certifications.map((item) =>
+                          item.id === certification.id
+                            ? { ...item, date: toDateString(date) }
+                            : item
+                        ),
+                      }))
+                    }
+                  />
+                </div>
+
+                <div className="mt-4">
+                  <FormInput
+                    placeholder="Institution (optional)"
+                    value={certification.institutionName ?? ''}
+                    onChange={(event) =>
+                      setDraft((prev) => ({
+                        ...prev,
+                        certifications: prev.certifications.map((item) =>
+                          item.id === certification.id
+                            ? {
+                                ...item,
+                                institutionName:
+                                  event.target.value || undefined,
+                              }
+                            : item
+                        ),
+                      }))
+                    }
+                    filled={Boolean(certification.institutionName)}
+                  />
+                </div>
+
+                <div className="mt-4">
+                  <FormInput
+                    size="lg"
+                    placeholder="Description"
+                    value={certification.description ?? ''}
+                    onChange={(event) =>
+                      setDraft((prev) => ({
+                        ...prev,
+                        certifications: prev.certifications.map((item) =>
+                          item.id === certification.id
+                            ? {
+                                ...item,
+                                description: event.target.value || undefined,
+                              }
+                            : item
+                        ),
+                      }))
+                    }
+                    filled={Boolean(certification.description)}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="w-full rounded-[20px] bg-white px-10 py-5">
+          <SectionTitle
+            title="Languages"
+            onAdd={() =>
+              setDraft((prev) => ({
+                ...prev,
+                languages: [
+                  ...prev.languages,
+                  { id: createTempId('language'), ...EMPTY_LANGUAGE },
+                ],
+              }))
+            }
+          />
+          <div className="mt-6 flex flex-col gap-6">
+            {draft.languages.map((language) => (
+              <div key={language.id} className="rounded-[10px] border p-4">
+                <div className="mb-3 flex justify-end">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() =>
+                      setDraft((prev) => ({
+                        ...prev,
+                        languages: prev.languages.filter(
+                          (item) => item.id !== language.id
+                        ),
+                      }))
+                    }
+                  >
+                    삭제
+                  </Button>
+                </div>
+
+                <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+                  <FormInput
+                    placeholder="Language"
+                    value={language.language}
+                    onChange={(event) =>
+                      setDraft((prev) => ({
+                        ...prev,
+                        languages: prev.languages.map((item) =>
+                          item.id === language.id
+                            ? { ...item, language: event.target.value }
+                            : item
+                        ),
+                      }))
+                    }
+                    filled={language.language.length > 0}
+                  />
+                  <FormDropdown
+                    value={language.proficiency}
+                    placeholder="Proficiency level"
+                    options={Object.entries(PROFICIENCY_LABELS).map(
+                      ([value, label]) => ({ value, label })
+                    )}
+                    onChange={(value) =>
+                      setDraft((prev) => ({
+                        ...prev,
+                        languages: prev.languages.map((item) =>
+                          item.id === language.id
+                            ? { ...item, proficiency: value }
+                            : item
+                        ),
+                      }))
+                    }
+                  />
+                </div>
+
+                <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
+                  <FormInput
+                    placeholder="Test name (optional)"
+                    value={language.testName ?? ''}
+                    onChange={(event) =>
+                      setDraft((prev) => ({
+                        ...prev,
+                        languages: prev.languages.map((item) =>
+                          item.id === language.id
+                            ? {
+                                ...item,
+                                testName: event.target.value || undefined,
+                              }
+                            : item
+                        ),
+                      }))
+                    }
+                    filled={Boolean(language.testName)}
+                  />
+                  <FormInput
+                    placeholder="Score (optional)"
+                    value={language.testScore ?? ''}
+                    onChange={(event) =>
+                      setDraft((prev) => ({
+                        ...prev,
+                        languages: prev.languages.map((item) =>
+                          item.id === language.id
+                            ? {
+                                ...item,
+                                testScore: event.target.value || undefined,
+                              }
+                            : item
+                        ),
+                      }))
+                    }
+                    filled={Boolean(language.testScore)}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="w-full rounded-[20px] bg-white px-10 py-5">
+          <SectionTitle title="Portfolio" onAdd={() => {}} />
+          <div className="mt-6 flex flex-col gap-4">
+            <Button
+              type="button"
+              variant="outline"
+              className="h-12 justify-start"
+              disabled
+            >
+              <Icon name="profile" size={20} />
+              File Upload (Coming Soon)
+            </Button>
+            <p className="text-sm text-muted-foreground">
+              파일 업로드 기능은 추후 작업에서 연결됩니다.
+            </p>
+          </div>
+        </section>
+
+        <section className="w-full rounded-[20px] bg-white px-10 py-5">
+          <SectionTitle
+            title="URL"
+            onAdd={() =>
+              setDraft((prev) => ({
+                ...prev,
+                urls: [...prev.urls, { id: createTempId('url'), ...EMPTY_URL }],
+              }))
+            }
+          />
+          <div className="mt-6 flex flex-col gap-6">
+            {draft.urls.map((url) => (
+              <div key={url.id} className="rounded-[10px] border p-4">
+                <div className="mb-3 flex justify-end">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() =>
+                      setDraft((prev) => ({
+                        ...prev,
+                        urls: prev.urls.filter((item) => item.id !== url.id),
+                      }))
+                    }
+                  >
+                    삭제
+                  </Button>
+                </div>
+
+                <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+                  <FormInput
+                    placeholder="Label"
+                    value={url.label}
+                    onChange={(event) =>
+                      setDraft((prev) => ({
+                        ...prev,
+                        urls: prev.urls.map((item) =>
+                          item.id === url.id
+                            ? { ...item, label: event.target.value }
+                            : item
+                        ),
+                      }))
+                    }
+                    filled={url.label.length > 0}
+                  />
+                  <FormInput
+                    placeholder="https://"
+                    value={url.url}
+                    onChange={(event) =>
+                      setDraft((prev) => ({
+                        ...prev,
+                        urls: prev.urls.map((item) =>
+                          item.id === url.id
+                            ? { ...item, url: event.target.value }
+                            : item
+                        ),
+                      }))
+                    }
+                    filled={url.url.length > 0}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      </div>
+
+      <div className="fixed inset-x-0 bottom-0 z-40 border-t bg-white/90 px-6 py-3 backdrop-blur">
+        <div className="mx-auto flex w-full max-w-[1200px] items-center justify-between gap-4">
+          <div className="text-sm">
+            {saveError ? (
+              <span className="text-destructive">{saveError}</span>
+            ) : isDirty ? (
+              <span className="text-[#1a1a1a]">
+                저장되지 않은 변경사항이 있습니다.
+              </span>
+            ) : (
+              <span className="text-muted-foreground">
+                모든 변경사항이 저장되었습니다.
+              </span>
+            )}
+          </div>
+          <Button
+            type="button"
+            variant={isDirty ? 'brand' : 'brand-disabled'}
+            size="brand-lg"
+            onClick={handleSave}
+            disabled={!isDirty || isSaving}
+          >
+            {isSaving ? 'Saving...' : 'Save'}
+          </Button>
+        </div>
+      </div>
+    </>
+  );
+}
