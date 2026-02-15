@@ -1,6 +1,6 @@
 import { Icon } from '@/components/ui/icon';
 import { PostStatus } from '@/components/ui/post-status';
-import { formatDate } from '@/entities/profile/ui/_utils';
+import { formatDate } from '@/lib/frontend/presentation';
 
 type Props = {
   title: string;

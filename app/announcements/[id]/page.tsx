@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { notFound } from 'next/navigation';
 import ReactMarkdown from 'react-markdown';
 import { Icon } from '@/components/ui/icon';
 import {
@@ -11,6 +12,16 @@ function formatDate(date: Date): string {
   const month = String(date.getUTCMonth() + 1).padStart(2, '0');
   const day = String(date.getUTCDate()).padStart(2, '0');
   return `${year}.${month}.${day}`;
+}
+
+function handleAnnouncementError(result: {
+  error: string;
+  errorCode?: string;
+}): never {
+  if (result.errorCode === 'NOT_FOUND') {
+    notFound();
+  }
+  throw new Error(result.error);
 }
 
 export default async function AnnouncementDetailPage({
@@ -26,11 +37,11 @@ export default async function AnnouncementDetailPage({
   ]);
 
   if ('error' in detailResult) {
-    return <p className="p-6 text-destructive">{detailResult.error}</p>;
+    handleAnnouncementError(detailResult);
   }
 
   if ('error' in neighborsResult) {
-    return <p className="p-6 text-destructive">{neighborsResult.error}</p>;
+    handleAnnouncementError(neighborsResult);
   }
 
   const announcement = detailResult.data;

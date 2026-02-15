@@ -5,6 +5,7 @@ import {
   getAnnouncementById,
   getAnnouncementNeighbors,
 } from '@/lib/actions/announcements';
+import { notFound } from 'next/navigation';
 
 jest.mock('react-markdown', () => ({
   __esModule: true,
@@ -15,12 +16,20 @@ jest.mock('@/lib/actions/announcements', () => ({
   getAnnouncementById: jest.fn(),
   getAnnouncementNeighbors: jest.fn(),
 }));
+jest.mock('next/navigation', () => ({
+  notFound: jest.fn(),
+}));
 
 const mockGetAnnouncementById = getAnnouncementById as unknown as jest.Mock;
 const mockGetAnnouncementNeighbors =
   getAnnouncementNeighbors as unknown as jest.Mock;
+const mockNotFound = notFound as unknown as jest.Mock;
 
 describe('AnnouncementDetailPage', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   it('상세/핀/Next-Before 영역을 렌더링한다', async () => {
     mockGetAnnouncementById.mockResolvedValue({
       success: true,
@@ -69,5 +78,40 @@ describe('AnnouncementDetailPage', () => {
     expect(
       screen.getByRole('link', { name: /announcement 목록/i })
     ).toHaveAttribute('href', '/announcements');
+  });
+
+  it('NOT_FOUND 에러 코드면 notFound를 호출한다', async () => {
+    mockGetAnnouncementById.mockResolvedValue({
+      error: '공지사항을 찾을 수 없습니다',
+      errorCode: 'NOT_FOUND',
+    });
+    mockGetAnnouncementNeighbors.mockResolvedValue({
+      success: true,
+      data: { next: null, before: null },
+    });
+    mockNotFound.mockImplementation(() => {
+      throw new Error('NEXT_HTTP_ERROR_FALLBACK;404');
+    });
+
+    await expect(
+      AnnouncementDetailPage({ params: Promise.resolve({ id: 'missing' }) })
+    ).rejects.toThrow('NEXT_HTTP_ERROR_FALLBACK;404');
+    expect(mockNotFound).toHaveBeenCalled();
+  });
+
+  it('NOT_FOUND가 아닌 에러는 에러 바운더리로 전파한다', async () => {
+    mockGetAnnouncementById.mockResolvedValue({
+      error: '일시적인 오류입니다',
+      errorCode: 'CONFLICT',
+    });
+    mockGetAnnouncementNeighbors.mockResolvedValue({
+      success: true,
+      data: { next: null, before: null },
+    });
+
+    await expect(
+      AnnouncementDetailPage({ params: Promise.resolve({ id: 'ann-1' }) })
+    ).rejects.toThrow('일시적인 오류입니다');
+    expect(mockNotFound).not.toHaveBeenCalled();
   });
 });

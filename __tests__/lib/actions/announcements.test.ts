@@ -41,6 +41,7 @@ describe('getAnnouncements', () => {
     expect(result).toEqual(
       expect.objectContaining({ error: expect.any(String) })
     );
+    expect(result).not.toHaveProperty('errorCode');
     expect(announcementsUC.getAnnouncements).not.toHaveBeenCalled();
   });
 
@@ -76,7 +77,7 @@ describe('getAnnouncementById', () => {
     expect(announcementsUC.getAnnouncementById).toHaveBeenCalledWith('ann-1');
   });
 
-  it('DomainError NOT_FOUND → { error: message }', async () => {
+  it('DomainError NOT_FOUND → { error, errorCode }', async () => {
     const domainErr = new DomainError(
       'NOT_FOUND',
       '공지사항을(를) 찾을 수 없습니다'
@@ -87,7 +88,10 @@ describe('getAnnouncementById', () => {
 
     const result = await getAnnouncementById('nonexistent');
 
-    expect(result).toEqual({ error: '공지사항을(를) 찾을 수 없습니다' });
+    expect(result).toEqual({
+      error: '공지사항을(를) 찾을 수 없습니다',
+      errorCode: 'NOT_FOUND',
+    });
   });
 });
 
@@ -109,7 +113,7 @@ describe('getAnnouncementNeighbors', () => {
     );
   });
 
-  it('DomainError → { error: message }', async () => {
+  it('DomainError → { error, errorCode }', async () => {
     (
       announcementsUC.getAnnouncementNeighbors as unknown as jest.Mock
     ).mockRejectedValue(
@@ -118,6 +122,9 @@ describe('getAnnouncementNeighbors', () => {
 
     const result = await getAnnouncementNeighbors('ann-unknown');
 
-    expect(result).toEqual({ error: '공지사항을 찾을 수 없습니다' });
+    expect(result).toEqual({
+      error: '공지사항을 찾을 수 없습니다',
+      errorCode: 'NOT_FOUND',
+    });
   });
 });

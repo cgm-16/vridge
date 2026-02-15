@@ -8,6 +8,28 @@ import nextTs from 'eslint-config-next/typescript';
 const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
+  {
+    files: ['**/*.{js,mjs,cjs,ts,tsx,jsx}'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [
+            {
+              name: '@/entities/profile/ui/_utils',
+              message:
+                '공유 프레젠테이션 유틸은 "@/lib/frontend/presentation"에서 가져오세요.',
+            },
+            {
+              name: '@/entities/job/ui/_utils',
+              message:
+                '공유 프레젠테이션 유틸은 "@/lib/frontend/presentation"에서 가져오세요.',
+            },
+          ],
+        },
+      ],
+    },
+  },
   // Override default ignores of eslint-config-next.
   globalIgnores([
     // Default ignores of eslint-config-next:
