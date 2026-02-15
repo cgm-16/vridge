@@ -319,8 +319,10 @@ P24 (Polish + E2E) depends on all
 - 미저장 이탈 방지 가드를 추가했다 (`beforeunload`, 링크 클릭, 뒤로가기 confirm).
 - 로그인/회원가입 모달을 Figma 구조에 맞게 재정렬하면서 기존 인증 동작을 유지했다 (소셜 로그인, 이메일/비밀번호, 3-step signup).
 - Prompt 20 공유 컴포넌트 재사용을 강화했다 (`FormInput`, `Icon`, `Button`, `ToggleSwitch`, `SectionTitle`, `DatePicker`, `FormDropdown`, `SearchBar`, `Chip`, `DialcodePicker`).
+- 활성 프로필 엔티티 표시 컴포넌트 4곳의 `Badge`를 `Chip`으로 정렬했다 (`skill-badges`, `career-list`, `education-list`, `language-list`).
+- `education-list` 테스트를 신규 추가하고, 관련 엔티티/정렬 컨트롤 테스트에 `Chip` 및 compact select 가드 검증을 추가했다.
 - 테스트를 확장했다: 공지사항 페이지/상세, 후보자 slug 페이지, 지원 목록 페이지, nav/proxy/profile/announcement use-case·action.
-- 전체 검증 완료: `63 suite`, `424 tests`, `tsc --noEmit` 클린.
+- 전체 검증 완료: `64 suite`, `431 tests`, `tsc --noEmit` 클린.
 
 ---
 
