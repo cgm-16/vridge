@@ -7,9 +7,10 @@ describe('SkillBadges', () => {
       { skill: { displayNameEn: 'TypeScript' } },
       { skill: { displayNameEn: 'React' } },
     ];
-    render(<SkillBadges skills={skills} />);
+    const { container } = render(<SkillBadges skills={skills} />);
     expect(screen.getByText('TypeScript')).toBeInTheDocument();
     expect(screen.getByText('React')).toBeInTheDocument();
+    expect(container.querySelectorAll('[data-slot="chip"]')).toHaveLength(2);
   });
 
   it('renders empty state when skills is empty', () => {

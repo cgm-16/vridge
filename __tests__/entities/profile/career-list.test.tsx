@@ -26,9 +26,10 @@ describe('CareerList', () => {
     expect(screen.getByText('Software Engineer')).toBeInTheDocument();
   });
 
-  it('renders employment type label as badge', () => {
-    render(<CareerList careers={[baseCareer]} />);
+  it('renders employment type label as chip', () => {
+    const { container } = render(<CareerList careers={[baseCareer]} />);
     expect(screen.getByText('정규직')).toBeInTheDocument();
+    expect(container.querySelectorAll('[data-slot="chip"]')).toHaveLength(1);
   });
 
   it('formats startDate as YYYY.MM', () => {
@@ -54,7 +55,8 @@ describe('CareerList', () => {
 
   it('renders experience level when provided', () => {
     const career = { ...baseCareer, experienceLevel: 'SENIOR' };
-    render(<CareerList careers={[career]} />);
+    const { container } = render(<CareerList careers={[career]} />);
     expect(screen.getByText('Senior')).toBeInTheDocument();
+    expect(container.querySelectorAll('[data-slot="chip"]')).toHaveLength(2);
   });
 });

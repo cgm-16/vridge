@@ -1,4 +1,4 @@
-import { Badge } from '@/components/ui/badge';
+import { Chip } from '@/components/ui/chip';
 import { PROFICIENCY_LABELS } from './_utils';
 
 type Language = {
@@ -24,9 +24,11 @@ export function LanguageList({ languages }: Props) {
       {languages.map((lang) => (
         <li key={lang.id} className="flex items-center gap-2">
           <span>{lang.language}</span>
-          <Badge variant="secondary">
-            {PROFICIENCY_LABELS[lang.proficiency] ?? lang.proficiency}
-          </Badge>
+          <Chip
+            label={PROFICIENCY_LABELS[lang.proficiency] ?? lang.proficiency}
+            variant="displayed"
+            size="sm"
+          />
           {lang.testName && lang.testScore && (
             <span className="text-sm text-muted-foreground">
               {lang.testName} · {lang.testScore}
