@@ -47,6 +47,7 @@ export async function getUserApplications(userId: string) {
         include: {
           job: { include: { family: true } },
           org: true,
+          skills: { include: { skill: true } },
         },
       },
     },

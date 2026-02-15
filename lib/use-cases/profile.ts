@@ -11,6 +11,17 @@ import type {
   profileCertificationSchema,
 } from '@/lib/validations/profile';
 
+const READONLY_PROFILE_INCLUDE = {
+  authUser: { select: { email: true } },
+  profilePublic: true,
+  careers: { include: { job: true }, orderBy: { sortOrder: 'asc' } },
+  educations: { orderBy: { sortOrder: 'asc' } },
+  languages: { orderBy: { sortOrder: 'asc' } },
+  urls: { orderBy: { sortOrder: 'asc' } },
+  profileSkills: { include: { skill: true } },
+  certifications: { orderBy: { sortOrder: 'asc' } },
+} as const;
+
 export async function getFullProfile(userId: string) {
   const profile = await prisma.appUser.findUnique({
     where: { id: userId },
@@ -35,13 +46,8 @@ export async function getProfileForViewer(
   mode: 'partial' | 'full'
 ) {
   const baseInclude = {
-    profilePublic: true,
-    careers: { include: { job: true }, orderBy: { sortOrder: 'asc' } },
-    educations: { orderBy: { sortOrder: 'asc' } },
-    languages: { orderBy: { sortOrder: 'asc' } },
-    urls: { orderBy: { sortOrder: 'asc' } },
-    profileSkills: { include: { skill: true } },
-    certifications: { orderBy: { sortOrder: 'asc' } },
+    ...READONLY_PROFILE_INCLUDE,
+    authUser: false,
   } as const;
 
   const include =
@@ -54,6 +60,19 @@ export async function getProfileForViewer(
     include,
   });
   if (!profile) throw notFound('프로필');
+  return profile;
+}
+
+export async function getProfileBySlug(slug: string) {
+  const profile = await prisma.appUser.findFirst({
+    where: {
+      profilePublic: {
+        is: { publicSlug: slug },
+      },
+    },
+    include: READONLY_PROFILE_INCLUDE,
+  });
+  if (!profile || !profile.profilePublic?.isPublic) throw notFound('프로필');
   return profile;
 }
 

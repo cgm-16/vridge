@@ -1,6 +1,7 @@
 import {
   getFullProfile,
   getProfileForViewer,
+  getProfileBySlug,
   updatePublicProfile,
   updatePrivateProfile,
   addCareer,
@@ -28,6 +29,7 @@ jest.mock('@/lib/infrastructure/db', () => ({
   prisma: {
     appUser: {
       findUnique: jest.fn(),
+      findFirst: jest.fn(),
     },
     profilesPublic: {
       update: jest.fn(),
@@ -127,6 +129,57 @@ describe('getProfileForViewer', () => {
     await expect(getProfileForViewer('nonexistent', 'partial')).rejects.toThrow(
       DomainError
     );
+  });
+});
+
+describe('getProfileBySlug', () => {
+  it('publicSlug로 공개 프로필 반환', async () => {
+    (prisma.appUser.findFirst as unknown as jest.Mock).mockResolvedValue({
+      ...mockUser,
+      profilePublic: {
+        firstName: '홍',
+        lastName: '길동',
+        isPublic: true,
+        publicSlug: 'lion-park',
+      },
+    });
+
+    const result = await getProfileBySlug('lion-park');
+
+    expect(result).toEqual(
+      expect.objectContaining({
+        profilePublic: expect.objectContaining({ publicSlug: 'lion-park' }),
+      })
+    );
+    expect(prisma.appUser.findFirst).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: {
+          profilePublic: {
+            is: { publicSlug: 'lion-park' },
+          },
+        },
+      })
+    );
+  });
+
+  it('slug 미존재 → NOT_FOUND throw', async () => {
+    (prisma.appUser.findFirst as unknown as jest.Mock).mockResolvedValue(null);
+
+    await expect(getProfileBySlug('unknown')).rejects.toThrow(DomainError);
+  });
+
+  it('isPublic=false → NOT_FOUND throw', async () => {
+    (prisma.appUser.findFirst as unknown as jest.Mock).mockResolvedValue({
+      ...mockUser,
+      profilePublic: {
+        firstName: '홍',
+        lastName: '길동',
+        isPublic: false,
+        publicSlug: 'private-user',
+      },
+    });
+
+    await expect(getProfileBySlug('private-user')).rejects.toThrow(DomainError);
   });
 });
 

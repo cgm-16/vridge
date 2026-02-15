@@ -21,6 +21,7 @@ import {
 } from '@/lib/validations/profile';
 import {
   getFullProfile,
+  getProfileBySlug as ucGetProfileBySlug,
   getProfileForViewer,
   updatePublicProfile,
   updatePrivateProfile,
@@ -335,6 +336,17 @@ export async function getProfileForRecruiter(
         .then((r) => r !== null);
     await assertCanViewCandidate(user.role as AppRole, candidateId, checker);
     const data = await getProfileForViewer(candidateId, 'full');
+    return { success: true, data };
+  } catch (e) {
+    return handleError(e);
+  }
+}
+
+export async function getProfileBySlug(
+  slug: string
+): Promise<QueryResult<Awaited<ReturnType<typeof ucGetProfileBySlug>>>> {
+  try {
+    const data = await ucGetProfileBySlug(slug);
     return { success: true, data };
   } catch (e) {
     return handleError(e);

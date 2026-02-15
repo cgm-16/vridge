@@ -7,6 +7,7 @@ import {
   addProfileSkill,
   deleteProfileSkill,
   getMyProfile,
+  getProfileBySlug,
   getProfileForRecruiter,
   addProfileCertification,
   updateProfileCertification,
@@ -305,6 +306,37 @@ describe('getMyProfile', () => {
     );
 
     await expect(getMyProfile()).rejects.toThrow('Unauthorized');
+  });
+});
+
+describe('getProfileBySlug', () => {
+  it('공개 프로필 조회 성공', async () => {
+    const profileData = {
+      id: 'candidate-1',
+      profilePublic: { firstName: '이', lastName: '영희', isPublic: true },
+    };
+    (
+      profileUseCases.getProfileBySlug as unknown as jest.Mock
+    ).mockResolvedValue(profileData);
+
+    const result = await getProfileBySlug('candidate-1-slug');
+
+    expect(result).toEqual({ success: true, data: profileData });
+    expect(profileUseCases.getProfileBySlug).toHaveBeenCalledWith(
+      'candidate-1-slug'
+    );
+  });
+
+  it('존재하지 않는 slug → { error: ... }', async () => {
+    (
+      profileUseCases.getProfileBySlug as unknown as jest.Mock
+    ).mockRejectedValue(
+      new DomainError('NOT_FOUND', '프로필을(를) 찾을 수 없습니다')
+    );
+
+    const result = await getProfileBySlug('missing-slug');
+
+    expect(result).toEqual({ error: '프로필을(를) 찾을 수 없습니다' });
   });
 });
 

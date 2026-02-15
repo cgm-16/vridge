@@ -9,7 +9,7 @@ import UserMenu from './user-menu';
 
 const NAV_LINKS = [
   { label: 'Jobs', href: '/jobs' },
-  { label: 'Announcement', href: '/announcement' },
+  { label: 'Announcement', href: '/announcements' },
 ];
 
 export default function MainNav() {
