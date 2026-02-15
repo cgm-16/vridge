@@ -31,8 +31,18 @@ describe('공개 라우트', () => {
     expect(mockGetSession).not.toHaveBeenCalled();
   });
 
-  it('/announcement/* 은 세션 확인 없이 통과', async () => {
-    await proxy(makeRequest('/announcement/1'));
+  it('/announcements/* 은 세션 확인 없이 통과', async () => {
+    await proxy(makeRequest('/announcements/1'));
+    expect(mockGetSession).not.toHaveBeenCalled();
+  });
+
+  it('/candidate/[slug] 공개 라우트는 세션 확인 없이 통과', async () => {
+    await proxy(makeRequest('/candidate/lion-park'));
+    expect(mockGetSession).not.toHaveBeenCalled();
+  });
+
+  it('/candidate/[slug]/profile 공개 라우트는 세션 확인 없이 통과', async () => {
+    await proxy(makeRequest('/candidate/lion-park/profile'));
     expect(mockGetSession).not.toHaveBeenCalled();
   });
 

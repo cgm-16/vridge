@@ -6,6 +6,7 @@ import { announcementFilterSchema } from '@/lib/validations/announcement';
 import {
   getAnnouncements as ucGetAnnouncements,
   getAnnouncementById as ucGetAnnouncementById,
+  getAnnouncementNeighbors as ucGetAnnouncementNeighbors,
 } from '@/lib/use-cases/announcements';
 
 type QueryResult<T> = { success: true; data: T } | { error: string };
@@ -33,6 +34,19 @@ export async function getAnnouncementById(
 ): Promise<QueryResult<Awaited<ReturnType<typeof ucGetAnnouncementById>>>> {
   try {
     const data = await ucGetAnnouncementById(id);
+    return { success: true, data };
+  } catch (e) {
+    return handleError(e);
+  }
+}
+
+export async function getAnnouncementNeighbors(
+  id: string
+): Promise<
+  QueryResult<Awaited<ReturnType<typeof ucGetAnnouncementNeighbors>>>
+> {
+  try {
+    const data = await ucGetAnnouncementNeighbors(id);
     return { success: true, data };
   } catch (e) {
     return handleError(e);

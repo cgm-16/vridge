@@ -1,6 +1,7 @@
 import {
   getAnnouncements,
   getAnnouncementById,
+  getAnnouncementNeighbors,
 } from '@/lib/use-cases/announcements';
 import { DomainError } from '@/lib/domain/errors';
 import { prisma } from '@/lib/infrastructure/db';
@@ -11,6 +12,7 @@ jest.mock('@/lib/infrastructure/db', () => ({
       findMany: jest.fn(),
       count: jest.fn(),
       findUnique: jest.fn(),
+      findFirst: jest.fn(),
     },
   },
 }));
@@ -91,6 +93,56 @@ describe('getAnnouncementById', () => {
     );
 
     await expect(getAnnouncementById('nonexistent')).rejects.toThrow(
+      DomainError
+    );
+  });
+});
+
+describe('getAnnouncementNeighbors', () => {
+  it('게시판 순서에서 다음/이전 공지 반환', async () => {
+    (prisma.announcement.findUnique as unknown as jest.Mock).mockResolvedValue(
+      mockAnnouncement
+    );
+    (prisma.announcement.findMany as unknown as jest.Mock).mockResolvedValue([
+      { id: 'ann-3', title: '세 번째', isPinned: true, createdAt: new Date() },
+      { id: 'ann-1', title: '현재', isPinned: true, createdAt: new Date() },
+      {
+        id: 'ann-2',
+        title: '두 번째',
+        isPinned: false,
+        createdAt: new Date(),
+      },
+    ]);
+
+    const result = await getAnnouncementNeighbors('ann-1');
+
+    expect(result).toEqual({
+      next: {
+        id: 'ann-2',
+        title: '두 번째',
+        isPinned: false,
+        createdAt: expect.any(Date),
+      },
+      before: {
+        id: 'ann-3',
+        title: '세 번째',
+        isPinned: true,
+        createdAt: expect.any(Date),
+      },
+    });
+    expect(prisma.announcement.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        orderBy: [{ isPinned: 'desc' }, { createdAt: 'desc' }, { id: 'desc' }],
+      })
+    );
+  });
+
+  it('공지사항 없음 → DomainError throw', async () => {
+    (prisma.announcement.findUnique as unknown as jest.Mock).mockResolvedValue(
+      null
+    );
+
+    await expect(getAnnouncementNeighbors('nonexistent')).rejects.toThrow(
       DomainError
     );
   });

@@ -72,9 +72,9 @@ describe('MainNav', () => {
     expect(jobsLink.className).toContain('text-brand');
   });
 
-  it('/announcement 경로 — Announcement 링크에 활성 클래스 적용', () => {
+  it('/announcements 경로 — Announcement 링크에 활성 클래스 적용', () => {
     mockUseSession.mockReturnValue({ data: null });
-    mockUsePathname.mockReturnValue('/announcement');
+    mockUsePathname.mockReturnValue('/announcements');
     render(<MainNav />);
 
     const announcementLink = screen.getByRole('link', { name: 'Announcement' });

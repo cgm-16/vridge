@@ -25,3 +25,21 @@ export async function getAnnouncementById(id: string) {
   if (!announcement) throw notFound('공지사항');
   return announcement;
 }
+
+export async function getAnnouncementNeighbors(id: string) {
+  const current = await prisma.announcement.findUnique({ where: { id } });
+  if (!current) throw notFound('공지사항');
+
+  const ordered = await prisma.announcement.findMany({
+    select: { id: true, title: true, isPinned: true, createdAt: true },
+    orderBy: [{ isPinned: 'desc' }, { createdAt: 'desc' }, { id: 'desc' }],
+  });
+
+  const currentIndex = ordered.findIndex((item) => item.id === id);
+  if (currentIndex === -1) throw notFound('공지사항');
+
+  return {
+    next: ordered[currentIndex + 1] ?? null,
+    before: ordered[currentIndex - 1] ?? null,
+  };
+}

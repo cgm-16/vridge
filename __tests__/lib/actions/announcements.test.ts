@@ -1,6 +1,7 @@
 import {
   getAnnouncements,
   getAnnouncementById,
+  getAnnouncementNeighbors,
 } from '@/lib/actions/announcements';
 import { DomainError } from '@/lib/domain/errors';
 import * as announcementsUC from '@/lib/use-cases/announcements';
@@ -8,6 +9,7 @@ import * as announcementsUC from '@/lib/use-cases/announcements';
 jest.mock('@/lib/use-cases/announcements', () => ({
   getAnnouncements: jest.fn(),
   getAnnouncementById: jest.fn(),
+  getAnnouncementNeighbors: jest.fn(),
 }));
 
 beforeEach(() => jest.clearAllMocks());
@@ -86,5 +88,36 @@ describe('getAnnouncementById', () => {
     const result = await getAnnouncementById('nonexistent');
 
     expect(result).toEqual({ error: '공지사항을(를) 찾을 수 없습니다' });
+  });
+});
+
+describe('getAnnouncementNeighbors', () => {
+  it('다음/이전 공지 조회 성공 → { success: true, data }', async () => {
+    const neighbors = {
+      next: { id: 'ann-2', title: '다음 공지', createdAt: new Date() },
+      before: { id: 'ann-0', title: '이전 공지', createdAt: new Date() },
+    };
+    (
+      announcementsUC.getAnnouncementNeighbors as unknown as jest.Mock
+    ).mockResolvedValue(neighbors);
+
+    const result = await getAnnouncementNeighbors('ann-1');
+
+    expect(result).toEqual({ success: true, data: neighbors });
+    expect(announcementsUC.getAnnouncementNeighbors).toHaveBeenCalledWith(
+      'ann-1'
+    );
+  });
+
+  it('DomainError → { error: message }', async () => {
+    (
+      announcementsUC.getAnnouncementNeighbors as unknown as jest.Mock
+    ).mockRejectedValue(
+      new DomainError('NOT_FOUND', '공지사항을 찾을 수 없습니다')
+    );
+
+    const result = await getAnnouncementNeighbors('ann-unknown');
+
+    expect(result).toEqual({ error: '공지사항을 찾을 수 없습니다' });
   });
 });

@@ -2,10 +2,22 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/infrastructure/auth';
 
 function isPublicPath(pathname: string): boolean {
+  const segments = pathname.split('/').filter(Boolean);
+  const isPublicCandidatePath =
+    segments[0] === 'candidate' &&
+    ((segments.length === 2 &&
+      segments[1] !== 'profile' &&
+      segments[1] !== 'applications') ||
+      (segments.length === 3 &&
+        segments[2] === 'profile' &&
+        segments[1] !== 'profile' &&
+        segments[1] !== 'applications'));
+
   return (
     pathname === '/' ||
     pathname.startsWith('/jobs') ||
-    pathname.startsWith('/announcement') ||
+    pathname.startsWith('/announcements') ||
+    isPublicCandidatePath ||
     pathname.startsWith('/api/auth')
   );
 }
