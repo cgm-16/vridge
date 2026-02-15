@@ -9,10 +9,11 @@ const baseLanguage = {
 };
 
 describe('LanguageList', () => {
-  it('언어와 숙련도 렌더링', () => {
-    render(<LanguageList languages={[baseLanguage]} />);
+  it('언어와 숙련도 렌더링 + 숙련도 chip 사용', () => {
+    const { container } = render(<LanguageList languages={[baseLanguage]} />);
     expect(screen.getByText('English')).toBeInTheDocument();
     expect(screen.getByText('업무 가능')).toBeInTheDocument();
+    expect(container.querySelectorAll('[data-slot="chip"]')).toHaveLength(1);
   });
 
   it('testName/testScore 함께 있으면 점수 정보 렌더링', () => {

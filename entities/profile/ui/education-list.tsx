@@ -1,4 +1,4 @@
-import { Badge } from '@/components/ui/badge';
+import { Chip } from '@/components/ui/chip';
 import {
   formatDate,
   EDUCATION_TYPE_LABELS,
@@ -31,17 +31,21 @@ export function EducationList({ educations }: Props) {
         <li key={edu.id} className="flex flex-col gap-1">
           <div className="flex items-center gap-2">
             <span className="font-semibold">{edu.institutionName}</span>
-            <Badge variant="secondary">
-              {EDUCATION_TYPE_LABELS[edu.educationType] ?? edu.educationType}
-            </Badge>
-            <Badge
-              variant={
-                edu.graduationStatus === 'GRADUATED' ? 'default' : 'outline'
+            <Chip
+              label={
+                EDUCATION_TYPE_LABELS[edu.educationType] ?? edu.educationType
               }
-            >
-              {GRADUATION_STATUS_LABELS[edu.graduationStatus] ??
-                edu.graduationStatus}
-            </Badge>
+              variant="displayed"
+              size="sm"
+            />
+            <Chip
+              label={
+                GRADUATION_STATUS_LABELS[edu.graduationStatus] ??
+                edu.graduationStatus
+              }
+              variant="displayed"
+              size="sm"
+            />
           </div>
           {edu.field && (
             <span className="text-sm text-muted-foreground">{edu.field}</span>

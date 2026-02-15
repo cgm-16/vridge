@@ -1,4 +1,4 @@
-import { Badge } from '@/components/ui/badge';
+import { Chip } from '@/components/ui/chip';
 import {
   formatDate,
   EMPLOYMENT_TYPE_LABELS,
@@ -33,15 +33,23 @@ export function CareerList({ careers }: Props) {
         <li key={career.id} className="flex flex-col gap-1">
           <div className="flex items-center gap-2">
             <span className="font-semibold">{career.companyName}</span>
-            <Badge variant="secondary">
-              {EMPLOYMENT_TYPE_LABELS[career.employmentType] ??
-                career.employmentType}
-            </Badge>
+            <Chip
+              label={
+                EMPLOYMENT_TYPE_LABELS[career.employmentType] ??
+                career.employmentType
+              }
+              variant="displayed"
+              size="sm"
+            />
             {career.experienceLevel && (
-              <Badge variant="outline">
-                {EXPERIENCE_LEVEL_LABELS[career.experienceLevel] ??
-                  career.experienceLevel}
-              </Badge>
+              <Chip
+                label={
+                  EXPERIENCE_LEVEL_LABELS[career.experienceLevel] ??
+                  career.experienceLevel
+                }
+                variant="displayed"
+                size="sm"
+              />
             )}
           </div>
           <span className="text-sm">{career.positionTitle}</span>

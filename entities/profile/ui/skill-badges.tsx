@@ -1,4 +1,4 @@
-import { Badge } from '@/components/ui/badge';
+import { Chip } from '@/components/ui/chip';
 
 type Skill = {
   skill: { displayNameEn: string };
@@ -16,9 +16,12 @@ export function SkillBadges({ skills }: Props) {
   return (
     <div className="flex flex-wrap gap-2">
       {skills.map((s, i) => (
-        <Badge key={i} variant="secondary">
-          {s.skill.displayNameEn}
-        </Badge>
+        <Chip
+          key={`${s.skill.displayNameEn}-${i}`}
+          label={s.skill.displayNameEn}
+          variant="displayed"
+          size="md"
+        />
       ))}
     </div>
   );

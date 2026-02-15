@@ -23,6 +23,12 @@ describe('JobSortControl', () => {
     ).toBeInTheDocument();
   });
 
+  it('compact raw select 스타일을 유지한다', () => {
+    render(<JobSortControl />);
+    const select = screen.getByRole('combobox', { name: 'Sort by' });
+    expect(select).toHaveClass('appearance-none');
+  });
+
   it('sort 파라미터 없으면 기본값 updated_desc 선택', () => {
     render(<JobSortControl />);
     const select = screen.getByRole('combobox', { name: 'Sort by' });

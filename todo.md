@@ -79,6 +79,6 @@
 
 ## 현재 상태
 
-- **테스트**: 424개 통과 (63 suite)
+- **테스트**: 431개 통과 (64 suite)
 - **타입 체크**: `tsc --noEmit` 클린
-- **브랜치**: `feat/prompt23-ui-alignment`
+- **브랜치**: `feat/prompt23-active-component-alignment`
