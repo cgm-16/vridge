@@ -232,14 +232,17 @@ export const enMessages = {
   'error.notFound.education': 'Education not found.',
   'error.notFound.language': 'Language not found.',
   'error.notFound.url': 'URL not found.',
+  'error.notFound.skill': 'Skill not found.',
   'error.notFound.certification': 'Certification not found.',
   'error.notFound.jobDescription': 'Job posting not found.',
   'error.notFound.application': 'Application not found.',
   'error.notFound.announcement': 'Announcement not found.',
+  'error.notFound.unknown': 'Requested resource not found.',
   'error.conflict.alreadyApplied': 'You already applied to this job posting.',
   'error.conflict.withdrawOnlyApplied':
     'Withdrawal is only available while application status is applied.',
   'error.conflict.skillExists': 'Skill is already added.',
+  'error.conflict.unknown': 'Conflict occurred.',
   'error.auth.required': 'Authentication is required.',
 } as const;
 

@@ -215,13 +215,16 @@ export const koMessages: Record<MessageKey, string> = {
   'error.notFound.education': '학력을 찾을 수 없습니다.',
   'error.notFound.language': '언어를 찾을 수 없습니다.',
   'error.notFound.url': '링크를 찾을 수 없습니다.',
+  'error.notFound.skill': '스킬을 찾을 수 없습니다.',
   'error.notFound.certification': '자격증을 찾을 수 없습니다.',
   'error.notFound.jobDescription': '채용공고를 찾을 수 없습니다.',
   'error.notFound.application': '지원을 찾을 수 없습니다.',
   'error.notFound.announcement': '공지사항을 찾을 수 없습니다.',
+  'error.notFound.unknown': '요청한 리소스를 찾을 수 없습니다.',
   'error.conflict.alreadyApplied': '이미 지원한 채용공고입니다.',
   'error.conflict.withdrawOnlyApplied':
     '지원 취소는 지원 상태에서만 가능합니다.',
   'error.conflict.skillExists': '이미 추가된 스킬입니다.',
+  'error.conflict.unknown': '충돌이 발생했습니다.',
   'error.auth.required': '인증이 필요합니다.',
 };

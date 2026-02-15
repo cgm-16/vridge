@@ -222,13 +222,16 @@ export const viMessages: Record<MessageKey, string> = {
   'error.notFound.education': 'Không tìm thấy học vấn.',
   'error.notFound.language': 'Không tìm thấy ngôn ngữ.',
   'error.notFound.url': 'Không tìm thấy liên kết.',
+  'error.notFound.skill': 'Không tìm thấy kỹ năng.',
   'error.notFound.certification': 'Không tìm thấy chứng chỉ.',
   'error.notFound.jobDescription': 'Không tìm thấy tin tuyển dụng.',
   'error.notFound.application': 'Không tìm thấy đơn ứng tuyển.',
   'error.notFound.announcement': 'Không tìm thấy thông báo.',
+  'error.notFound.unknown': 'Không tìm thấy tài nguyên được yêu cầu.',
   'error.conflict.alreadyApplied': 'Bạn đã ứng tuyển công việc này.',
   'error.conflict.withdrawOnlyApplied':
     'Chỉ có thể rút đơn khi trạng thái là đã ứng tuyển.',
   'error.conflict.skillExists': 'Kỹ năng đã được thêm.',
+  'error.conflict.unknown': 'Đã xảy ra xung đột.',
   'error.auth.required': 'Cần đăng nhập.',
 };
