@@ -1,10 +1,10 @@
 # 프로젝트 상태 — vridge ATS MVP
 
-> 내부 공유 문서 (기준 브랜치: `feat/item1-candidate-profile-fix`)
+> 내부 공유 문서 (기준 브랜치: `dev`)
 
 ## 현재 스냅샷
 
-- 브랜치: `feat/item1-candidate-profile-fix`
+- 브랜치: `dev`
 - 테스트: `71` suite, `459` tests 통과
 - 타입 체크: `pnpm exec tsc --noEmit` 통과
 - 앱 라우팅: Next.js App Router (`app/`)
@@ -31,6 +31,7 @@
 - 대시보드 내 내 프로필/프로필 편집/내 지원 목록
 - 전역 `error.tsx`, `not-found.tsx`, 라우트별 `loading.tsx`/`error.tsx` 반영
 - `app/(dashboard)/candidate/profile/page.tsx`는 더 이상 slug 페이지로 리다이렉트하지 않고, 내 프로필 섹션 렌더링 + 하단 `Edit Profile` CTA 제공
+- `app/candidate/[slug]/page.tsx`의 공개 프로필 카드 상태/생년월일 표기가 로케일별 번역/포맷으로 정렬되고, 섹션 컨테이너/타이틀 스타일이 Figma node `283:2572`에 가깝게 보정됨
 
 ### i18n (Phase 6)
 

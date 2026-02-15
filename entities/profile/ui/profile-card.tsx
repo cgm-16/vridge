@@ -1,6 +1,9 @@
+'use client';
+
 import Image from 'next/image';
 import { Icon } from '@/components/ui/icon';
 import { PostStatus } from '@/components/ui/post-status';
+import { useI18n } from '@/lib/i18n/client';
 
 type Props = {
   firstName: string;
@@ -15,26 +18,20 @@ type Props = {
   profileImageUrl?: string | null;
 };
 
-const MONTHS = [
-  'Jan',
-  'Feb',
-  'Mar',
-  'Apr',
-  'May',
-  'Jun',
-  'Jul',
-  'Aug',
-  'Sep',
-  'Oct',
-  'Nov',
-  'Dec',
-];
-
-function formatDob(date: Date) {
-  const d = date.getUTCDate();
-  const m = MONTHS[date.getUTCMonth()];
-  const y = date.getUTCFullYear();
-  return `${String(d).padStart(2, '0')}. ${m}. ${y}`;
+function formatDob(date: Date, locale: string) {
+  const day = new Intl.DateTimeFormat(locale, {
+    day: '2-digit',
+    timeZone: 'UTC',
+  }).format(date);
+  const month = new Intl.DateTimeFormat(locale, {
+    month: 'short',
+    timeZone: 'UTC',
+  }).format(date);
+  const year = new Intl.DateTimeFormat(locale, {
+    year: 'numeric',
+    timeZone: 'UTC',
+  }).format(date);
+  return `${day}. ${month}. ${year}`;
 }
 
 export function ProfileCard({
@@ -49,6 +46,8 @@ export function ProfileCard({
   isOpenToWork = false,
   profileImageUrl,
 }: Props) {
+  const { locale, t } = useI18n();
+
   return (
     <div className="rounded-[20px] bg-[#fbfbfb] px-[40px] py-[30px]">
       <div className="flex gap-6">
@@ -69,7 +68,11 @@ export function ProfileCard({
           </div>
           <PostStatus
             status={isOpenToWork ? 'recruiting' : 'done'}
-            label={isOpenToWork ? 'Open to Work' : 'Not Open to Work'}
+            label={
+              isOpenToWork
+                ? t('profile.openToWork')
+                : t('profile.notOpenToWork')
+            }
             size="sm"
           />
         </div>
@@ -80,7 +83,7 @@ export function ProfileCard({
           </h2>
           {dateOfBirth && (
             <span className="text-[14px] text-[#808080]">
-              {formatDob(dateOfBirth)}
+              {formatDob(dateOfBirth, locale)}
             </span>
           )}
 

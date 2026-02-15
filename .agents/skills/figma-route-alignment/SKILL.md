@@ -11,13 +11,27 @@ Use this skill to run a one-item-at-a-time Figma alignment loop for vridge. Keep
 
 ## Run Workflow
 
-1. Select exactly one target from `fix_needed.md` and lock route/component scope.
-2. Map the Figma URL to `fileKey` and `nodeId`, then identify the concrete implementation files.
-3. Compare current code and rendered structure against Figma metadata/screenshot.
-4. Produce a decision-complete plan before making changes.
-5. Implement the smallest reasonable change set to close the mismatch.
-6. Run item-specific and related regression checks, then run `pnpm exec tsc --noEmit`.
-7. Update trackers (`todo.md`, `docs/project-state.md`, `docs/project-state-requirements.md`, and `docs/folder-structure.md` if structure changed).
+0. **Phase 0 — Git baseline**
+   - Confirm `dev` is up to date (`git checkout dev`, `git pull origin dev`).
+   - Create and switch to a feature branch from `dev` (for example: `feat/itemXX-<slug>`).
+   - Confirm branch and baseline before coding (`git status --short --branch`).
+1. **Phase 1 — Scope lock**
+   - Select exactly one target from `fix_needed.md` and lock route/component scope.
+2. **Phase 2 — Mapping**
+   - Map the Figma URL to `fileKey` and `nodeId`, then identify the concrete implementation files.
+3. **Phase 3 — Design comparison**
+   - Compare current code and rendered structure against Figma metadata/screenshot.
+4. **Phase 4 — Locked plan**
+   - Produce a decision-complete plan before making changes.
+5. **Phase 5 — Implementation**
+   - Implement the smallest reasonable change set to close the mismatch.
+6. **Phase 6 — Verification**
+   - Run item-specific and related regression checks, then run `pnpm exec tsc --noEmit`.
+7. **Phase 7 — Tracker updates**
+   - Update trackers (`todo.md`, `docs/project-state.md`, `docs/project-state-requirements.md`, and `docs/folder-structure.md` if structure changed).
+8. **Phase 8 — Korean PR**
+   - Push the feature branch and open a PR targeting `dev`.
+   - Write the PR title and description in Korean with: scope, changed files, and test/type-check results.
 
 ## Scope Lock Rules
 

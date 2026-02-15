@@ -46,6 +46,26 @@ describe('ProfileCard', () => {
     expect(screen.getByText('Not Open to Work')).toBeInTheDocument();
   });
 
+  it('ko 로케일에서 상태 문구가 현지화된다', () => {
+    renderWithI18n(<ProfileCard {...baseProps} isOpenToWork />, {
+      locale: 'ko',
+    });
+    expect(screen.getByText('구직 중')).toBeInTheDocument();
+  });
+
+  it('ko 로케일에서 비구직 상태 문구가 현지화된다', () => {
+    renderWithI18n(<ProfileCard {...baseProps} isOpenToWork={false} />, {
+      locale: 'ko',
+    });
+    expect(screen.getByText('구직 아님')).toBeInTheDocument();
+  });
+
+  it('생년월일 월 표기가 로케일에 따라 달라진다', () => {
+    renderWithI18n(<ProfileCard {...baseProps} />, { locale: 'ko' });
+    expect(screen.getByText(/1월/)).toBeInTheDocument();
+    expect(screen.queryByText('15. Jan. 1990')).not.toBeInTheDocument();
+  });
+
   it('profileImageUrl 없으면 기본 프로필 아이콘 fallback 표시', () => {
     renderWithI18n(<ProfileCard {...baseProps} />);
     expect(screen.getByAltText('Profile photo')).toBeInTheDocument();
