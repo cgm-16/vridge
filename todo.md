@@ -82,7 +82,7 @@
 | #   | 작업                                   | 상태 |
 | --- | -------------------------------------- | ---- |
 | 30  | `/candidate/profile` 렌더링/수정 CTA   | ✅   |
-| 31  | `/candidate/[slug]` i18n 이슈 정리     | ⬜   |
+| 31  | `/candidate/[slug]` i18n 이슈 정리     | ✅   |
 | 32  | `/candidate/profile/edit` 링크/동선    | ⬜   |
 | 33  | `/candidate/applications` 디자인 보정  | ⬜   |
 | 34  | 인증 입력 필드(이메일/비밀번호) 아이콘 | ⬜   |
@@ -109,7 +109,7 @@
 
 ## 현재 상태
 
-- **브랜치**: `feat/item1-candidate-profile-fix`
+- **브랜치**: `dev`
 - **테스트**: 459개 통과 (71 suite)
 - **타입 체크**: `pnpm exec tsc --noEmit` 클린
 - **로케일 정책**: `vi` 기본, `en/ko` 지원, 쿠키 키 `vridge_locale`

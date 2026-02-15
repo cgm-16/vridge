@@ -18,11 +18,21 @@ jest.mock('@/lib/actions/applications', () => ({
 }));
 jest.mock('@/lib/i18n/server', () => {
   const { enMessages } = jest.requireActual('@/lib/i18n/messages/en');
+  const { koMessages } = jest.requireActual('@/lib/i18n/messages/ko');
+  const messagesByLocale = {
+    en: enMessages,
+    ko: koMessages,
+  } as const;
+  let locale: keyof typeof messagesByLocale = 'en';
+
   return {
+    __setLocaleForTest: (nextLocale: keyof typeof messagesByLocale) => {
+      locale = nextLocale;
+    },
     getServerI18n: jest.fn(async () => ({
-      locale: 'en',
-      messages: enMessages,
-      t: (key: string) => enMessages[key] ?? key,
+      locale,
+      messages: messagesByLocale[locale],
+      t: (key: string) => messagesByLocale[locale][key] ?? key,
     })),
   };
 });
@@ -30,6 +40,9 @@ jest.mock('@/lib/i18n/server', () => {
 const mockGetProfileBySlug = getProfileBySlug as unknown as jest.Mock;
 const mockGetCurrentUser = getCurrentUser as unknown as jest.Mock;
 const mockGetMyApplications = getMyApplications as unknown as jest.Mock;
+const mockI18nServer = jest.requireMock('@/lib/i18n/server') as {
+  __setLocaleForTest: (locale: 'en' | 'ko') => void;
+};
 
 const profileData = {
   id: 'user-1',
@@ -58,6 +71,7 @@ const profileData = {
 describe('CandidateSlugPage', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockI18nServer.__setLocaleForTest('en');
     mockGetProfileBySlug.mockResolvedValue({
       success: true,
       data: profileData,
@@ -100,5 +114,18 @@ describe('CandidateSlugPage', () => {
 
     expect(screen.queryByText('My Jobs')).not.toBeInTheDocument();
     expect(mockGetMyApplications).not.toHaveBeenCalled();
+  });
+
+  it('ko 로케일에서 공개 프로필 상태 문구를 현지화한다', async () => {
+    mockI18nServer.__setLocaleForTest('ko');
+    mockGetCurrentUser.mockResolvedValue(null);
+
+    const ui = await CandidateSlugPage({
+      params: Promise.resolve({ slug: 'lion-park' }),
+    });
+    renderWithI18n(ui, { locale: 'ko' });
+
+    expect(screen.getByText('구직 중')).toBeInTheDocument();
+    expect(screen.queryByText('Open to Work')).not.toBeInTheDocument();
   });
 });
