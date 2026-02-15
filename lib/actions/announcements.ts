@@ -9,10 +9,14 @@ import {
   getAnnouncementNeighbors as ucGetAnnouncementNeighbors,
 } from '@/lib/use-cases/announcements';
 
-type QueryResult<T> = { success: true; data: T } | { error: string };
+type QueryResult<T> =
+  | { success: true; data: T }
+  | { error: string; errorCode?: string };
 
-function handleError(e: unknown): { error: string } {
-  if (e instanceof DomainError) return { error: e.message };
+function handleError(e: unknown): { error: string; errorCode?: string } {
+  if (e instanceof DomainError) {
+    return { error: e.message, errorCode: e.code };
+  }
   if (e instanceof ZodError) return { error: '필터 값이 유효하지 않습니다' };
   throw e;
 }
