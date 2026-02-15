@@ -1,8 +1,10 @@
 import { Icon } from '@/components/ui/icon';
 import { Chip } from '@/components/ui/chip';
 import { Button } from '@/components/ui/button';
-import { EMPLOYMENT_TYPE_LABELS } from '@/entities/profile/ui/_utils';
-import { WORK_ARRANGEMENT_LABELS } from '@/entities/job/ui/_utils';
+import {
+  EMPLOYMENT_TYPE_LABELS,
+  WORK_ARRANGEMENT_LABELS,
+} from '@/lib/frontend/presentation';
 
 type Props = {
   jobDisplayNameEn: string;

@@ -1,4 +1,4 @@
-import { APPLY_STATUS_LABELS } from '@/entities/job/ui/_utils';
+import { APPLY_STATUS_LABELS } from '@/lib/frontend/presentation';
 
 const STATUS_CLASSES: Record<string, string> = {
   applied: 'bg-blue-100 text-blue-800',

@@ -3,11 +3,9 @@ import { Card, CardContent } from '@/components/ui/card';
 import {
   EMPLOYMENT_TYPE_LABELS,
   formatDate,
-} from '@/entities/profile/ui/_utils';
-import {
   WORK_ARRANGEMENT_LABELS,
   formatSalary,
-} from '@/entities/job/ui/_utils';
+} from '@/lib/frontend/presentation';
 
 type Props = {
   id: string;

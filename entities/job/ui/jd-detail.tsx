@@ -1,9 +1,9 @@
 import ReactMarkdown from 'react-markdown';
-import { EMPLOYMENT_TYPE_LABELS } from '@/entities/profile/ui/_utils';
 import {
+  EMPLOYMENT_TYPE_LABELS,
   WORK_ARRANGEMENT_LABELS,
   formatSalary,
-} from '@/entities/job/ui/_utils';
+} from '@/lib/frontend/presentation';
 
 type Props = {
   title: string;

@@ -5,8 +5,8 @@ import { Icon } from '@/components/ui/icon';
 import {
   EMPLOYMENT_TYPE_LABELS,
   formatDate,
-} from '@/entities/profile/ui/_utils';
-import { WORK_ARRANGEMENT_LABELS } from '@/entities/job/ui/_utils';
+  WORK_ARRANGEMENT_LABELS,
+} from '@/lib/frontend/presentation';
 
 type Props = {
   id: string;

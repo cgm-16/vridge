@@ -22,7 +22,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { PROFICIENCY_LABELS } from '@/entities/profile/ui/_utils';
+import { PROFICIENCY_LABELS } from '@/lib/frontend/presentation';
 import {
   useAddLanguage,
   useUpdateLanguage,

@@ -28,7 +28,7 @@ import {
   EXPERIENCE_LEVEL_LABELS,
   GRADUATION_STATUS_LABELS,
   PROFICIENCY_LABELS,
-} from '@/entities/profile/ui/_utils';
+} from '@/lib/frontend/presentation';
 import {
   useAddCareer,
   useAddCertification,

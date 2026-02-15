@@ -23,7 +23,7 @@ import {
 import {
   EDUCATION_TYPE_LABELS,
   GRADUATION_STATUS_LABELS,
-} from '@/entities/profile/ui/_utils';
+} from '@/lib/frontend/presentation';
 import {
   useAddEducation,
   useUpdateEducation,

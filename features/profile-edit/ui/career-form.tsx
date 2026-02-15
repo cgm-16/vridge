@@ -27,7 +27,7 @@ import { FormDropdown } from '@/components/ui/form-dropdown';
 import {
   EMPLOYMENT_TYPE_LABELS,
   EXPERIENCE_LEVEL_LABELS,
-} from '@/entities/profile/ui/_utils';
+} from '@/lib/frontend/presentation';
 import {
   useAddCareer,
   useUpdateCareer,
