@@ -1,12 +1,12 @@
 # 프로젝트 폴더 구조
 
-> 이 문서는 현재 `dev` 기준 코드 구조를 기준으로 유지합니다.
+> 이 문서는 현재 `dev` 기준 코드 구조를 반영합니다.
 
 ## 아키텍처 요약
 
-- 백엔드: `lib/domain -> lib/use-cases -> lib/infrastructure -> lib/actions` (Clean Architecture)
+- 백엔드: `lib/domain -> lib/use-cases -> lib/infrastructure -> lib/actions`
 - 프론트엔드: `entities -> features -> widgets -> app` (FSD)
-- 공용 프레젠테이션 유틸: `lib/frontend/presentation.ts`
+- i18n: `lib/i18n/*` + `components/providers.tsx` 전역 주입
 - 라우팅: Next.js App Router (`app/`)
 
 ## 루트 구조
@@ -77,9 +77,12 @@ lib/
 ├── infrastructure/   # Prisma, BetterAuth, auth 유틸
 ├── use-cases/        # 비즈니스 로직
 ├── validations/      # Zod 스키마
-├── frontend/         # 프론트 공용 표현 유틸 (presentation)
+├── i18n/             # 로케일/번역 런타임/사전
+├── frontend/         # 프론트 공용 표현 유틸
 └── generated/prisma/ # Prisma 생성 산출물
 ```
+
+`lib/actions/_shared.ts`는 액션 공통 에러 매핑(`ActionError`)을 담당합니다.
 
 ## FSD 구조
 
@@ -120,7 +123,7 @@ features/
 └── profile-edit/
 ```
 
-`features/job-browse/model/query-state.ts`가 jobs 목록의 `search`, `familyId`, `sort`, `page` 쿼리 상태 규칙(파싱/패치/링크 생성)의 단일 소유 지점입니다.
+`features/job-browse/model/query-state.ts`가 jobs 목록의 `search`, `familyId`, `sort`, `page` 쿼리 규칙의 단일 소유 지점입니다.
 
 ### widgets
 
@@ -131,13 +134,31 @@ widgets/
     └── user-menu.tsx
 ```
 
+## i18n 구조
+
+```text
+lib/i18n/
+├── config.ts
+├── types.ts
+├── runtime.ts
+├── server.ts
+├── client.tsx
+├── catalog.ts
+├── action-error.ts
+└── messages/
+    ├── vi.ts
+    ├── en.ts
+    └── ko.ts
+```
+
+## 테스트 구조 (`__tests__/`)
+
+- 소스 구조를 미러링하여 `app/`, `lib/`, `entities/`, `features/`, `widgets/` 단위로 유지
+- UI 렌더링 테스트 + use-case/action 단위 테스트 + `proxy.ts` node 환경 테스트
+- i18n 클라이언트 컴포넌트는 `__tests__/test-utils/render-with-i18n.tsx`로 감싸서 렌더링
+
 ## `proxy.ts` 역할
 
 - 정적 파일 경로(확장자 포함 경로)는 인증 검사 없이 통과
 - 공개 경로(`/`, `/jobs`, `/announcements`, 공개 후보자 slug 경로, `/api/auth`)는 세션 검사 없이 통과
-- 보호 경로에서 미인증이면 `/jobs?auth=required`로 리다이렉트
-
-## 테스트 구조 (`__tests__/`)
-
-- 소스 구조를 미러링해서 `app/`, `lib/`, `entities/`, `features/`, `widgets/` 단위로 유지
-- UI 렌더링 테스트 + use-case/action 단위 테스트 + proxy/node 환경 테스트를 함께 사용
+- 보호 경로 미인증 접근은 `/jobs?auth=required`로 리다이렉트

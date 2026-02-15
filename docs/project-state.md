@@ -1,418 +1,98 @@
-# Project State — vridge ATS MVP
-
-> Internal reference for Ori and Claude. English only.
-
----
-
-## Current Status
-
-- **Branch**: `dev` (clean working tree)
-- **Tests**: 249 passing (32 suites), 0 failing
-- **Types**: `tsc --noEmit` clean
-- **PRs**: 22 merged to dev (PRs #3–#22), PR #23 open (P19)
-
-## Completed Prompts (1–15)
-
-| #   | Scope      | What it built                                                                                         |
-| --- | ---------- | ----------------------------------------------------------------------------------------------------- |
-| 1   | Foundation | Jest config (next/jest + SWC), Prisma singleton (`PrismaPg`), `.env.example`                          |
-| 2   | Foundation | BetterAuth schema (4 models), seed script (5 job families, 30 skills). DB migration pending           |
-| 3   | Auth       | BetterAuth server instance, `api/auth/[...all]` route                                                 |
-| 4   | Auth       | Auth client (browser), `getCurrentUser`/`requireUser`/`requireRole`                                   |
-| 5   | Auth       | Route protection middleware (`proxy.ts`), signup hook (auto-provision AppUser + profiles)             |
-| 6   | Validation | Zod schemas: profile (7), application (1), job-description filter (1)                                 |
-| 7   | Domain     | `DomainError` + factories, `assertOwnership`/`assertRole`, reachability checker (DI)                  |
-| 8   | Data       | Profile use-cases (18 functions) + server actions (18 actions)                                        |
-| 9   | Data       | Catalog queries (job families, skills search), JD queries (paginated, filtered)                       |
-| 10  | Data       | Application management: create/withdraw/list, recruiter applicant queries                             |
-| 11  | UI Shell   | Providers, MainNav (Jobs + Announcement tabs), dashboard sidebar layout                               |
-| 12  | Auth UI    | Login/signup modals (Zustand state, TanStack Form), `?auth=required` redirect handling                |
-| 13  | Entity UI  | Profile display components (7 components: header, career, education, language, skills, urls, contact) |
-| 14  | Feature UI | Profile edit forms (7 forms + skill picker), 16 mutation hooks                                        |
-| 15  | Feature UI | Job browse (filters, card grid, pagination), job detail, apply/withdraw button, my applications       |
-
-| 17 | Schema | Prisma schema evolution: 2 new enums, 6 new fields, 2 new models (ProfileCertification, Announcement) |
-| 18 | Data | Certification CRUD, announcement queries, extended Zod schemas (+7 fields across 3 schemas) |
-| 19 | Auth UI | Social login (Google/Facebook), PasswordInput component, login/signup modal redesign (two-step flow) |
-
-## Descoped
-
-- **Prompt 16** (Recruiter Dashboard) — descoped from current plan
-
-## Not Yet Built
-
-- **Recruiter views**: No recruiter dashboard, applicant list, or candidate profile view pages
-- **File uploads**: No S3 integration, no attachment upload/download
-- **Error pages**: No `error.tsx`, `not-found.tsx`, or loading skeletons
-- **E2E smoke test**: No integration-level test covering full user flows
-- **Announcement pages**: Backend ready (P18), `app/announcements/` routes not created yet
-- **Recruiter sidebar**: Dashboard sidebar only shows candidate links (My Profile, My Jobs)
-- **Design system**: Shared UI primitives (Icon, StatusIndicator, Pagination, brand button) not yet built (P20)
-
-## Existing Backend Ready but No UI
-
-These use-cases and actions exist but have no corresponding pages:
-
-| Backend                                  | Functions                                        | UI Status       |
-| ---------------------------------------- | ------------------------------------------------ | --------------- |
-| `getApplicationsForJd(jdId)`             | Recruiter: list applicants for a JD              | No page         |
-| `getApplicantStats(jdId)`                | Recruiter: status counts per JD                  | No page         |
-| `getProfileForViewer(candidateId, mode)` | Recruiter: view candidate profile (partial/full) | No page         |
-| `getProfileForRecruiter` action          | Wraps above with authorization                   | No page         |
-| Certification CRUD (P18)                 | add/update/deleteCertification + actions         | No edit form UI |
-| Announcement queries (P18)               | getAnnouncements + getAnnouncementById + actions | No page         |
-| Attachment use-cases                     | Planned in Prompt 17                             | Not implemented |
-
-## Key Technical Patterns Established
-
-### Backend
-
-- **Action result type**: `{ success: true, data: T }` or `{ error: string }` — narrowed with `'error' in result`
-- **Auth mock pattern**: Factory mock for any module transitively importing Prisma or better-auth ESM
-- **Domain purity**: `lib/domain/` has zero infrastructure imports; DB-dependent checks use DI (`ReachabilityChecker`)
-- **Zod 4 UUID**: Validates RFC 4122 variant bits — test UUIDs must use `123e4567-e89b-12d3-a456-426614174000` format
-
-### Frontend
-
-- **Entity components**: Server components, no `'use client'`, local prop types (decoupled from Prisma)
-- **Feature components**: Client components with `'use client'`, TanStack Form for forms, TanStack Query for mutations
-- **Auth modals**: Zustand store (`use-auth-modal.ts`), modals rendered globally in `app/layout.tsx`. Social login via `signIn.social()`. Shared `PasswordInput` component (lock icon + eye toggle).
-- **Signup flow**: Two-step (method select → email form → success). `signUp.email()` passes `name: email.split('@')[0]` as derived fallback.
-- **QueryResult extraction**: `Extract<Awaited<ReturnType<typeof action>>, { success: true }>['data']`
-- **JD pages**: Dual routing — public (`/jobs/`) and authenticated (`/candidate/jobs/`)
-
-### Tooling
-
-- **Package manager**: pnpm (never npm/npx)
-- **Middleware**: `proxy.ts` (NOT `middleware.ts`)
-- **Prisma output**: `lib/generated/prisma/` (gitignored, needs `prisma generate`)
-
-## Routes Summary
-
-### Public (no auth)
-
-| Route                | Page                                   | Status                         |
-| -------------------- | -------------------------------------- | ------------------------------ |
-| `/`                  | Redirects to `/jobs`                   | Working                        |
-| `/jobs`              | Job listing (filters, pagination)      | Working                        |
-| `/jobs/[id]`         | Job detail (with "login to apply" CTA) | Working                        |
-| `/announcement`      | Announcement list                      | Nav tab exists, page not built |
-| `/announcement/[id]` | Announcement detail                    | Not built                      |
-
-### Authenticated — Candidate
-
-| Route                     | Page                       | Status  |
-| ------------------------- | -------------------------- | ------- |
-| `/candidate/profile`      | View my profile            | Working |
-| `/candidate/profile/edit` | Edit profile (forms)       | Working |
-| `/candidate/jobs`         | Job listing (same filters) | Working |
-| `/candidate/jobs/[id]`    | Job detail + apply button  | Working |
-| `/candidate/applications` | My applications list       | Working |
-
-### Authenticated — Recruiter
-
-| Route                           | Page                    | Status    |
-| ------------------------------- | ----------------------- | --------- |
-| `/recruiter`                    | Recruiter dashboard     | Not built |
-| `/recruiter/jd/[id]/applicants` | Applicant list for a JD | Not built |
-| `/recruiter/candidates/[id]`    | Candidate profile view  | Not built |
-
----
-
-## Figma Page Mapping
-
-File key: `27tn2lCDeji78dNzuOICXv`
-
-### Auth — Sign In
-
-| Node ID   | Description       |
-| --------- | ----------------- |
-| 379-3660  | Sign in - main    |
-| 386-3134  | Sign in - variant |
-| 285-14923 | Sign in - variant |
-| 386-3612  | Sign in - variant |
-
-### Auth — Sign Up
-
-| Node ID   | Description       |
-| --------- | ----------------- |
-| 386-3979  | Sign up - main    |
-| 285-14619 | Sign up - variant |
-| 386-4511  | Sign up - variant |
-| 386-4533  | Sign up - variant |
-| 386-4670  | Sign up - variant |
-| 386-4611  | Sign up - variant |
-| 386-4610  | Sign up - variant |
-| 285-14813 | Sign up - variant |
-
-### Home — Jobs List (`/jobs`)
-
-| Node ID  | Description      |
-| -------- | ---------------- |
-| 379-2515 | Job listing page |
-
-### Home — Job Detail (`/jobs/[id]`)
-
-| Node ID  | Description     |
-| -------- | --------------- |
-| 379-2826 | Job detail page |
-
-### Announcements List (`/announcements`)
-
-| Node ID   | Description               |
-| --------- | ------------------------- |
-| 315-15060 | Announcement listing page |
-| 330-1192  | Navbar only (wrong node)  |
-
-### Announcement Detail (`/announcements/[postId]`)
-
-| Node ID   | Description              |
-| --------- | ------------------------ |
-| 315-15103 | Announcement detail page |
-| 330-1214  | Navbar only (wrong node) |
-
-### My Page — Profile View (`/candidate/[id]/profile`)
-
-| Node ID  | Description       |
-| -------- | ----------------- |
-| 323-1107 | Profile view page |
-
-### My Page — Profile Edit (`/candidate/[id]/profile/edit`)
-
-| Node ID  | Description            |
-| -------- | ---------------------- |
-| 323-783  | Profile edit - main    |
-| 327-1910 | Profile edit - variant |
-| 323-1093 | Profile edit - variant |
-| 323-1081 | Profile edit - variant |
-| 327-1961 | Profile edit - variant |
-
-### My Page — My Jobs (`/candidate/[id]/profile/jobs`)
-
-| Node ID  | Description          |
-| -------- | -------------------- |
-| 283-2635 | My applied jobs list |
-
-### My Page — Landing (`/candidate/[id]`)
-
-| Node ID  | Description                |
-| -------- | -------------------------- |
-| 283-2572 | Candidate landing/overview |
-
-### Design System — Components
-
-| Node ID  | Description                   |
-| -------- | ----------------------------- |
-| 378-439  | Component library             |
-| 163-7580 | Component library             |
-| 343-4125 | Icons (most in public/icons/) |
-
-## Routing Changes from Figma
-
-Ori's notes during mapping (to be discussed):
-
-1. **Profile slug for sharing**: Figma shows `/candidate/[uniqueId]/profile` — current impl uses `/candidate/profile` (no dynamic segment). Need to add shareable profile URLs.
-2. **Announcements (plural)**: Figma uses `/announcements`, current nav links to `/announcement` (singular). Need to decide and align.
-3. **Pagination strategy**: Figma designs for `/jobs` and `/announcements` — need to review pagination approach (current: simple prev/next with page numbers).
-4. **My Jobs route**: Figma shows `/candidate/[id]/profile/jobs` — current impl uses `/candidate/applications`. Different URL structure.
-5. **Candidate landing page**: Figma has `/candidate/[id]` as an overview/landing — not currently implemented.
-
-## Figma vs. Implementation Comparison
-
-### Sign In Modal
-
-**Figma**: Social login (Google + Facebook) at top → "or" divider → email/password fields → "Forgot password?" → "Continue" button. Input fields have icon prefixes (@ for email, lock for password). Password has show/hide toggle. Button is orange when form filled, gray when empty. Error state shows red text below password field. Top-left: "Don't have an account yet? Sign up".
-
-**Current implementation**: Plain email + password labels + inputs. No social login. No input icons. No password toggle. No "Forgot password?" link. Button says "Log in" (not "Continue"). No disabled/gray state. Korean labels ("로그인"). "계정이 없으신가요? Sign Up" at bottom center.
-
-**Differences**:
-
-- [x] Missing: Google + Facebook social login buttons
-- [ ] Missing: Input field icons (@ prefix for email — P20 InputWithIcon)
-- [x] Missing: Password visibility toggle (show/hide eye icon) — PasswordInput component
-- [x] Missing: "Forgot password?" link (stub)
-- [ ] Missing: Button disabled state (gray when form empty, orange when filled — P20 brand variant)
-- [x] Layout: Figma has "Don't have an account?" at top-left; impl has it at bottom-center
-- [ ] Label: Figma says "Login" title + "Continue" button; impl says "로그인" + "Log in"
-- [ ] Style: Figma button is rounded-full orange; impl uses shadcn default (P20)
-
-### Sign Up Modal
-
-**Figma**: Two-step flow. Step 1: choose method (Google / Facebook / Email). Step 2 (email): email + password only (no name, no confirm). Privacy policy checkbox required. Real-time password validation (green "Valid Password" ✓ / red "Password must be at least 8 characters" ✗). Email duplicate check (red "Someone is already using the same email address"). Success screen: orange checkmark circle + "You're all set!" + "Welcome to your K-career journey!" + "Continue" button. Top-left: "Have an account? Login".
-
-**Current implementation**: Single-step form with name + email + password + confirmPassword. No social login options. No privacy policy checkbox. No real-time validation feedback (only on-submit). No success screen. "회원가입" title.
-
-**Differences**:
-
-- [x] Missing: Two-step signup flow (method selection → form)
-- [x] Missing: Google + Facebook signup options
-- [x] Missing: Privacy policy / Terms of Service checkbox
-- [x] Missing: Real-time password validation (green ✓ / red ✗ inline feedback)
-- [ ] Missing: Real-time email duplicate check
-- [x] Missing: Success screen ("You're all set!" with checkmark)
-- [x] Extra: Current has `name` and `confirmPassword` fields; Figma does not — removed, name derived from email
-- [x] Layout: Figma has "Have an account?" at top-left; impl has it at bottom-center
-
-### Jobs List (`/jobs`)
-
-**Figma**: Search bar at top. Horizontal category tabs (All / Develop / Design / Marketing / etc). "Sort by: Recent updated" dropdown with sort icon. Job cards show: company logo placeholder, CompanyName, time, "Recruiting" green status dot, **bold Job Position title**, metadata row with icons (briefcase Job Title, location Work Type, chart Required Experience, edu Required Edu), skill label badges, orange "Apply Now" button on right. Numbered pagination: ‹ 1 2 3 4 5 ··· ›.
-
-**Current implementation**: Dropdown select filters (job family, employment type, work arrangement). No search bar. No category tabs. No sort. Cards are simpler layout. No company logo. No "Recruiting" status. No "Apply Now" button on cards (card is clickable link). Simple prev/next pagination with "이전"/"다음".
-
-**Differences**:
-
-- [ ] Missing: Search bar
-- [ ] Missing: Horizontal category tabs (Figma) vs dropdown selects (impl)
-- [ ] Missing: Sort functionality ("Sort by: Recent updated")
-- [ ] Missing: Company logo in card
-- [ ] Missing: "Recruiting" / "Done" status indicator (green/gray dot)
-- [ ] Missing: Icon prefixes in metadata row (briefcase, location, chart, edu icons)
-- [ ] Missing: "Apply Now" button on each card
-- [ ] Missing: Numbered pagination (1, 2, 3, 4, 5, ...) — current is simple prev/next
-- [ ] Layout: Figma card is horizontal full-width row; impl may differ in structure
-
-### Job Detail (`/jobs/[id]`)
-
-**Figma**: Back arrow ‹ + company logo + title "[Company] Job Position / Work Type / Required Experience" + time + "Recruiting" green dot. **Right sticky sidebar**: Job Title, Work Type, Required Experience, Required Edu (with icons), skill badge labels, orange "Apply Now" button + orange share/forward button. Main content: sectioned with headers (About Us, Responsibilities, Required Qualifications, Preferred Qualifications) with bullet lists.
-
-**Current implementation**: Title + metadata rendered inline. No sticky sidebar. No company logo. No share button. No back arrow navigation. Content rendered via react-markdown. Apply button/CTA is inline, not in sidebar.
-
-**Differences**:
-
-- [ ] Missing: Two-column layout (main content + right sticky sidebar)
-- [ ] Missing: Back arrow navigation (‹)
-- [ ] Missing: Company logo
-- [ ] Missing: "Recruiting" status badge
-- [ ] Missing: Share/forward button (orange circle with arrow)
-- [ ] Missing: Icons in sidebar metadata
-- [ ] Layout: Sidebar with apply button is a major layout change from current inline approach
-
-### Announcements List (`/announcements`)
-
-**Figma**: "Announcement" tab active (orange). Title "Announcement" with orange underline. Table layout with columns: No, Title, Time. Pinned posts shown with red pin icon (📌) instead of number. Numbered posts below (4, 3, 2, 1). Date format: YYYY.MM.DD. No pagination visible (short list). No sidebar — full-width public page.
-
-**Current implementation**: Page not built. Nav links to `/announcement` (singular).
-
-**Differences**:
-
-- [ ] Page not built at all
-- [ ] Route naming: `/announcement` (current nav) vs `/announcements` (to be decided)
-- [ ] Need: Table layout (No / Title / Time columns)
-- [ ] Need: Pin functionality for important posts (red pin icon replaces number)
-- [ ] Need: Date format YYYY.MM.DD
-- [ ] Need: Pagination strategy (Figma shows short list, but Ori noted pagination needed)
-
-### Announcement Detail (`/announcements/[postId]`)
-
-**Figma**: Back arrow ‹. Title bold, "(Pinned)" label + date "2026.02.06". Content body in gray background card with paragraph text + bullet lists. Bottom: "Next" and "Before" navigation rows linking to adjacent posts (title + date).
-
-**Current implementation**: Not built.
-
-**Differences**:
-
-- [ ] Page not built at all
-- [ ] Need: Back arrow navigation
-- [ ] Need: "(Pinned)" label for pinned posts
-- [ ] Need: Content rendered as paragraphs + bullet lists (react-markdown)
-- [ ] Need: Next/Before post navigation at bottom
-
-### Profile View (`/candidate/profile`)
-
-**Figma**: Sidebar (MY Page / My Profile active / My Jobs / Logout). Main area: "Basic Profile" header → circular profile photo (large) → name, DOB "10. Feb. 2000", phone, email, location "Ho Chi Minh City, Vietnam", bio text. "Open to Work" green toggle/badge. Sections: Education (institution, dates, field, graduated), Skills (badge pills), Experience (company, dates, role, seniority, bullet descriptions), **Certification** (award name, year, institution), Languages (name + level + optional test score "TOEFL · 100"), Portfolio (file attachment with size "20.2MB"). Bottom-right: orange "Edit Profile" button.
-
-**Current implementation**: Sidebar matches. Sections: Basic info (firstName + lastName + aboutMe), Contact (phone + email), Skills, Experience, Education, Languages, URLs. Uses Card wrappers per section. No profile photo. No DOB. No location. No "Open to Work" toggle. No Certification section. No Portfolio/attachments. No test score for languages. "편집" button (top-right, outline variant).
-
-**Differences**:
-
-- [ ] Missing: Profile photo (circular, uploadable)
-- [ ] Missing: Date of birth display
-- [ ] Missing: Location field
-- [ ] Missing: "Open to Work" toggle/badge
-- [ ] Missing: Certification section (Prisma model added in P17, CRUD in P18, UI pending P22)
-- [ ] Missing: Portfolio/attachment display (S3 not implemented)
-- [ ] Missing: Language test score display (e.g., "TOEFL · 100")
-- [ ] Layout: Figma has "Basic Profile" as unified header card with photo; impl has separate Card sections
-- [ ] Style: Figma "Edit Profile" is bottom-right orange filled; impl "편집" is top-right outline
-- [ ] Section order differs: Figma is Basic → Education → Skills → Experience → Certification → Languages → Portfolio; impl is Basic → Contact → Skills → Experience → Education → Languages → URLs
-
-### Profile Edit (`/candidate/profile/edit`)
-
-**Figma**: Full-width form (no sidebar). Sections: Basic Profile (Hiring Status toggle, Last Name + First Name, Date of Birth custom month/year picker, phone with country code dropdown (+84/+82), email, location, headline, about me), Education (School Name, Level of Education dropdown with: High School Diploma / Associate / Bachelor's / Master's / Doctoral / Other, Field of Study, date range month/year picker, Graduation Status: Enrolled / On Leave / Graduated / Expected / Withdrawn), Skills (search + tag badges with ×), Experience (Company Name, date range, Job role, Field, Experience Level dropdown: Entry / Junior / Mid / Senior / Lead, Description), Certification (name, date, description), Languages (name + Proficiency Level: Basic / Intermediate / Advanced / Fluent / Native), Portfolio (file upload), URL (url input + listed urls). Bottom-right "Save" button.
-
-**Current implementation**: Has sidebar (not full-width). Sections split into Cards. HTML date inputs (not custom month/year). Plain phone input (no country code). No hiring status. No DOB. No location. No headline. No certification. No file upload. Education types/graduation statuses use different enum values. Experience doesn't have "Experience Level" dropdown.
-
-**Differences**:
-
-- [ ] Layout: Figma is full-width (no sidebar); impl has sidebar
-- [ ] Missing: Hiring Status toggle
-- [ ] Missing: Date of birth field with custom picker
-- [ ] Missing: Location field
-- [ ] Missing: Headline field
-- [ ] Missing: Phone country code dropdown (+84, +82)
-- [ ] Missing: Custom month/year date picker (current uses HTML date input)
-- [ ] Missing: Experience Level dropdown — schema field added P17, Zod added P18, UI pending P22
-- [ ] Missing: Certification section — backend ready P18, UI pending P22
-- [ ] Missing: File upload (Portfolio)
-- [ ] Enum mismatch: Education levels (Figma: High School → Doctoral + Other; schema may differ)
-- [x] Enum mismatch: Graduation status (Figma: Enrolled/On Leave/Graduated/Expected/Withdrawn; schema migrated to GraduationStatus enum in P17)
-
-### My Jobs / Applications (`/candidate/applications`)
-
-**Figma**: Title "My Jobs". Summary stat cards: "Applied: 2" | "In progress: 0". "List" section header. Job cards in same format as /jobs page (company logo, position, metadata with icons, skill labels). Sidebar present.
-
-**Current implementation**: Application list as table-like rows. Status badge per entry. No summary stats cards. Different layout from /jobs cards.
-
-**Differences**:
-
-- [ ] Missing: Summary stat cards (Applied count, In progress count)
-- [ ] Layout: Figma uses same job card format; impl uses simpler list
-- [ ] Missing: Reuse of JdCard component for applied jobs
-
-### Candidate Landing (`/candidate/[id]`)
-
-**Figma**: Dashboard landing showing profile summary (condensed Basic Profile card with photo, name, DOB, contact, location, bio, "Open to Work" toggle) + My Jobs summary (Applied/In progress stat cards). Sidebar present.
-
-**Current implementation**: This page does not exist. Current `/candidate/profile` goes directly to full profile view.
-
-**Differences**:
-
-- [ ] Page not built at all
-- [ ] Requires dynamic segment `[id]` for shareable URLs
-
-### Navbar
-
-**Figma**: VRIDGE logo (custom font) | pill-shaped container with Jobs + Announcement tabs (active tab in orange text) | EN dropdown | Log in · Sign Up (unauthenticated) OR avatar circle (authenticated). Multiple variants: light bg, dark bg variations shown.
-
-**Current implementation**: VRIDGE text | Jobs + Announcement links | EN stub | Log in / Sign Up buttons or UserMenu dropdown. Generally matches structure.
-
-**Differences**:
-
-- [ ] Style: Figma tabs are in a pill-shaped rounded container; impl may differ
-- [ ] Style: Active tab text is orange in Figma
-- [ ] Missing: EN language dropdown functionality (currently stub)
-- [ ] Missing: VRIDGE custom logo font (using text)
-
-### Sidebar
-
-**Figma**: "MY Page" header. Links: My Profile, My Jobs. Logout at bottom. Active link in orange text.
-
-**Current implementation**: Matches. Active link in `text-brand` (orange). Logout at bottom.
-
-**Differences**:
-
-- [ ] Minimal — sidebar is close to Figma
-
-### Design System / Components
-
-**Figma**: Orange primary color (buttons, active states). Rounded-full buttons. Custom SVG icons in `public/icons/` (25 icons present). Input fields with leading icons. Custom date picker (month/year scroll). Status indicators (green dot for "Recruiting"). Dark/light navbar variants.
-
-**Current implementation**: Using shadcn/ui defaults. Icons from `public/icons/` exist but aren't used in form inputs. No custom date picker. No status indicators. Standard shadcn button styles (not rounded-full orange).
-
-**Differences**:
-
-- [ ] Button style: Should be rounded-full with orange bg (not shadcn default)
-- [ ] Input style: Should have leading icon support (@ for email, lock for password, etc.)
-- [ ] Missing: Custom date picker component (month/year scroll with "Select" button)
-- [ ] Missing: Status indicator component (green/gray dot + label)
-- [ ] Icons: 25 SVGs exist in `public/icons/` but not used in components yet
-- [ ] Theme: Need to verify shadcn theme tokens align with Figma orange (#F97316 or similar)
+# 프로젝트 상태 — vridge ATS MVP
+
+> 내부 공유 문서 (기준 브랜치: `dev`)
+
+## 현재 스냅샷
+
+- 브랜치: `dev`
+- 테스트: `70` suite, `457` tests 통과
+- 타입 체크: `pnpm exec tsc --noEmit` 통과
+- 앱 라우팅: Next.js App Router (`app/`)
+- 인증: Better Auth + `proxy.ts` 기반 라우트 보호
+- 다국어: `vi` 기본, `en`/`ko` 지원, 쿠키 기반 로케일 유지
+
+## 완료 범위
+
+### Foundation / Auth / Data
+
+- Jest + Prisma + 환경변수 기본 구성
+- Better Auth 서버/클라이언트/세션 유틸 구성
+- `lib/domain` + `lib/use-cases` + `lib/actions` 계층 구조 정착
+- Profile / Catalog / Job Description / Application / Announcement 유스케이스 및 서버 액션 구현
+- Zod 스키마(프로필/채용공고/지원/공지) 적용
+
+### UI
+
+- 공통 레이아웃, 내비게이션, 인증 모달
+- 채용공고 목록/상세/지원 플로우
+- 공지사항 목록/상세
+- 후보자 공개 페이지(`app/candidate/[slug]/*`)
+- 대시보드 내 내 프로필/프로필 편집/내 지원 목록
+- 전역 `error.tsx`, `not-found.tsx`, 라우트별 `loading.tsx`/`error.tsx` 반영
+
+### i18n (Phase 6)
+
+- i18n 코어 추가
+  - `lib/i18n/config.ts`, `lib/i18n/runtime.ts`, `lib/i18n/server.ts`, `lib/i18n/client.tsx`
+  - 메시지 사전: `lib/i18n/messages/{vi,en,ko}.ts`
+- 로케일 정책
+  - 기본 로케일: `vi`
+  - 지원 로케일: `vi`, `en`, `ko`
+  - 쿠키 키: `vridge_locale` (URL 프리픽스 없음)
+  - 번역 누락 시 영어 사전으로 폴백
+- 앱 셸 연동
+  - `app/layout.tsx`에서 로케일/메시지 주입
+  - `<html lang>` 및 메타데이터 로컬라이징
+  - `widgets/nav/ui/main-nav.tsx` 언어 전환 + `router.refresh()`
+- 공통 표현/카탈로그/오류 로컬라이징
+  - `lib/frontend/presentation.ts` 로케일 인식 라벨/포맷
+  - `lib/i18n/catalog.ts` 카탈로그 표시명 선택 헬퍼
+  - 액션 에러 계약 표준화: `{ errorCode, errorKey, errorMessage? }`
+
+## 라우트 상태
+
+### 공개 라우트
+
+- `/` → `/jobs` 리다이렉트
+- `/jobs`, `/jobs/[id]`
+- `/announcements`, `/announcements/[id]`
+- `/candidate/[slug]`, `/candidate/[slug]/profile`
+- `/api/auth/*`
+
+### 인증 라우트 (후보자)
+
+- `/candidate/profile`
+- `/candidate/profile/edit`
+- `/candidate/applications`
+
+### 미구현/후속 라우트 (채용담당자)
+
+- `/recruiter` 대시보드
+- JD별 지원자 목록/후보자 열람 화면
+
+## 현재 규칙/패턴
+
+- 백엔드 계층
+  - `lib/domain`은 인프라 의존성 없음
+  - `lib/actions`는 유스케이스 어댑터 역할
+- 액션 결과 타입
+  - 성공: `{ success: true, data?: T }`
+  - 실패: `{ errorCode, errorKey, errorMessage? }`
+- 쿼리 상태 단일 소유
+  - `features/job-browse/model/query-state.ts`
+- 테스트 헬퍼
+  - i18n 의존 클라이언트 컴포넌트는 `__tests__/test-utils/render-with-i18n.tsx` 사용
+
+## 보류/후속 과제
+
+- S3 업로드(프로필 이미지/포트폴리오)
+- 채용담당자 대시보드 및 지원자 관리 UI
+- 비밀번호 찾기/재설정 플로우
+- 고급 입력 UI(국가코드 선택, 커스텀 월/년 picker)
+
+## 참고 문서
+
+- 구현 계획: `docs/implementation-plan-p5.md`
+- 폴더 구조: `docs/folder-structure.md`
+- 진행 현황: `todo.md`
+- 기존 상세 요구사항 체크리스트(아카이브): `docs/project-state-requirements.md`
