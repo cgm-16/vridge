@@ -31,6 +31,7 @@ vridge/
 ```
 
 - `public/icons/`에 dialcode picker용 국기 아이콘(`flag-vn.svg`, `flag-kr.svg`)이 추가되었습니다.
+- `public/icons/share.svg` 아이콘은 `/jobs/[id]` 상세 공유 CTA에서 사용됩니다.
 - 인증/디자인 정렬용 공통 컴포넌트로 `components/ui/login-field.tsx`, `components/ui/social-ls.tsx`가 추가되었습니다.
 
 ## Next.js 라우트 구조 (`app/`)
@@ -198,6 +199,9 @@ stories/
 - jobs 목록 CTA 단위 테스트: `__tests__/app/jobs-list-apply-cta.test.tsx`
 - jobs 상세 라우트 회귀 테스트: `__tests__/app/job-detail-page.test.tsx`
 - jobs 상세 공유 버튼 단위 테스트: `__tests__/app/share-job-button.test.tsx`
+- announcements 목록 라우트 회귀 테스트: `__tests__/app/announcements-page.test.tsx`
+- announcements 상세 라우트 회귀 테스트: `__tests__/app/announcement-detail-page.test.tsx`
+- 인증 플로우 회귀 테스트: `__tests__/features/auth/login-modal.test.tsx`, `__tests__/features/auth/signup-modal.test.tsx`
 - 신규 UI 컴포넌트 테스트: `__tests__/components/ui/login-field.test.tsx`, `__tests__/components/ui/social-ls.test.tsx`
 
 ## `proxy.ts` 역할

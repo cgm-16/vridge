@@ -3,21 +3,21 @@
 - route: app/(dashboard)/candidate/profile
 - design: https://www.figma.com/design/27tn2lCDeji78dNzuOICXv/Vridge-Web-Ver-0.1?node-id=323-1107&m=dev
 - description: profile of the candidate
-- current state: is being redirected by proxy, edit button does not exist
+- current state: 완료 (proxy 리다이렉트 제거, 대시보드 내 프로필 직접 렌더링, 하단 `Edit Profile` CTA 연결)
 
 2.
 
 - route: app/candidate/[slug]
 - design: https://www.figma.com/design/27tn2lCDeji78dNzuOICXv/Vridge-Web-Ver-0.1?node-id=283-2572&m=dev
 - description: public profile of the candidate
-- current state: i18n related issue
+- current state: 완료 (공개 프로필 i18n 문구/날짜 포맷 및 섹션 레이아웃 정렬)
 
 3.
 
 - route: app/(dashboard)/candidate/profile/edit
 - design: https://www.figma.com/design/27tn2lCDeji78dNzuOICXv/Vridge-Web-Ver-0.1?node-id=323-560&m=dev , https://www.figma.com/design/27tn2lCDeji78dNzuOICXv/Vridge-Web-Ver-0.1?node-id=323-783&m=dev
 - description: edit mode of profile of the candidate
-- current state: is not linked from profile page
+- current state: 완료 (내 프로필 페이지에서 편집 진입 링크 연결 및 route-local 정렬 반영)
 
   3.1.
 
@@ -58,7 +58,7 @@
 - component: Email field, Password field
 - design: https://www.figma.com/design/27tn2lCDeji78dNzuOICXv/Vridge-Web-Ver-0.1?node-id=386-3148&m=dev, https://www.figma.com/design/27tn2lCDeji78dNzuOICXv/Vridge-Web-Ver-0.1?node-id=386-3149&m=dev
 - description: login / signup fields
-- current state: ❌ descoped (팀 합의). hidden/show 아이콘 매핑은 3.1c에서 해결되었고, 잔여 정렬은 item #10(인증 플로우 전반)에서 처리
+- current state: ❌ descoped (팀 합의). hidden/show 아이콘 매핑은 3.1c에서 해결되었고, 인증 플로우 전반 정렬은 item #10에서 완료
 
 6.
 
@@ -72,14 +72,14 @@
 - route: app/jobs/[id]
 - design: https://www.figma.com/design/27tn2lCDeji78dNzuOICXv/Vridge-Web-Ver-0.1?node-id=330-3286&m=dev
 - description : jobs detail
-- current state: design mismatch and feature mismatch (withdraw not needed in this page and job description share button missing.)
+- current state: 완료 (route-level 정렬 + 상세 페이지 Withdraw 미노출 + 공유 버튼/뒤로가기 인터랙션 반영)
 
 8.
 
 - route: app/announcements
 - design: https://www.figma.com/design/27tn2lCDeji78dNzuOICXv/Vridge-Web-Ver-0.1?node-id=315-15060&m=dev
 - description: announcements
-- current state: design mismatch
+- current state: 완료 (route-local 정렬 + 고정 공지 핀 마커/목록 간격 보정)
 
 9.
 
@@ -92,4 +92,4 @@
 
 - components : the entire sign in / sign up flow
 - design: https://www.figma.com/design/27tn2lCDeji78dNzuOICXv/Vridge-Web-Ver-0.1?node-id=285-14949&m=dev
-- current state: highly likely desing mismatch, recheck thoroughly.
+- current state: 완료 (로그인/회원가입 플로우 전반 디자인 정렬 반영)
