@@ -31,6 +31,7 @@ vridge/
 ```
 
 - `public/icons/`에 dialcode picker용 국기 아이콘(`flag-vn.svg`, `flag-kr.svg`)이 추가되었습니다.
+- 인증/디자인 정렬용 공통 컴포넌트로 `components/ui/login-field.tsx`, `components/ui/social-ls.tsx`가 추가되었습니다.
 
 ## Next.js 라우트 구조 (`app/`)
 
@@ -188,6 +189,8 @@ stories/
 - i18n 클라이언트 컴포넌트는 `__tests__/test-utils/render-with-i18n.tsx`로 감싸서 렌더링
 - 내 프로필 라우트 회귀 테스트: `__tests__/app/candidate-profile-page.test.tsx`
 - 내 프로필 편집 라우트 회귀 테스트: `__tests__/app/candidate-profile-edit-page.test.tsx`
+- 대시보드 사이드바 회귀 테스트: `__tests__/app/dashboard-sidebar.test.tsx`
+- 신규 UI 컴포넌트 테스트: `__tests__/components/ui/login-field.test.tsx`, `__tests__/components/ui/social-ls.test.tsx`
 
 ## `proxy.ts` 역할
 

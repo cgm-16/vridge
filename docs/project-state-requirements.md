@@ -15,6 +15,7 @@
 - [x] Google/Facebook 소셜 로그인 버튼
 - [x] 이메일/비밀번호 입력 아이콘
 - [x] 비밀번호 표시/숨김 토글
+- [x] 비밀번호 상태별 아이콘 매핑(`hidden.svg`/`show.svg`)
 - [x] `Forgot password?` 링크(스텁)
 - [x] 입력 전 비활성(회색) / 입력 후 활성(브랜드) 버튼 상태
 - [x] 상단 좌측 `Don't have an account yet? Sign up` 레이아웃
@@ -122,7 +123,7 @@
 
 ## Navbar
 
-- [ ] Figma pill 컨테이너 완전 매칭
+- [x] Figma pill 컨테이너 구조 정렬(로고/탭/언어/인증 영역)
 - [x] 활성 탭 오렌지 강조
 - [x] 언어 드롭다운 동작(vi/en/ko)
 - [ ] VRIDGE 전용 로고 폰트 완전 매칭
@@ -143,6 +144,7 @@
 - [x] LangPicker 기본/열림/메뉴 상태 정렬
 - [x] CTA/Tap/SectionTitle/Chips/PostStatus 상태 정렬(Figma `node 248:12932`, `248:12970`, `337:3647`, `343:3931`, `371:1267`)
 - [x] SummaryCard/PostingList/PostingTitle 표시 구조 정렬(Figma `node 348:4430`, `371:1380`, `378:1586`)
+- [x] 3.1c 잔여 공통 컴포넌트 정렬(`LoginField`, `SocialLS`, `GNB2 shell`, `SearchBar`, `Pagination`, `ProfileCard`, `MyPageMenu`, `Toggle`)
 - [ ] 토큰/테마의 Figma 1:1 매칭 검증
 
 ## Storybook 문서화
