@@ -35,6 +35,7 @@
 - `app/(dashboard)/candidate/profile/edit/page.tsx`는 대시보드 셸을 유지한 채 콘텐츠 패널 섹션 구조/하단 Save 바/포트폴리오 표시가 Figma node `323:560`, `323:783` 기준으로 보정됨
 - `app/(dashboard)/candidate/applications/page.tsx`는 route-local 합성으로 Figma node `283:2635` 기준의 `My Jobs/List` 26px 헤딩, 통계 카드(22px/rounded 20), 리스트 섹션 셸을 정렬함(공유 컴포넌트/대시보드 셸 변경 없음)
 - `app/jobs/page.tsx`는 Figma node `315:15170` 기준으로 route-level 합성(1200/800 컨테이너, 탭/정렬 3열 정렬, 카드 간격)을 보정했고, 목록 행의 direct apply CTA를 추가함
+- `app/announcements/page.tsx`는 Figma node `315:15060` 기준으로 route-local 합성(22px 헤딩, 테이블 간격 `25px`, 행 간격 `30px`)과 고정 공지 핀 마커 표현(아이콘 전용)을 보정함
 - `JobDescription.status`(`recruiting`/`done`) 모델을 추가하고 시드에 `done` 공고를 포함해 목록 상태 표현을 데이터 기반으로 전환함
 - DS `3.1a` 입력 계열 공통 컴포넌트 정렬 완료(완료/계획: `8/8`): `FormInput(file variant 포함)`, `FormDropdown`, `DropdownBox`, `DropdownMenu`, `DatePicker`, `DialcodePicker`, `LangPicker`, `LangMenu` 상호작용
 - DS `3.1b` 표시 계열 공통 컴포넌트 정렬 완료(완료/계획: `8/8`): `CTA(Button)`, `Tap(TabItem)`, `SectionTitle`, `Chips`, `SummaryCard`, `PostStatus`, `PostingList`, `PostingTitle`
