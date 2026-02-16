@@ -43,7 +43,8 @@
 - scope: DS Batch 3 (remaining shared components)
 - components: LoginField, SocialLS, GNB2, SearchBar, Pagination, ProfileCard, MyPageMenu, Toggle
 - design: https://www.figma.com/design/27tn2lCDeji78dNzuOICXv/Vridge-Web-Ver-0.1?node-id=378-1640&m=dev, https://www.figma.com/design/27tn2lCDeji78dNzuOICXv/Vridge-Web-Ver-0.1?node-id=378-1650&m=dev, https://www.figma.com/design/27tn2lCDeji78dNzuOICXv/Vridge-Web-Ver-0.1?node-id=335-3407&m=dev, https://www.figma.com/design/27tn2lCDeji78dNzuOICXv/Vridge-Web-Ver-0.1?node-id=378-1663&m=dev, https://www.figma.com/design/27tn2lCDeji78dNzuOICXv/Vridge-Web-Ver-0.1?node-id=379-1949&m=dev, https://www.figma.com/design/27tn2lCDeji78dNzuOICXv/Vridge-Web-Ver-0.1?node-id=388-3215&m=dev, https://www.figma.com/design/27tn2lCDeji78dNzuOICXv/Vridge-Web-Ver-0.1?node-id=399-3926&m=dev, https://www.figma.com/design/27tn2lCDeji78dNzuOICXv/Vridge-Web-Ver-0.1?node-id=405-3838&m=dev
-- progress: 0/8
+- progress: 8/8
+- note: item #5의 비밀번호 아이콘 상태(hidden/show) 불일치는 3.1c에서 부분 해결됨
 
 4.
 
@@ -57,7 +58,7 @@
 - component: Email field, Password field
 - design: https://www.figma.com/design/27tn2lCDeji78dNzuOICXv/Vridge-Web-Ver-0.1?node-id=386-3148&m=dev, https://www.figma.com/design/27tn2lCDeji78dNzuOICXv/Vridge-Web-Ver-0.1?node-id=386-3149&m=dev
 - description: login / signup fields
-- current state: design mismatch and icon mismatch (hidden password should be paired with hidden.svg, current implementation has flipped icon states)
+- current state: design mismatch remains; icon mismatch는 3.1c에서 해결됨 (hidden -> hidden.svg, visible -> show.svg)
 
 6.
 

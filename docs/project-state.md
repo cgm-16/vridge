@@ -35,6 +35,8 @@
 - `app/(dashboard)/candidate/profile/edit/page.tsx`는 대시보드 셸을 유지한 채 콘텐츠 패널 섹션 구조/하단 Save 바/포트폴리오 표시가 Figma node `323:560`, `323:783` 기준으로 보정됨
 - DS `3.1a` 입력 계열 공통 컴포넌트 정렬 완료(완료/계획: `8/8`): `FormInput(file variant 포함)`, `FormDropdown`, `DropdownBox`, `DropdownMenu`, `DatePicker`, `DialcodePicker`, `LangPicker`, `LangMenu` 상호작용
 - DS `3.1b` 표시 계열 공통 컴포넌트 정렬 완료(완료/계획: `8/8`): `CTA(Button)`, `Tap(TabItem)`, `SectionTitle`, `Chips`, `SummaryCard`, `PostStatus`, `PostingList`, `PostingTitle`
+- DS `3.1c` 잔여 공통 컴포넌트 정렬 완료(완료/계획: `8/8`): `LoginField`, `SocialLS`, `GNB2(MainNav/UserMenu shell)`, `SearchBar`, `Pagination`, `ProfileCard(mode 확장)`, `MyPageMenu(DashboardSidebar)`, `Toggle`
+- item `#5`의 비밀번호 아이콘 상태 불일치(`hidden.svg`/`show.svg`)는 `3.1c`에서 선반영되었고, 인증 필드/플로우의 나머지 정밀 정렬은 후속 항목으로 유지
 - `DialcodePicker`용 국기 아이콘 자산(`flag-vn.svg`, `flag-kr.svg`) 추가 및 트리거/메뉴 상태 정렬
 
 ### i18n (Phase 6)
@@ -112,7 +114,7 @@
 - S3 업로드(프로필 이미지/포트폴리오)
 - 채용담당자 대시보드 및 지원자 관리 UI
 - 비밀번호 찾기/재설정 플로우
-- 디자인 시스템 공통 컴포넌트 잔여 정렬(`fix_needed.md`의 `3.1c` 배치)
+- 인증 입력 필드/로그인·회원가입 플로우의 잔여 디자인 정렬(`fix_needed.md`의 `#5`, `#9`)
 
 ## 참고 문서
 
