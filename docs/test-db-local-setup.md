@@ -62,14 +62,14 @@ pnpm db:test:reset
 
 `prisma/seed.ts`에서 email/password 로그인 가능한 credential 계정을 함께 생성합니다.
 
-- candidate: `candidate@likelion.net` / `@Aaa111`
-- recruiter: `recruiter@likelion.net` / `@Aaa111`
-- admin: `likelion@likelion.net` / `@Aaa111`
+- candidate: `candidate@likelion.net` / `@Aaa111!`
+- recruiter: `recruiter@likelion.net` / `@Aaa111!`
+- admin: `likelion@likelion.net` / `@Aaa111!`
 
 추가 후보자 계정:
 
-- candidate: `anh.nguyen@example.com` / `@Aaa111`
-- candidate: `seed.candidate1@likelion.net` / `@Aaa111` (이후 번호 증가)
+- candidate: `anh.nguyen@example.com` / `@Aaa111!`
+- candidate: `seed.candidate1@likelion.net` (candidate1, candidate2, ...) / `@Aaa111!`
 
 > 주의: 위 비밀번호는 로컬 테스트 전용 고정값입니다. 운영/공용 환경에서 사용 금지.
 
