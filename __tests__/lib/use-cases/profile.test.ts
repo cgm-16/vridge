@@ -195,6 +195,22 @@ describe('updatePublicProfile', () => {
       data,
     });
   });
+
+  it('dateOfBirth 문자열을 Date로 변환해 업데이트', async () => {
+    const data = {
+      firstName: '김',
+      lastName: '철수',
+      dateOfBirth: '1996-03-07',
+    };
+    await updatePublicProfile('user-1', data);
+    expect(prisma.profilesPublic.update).toHaveBeenCalledWith({
+      where: { userId: 'user-1' },
+      data: {
+        ...data,
+        dateOfBirth: new Date('1996-03-07T00:00:00.000Z'),
+      },
+    });
+  });
 });
 
 describe('updatePrivateProfile', () => {
@@ -230,7 +246,12 @@ describe('addCareer', () => {
     );
     const result = await addCareer('user-1', careerData);
     expect(prisma.profileCareer.create).toHaveBeenCalledWith({
-      data: { ...careerData, userId: 'user-1' },
+      data: {
+        ...careerData,
+        userId: 'user-1',
+        startDate: new Date('2020-01-01T00:00:00.000Z'),
+        endDate: new Date('2023-12-31T00:00:00.000Z'),
+      },
     });
     expect(result).toEqual(created);
   });
@@ -249,7 +270,11 @@ describe('updateCareer', () => {
     await updateCareer('user-1', 'career-1', careerData);
     expect(prisma.profileCareer.update).toHaveBeenCalledWith({
       where: { id: 'career-1' },
-      data: careerData,
+      data: {
+        ...careerData,
+        startDate: new Date('2020-01-01T00:00:00.000Z'),
+        endDate: new Date('2023-12-31T00:00:00.000Z'),
+      },
     });
   });
 
@@ -304,12 +329,37 @@ describe('addEducation', () => {
     );
     await addEducation('user-1', educationData);
     expect(prisma.profileEducation.create).toHaveBeenCalledWith({
-      data: { ...educationData, userId: 'user-1' },
+      data: {
+        ...educationData,
+        userId: 'user-1',
+        startDate: new Date('2016-03-01T00:00:00.000Z'),
+        endDate: new Date('2020-02-28T00:00:00.000Z'),
+      },
     });
   });
 });
 
 describe('updateEducation', () => {
+  it('학력 찾아 업데이트', async () => {
+    const existing = { id: 'edu-1', userId: 'user-1' };
+    (
+      prisma.profileEducation.findFirst as unknown as jest.Mock
+    ).mockResolvedValue(existing);
+    (prisma.profileEducation.update as unknown as jest.Mock).mockResolvedValue({
+      ...existing,
+      ...educationData,
+    });
+    await updateEducation('user-1', 'edu-1', educationData);
+    expect(prisma.profileEducation.update).toHaveBeenCalledWith({
+      where: { id: 'edu-1' },
+      data: {
+        ...educationData,
+        startDate: new Date('2016-03-01T00:00:00.000Z'),
+        endDate: new Date('2020-02-28T00:00:00.000Z'),
+      },
+    });
+  });
+
   it('학력 없음 → NOT_FOUND throw', async () => {
     (
       prisma.profileEducation.findFirst as unknown as jest.Mock
@@ -464,7 +514,11 @@ describe('addCertification', () => {
     ).mockResolvedValue(created);
     const result = await addCertification('user-1', certificationData);
     expect(prisma.profileCertification.create).toHaveBeenCalledWith({
-      data: { ...certificationData, userId: 'user-1' },
+      data: {
+        ...certificationData,
+        userId: 'user-1',
+        date: new Date('2023-06-15T00:00:00.000Z'),
+      },
     });
     expect(result).toEqual(created);
   });
@@ -482,7 +536,10 @@ describe('updateCertification', () => {
     await updateCertification('user-1', 'cert-1', certificationData);
     expect(prisma.profileCertification.update).toHaveBeenCalledWith({
       where: { id: 'cert-1' },
-      data: certificationData,
+      data: {
+        ...certificationData,
+        date: new Date('2023-06-15T00:00:00.000Z'),
+      },
     });
   });
 
