@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/infrastructure/db';
 import { notFound, conflict } from '@/lib/domain/errors';
+import { toDateOnlyUtc } from '@/lib/date-only';
 import type { z } from 'zod';
 import type {
   profilePublicSchema,
@@ -21,6 +22,37 @@ const READONLY_PROFILE_INCLUDE = {
   profileSkills: { include: { skill: true } },
   certifications: { orderBy: { sortOrder: 'asc' } },
 } as const;
+
+function toPublicProfileWriteData(data: z.infer<typeof profilePublicSchema>) {
+  return data.dateOfBirth
+    ? { ...data, dateOfBirth: toDateOnlyUtc(data.dateOfBirth) }
+    : data;
+}
+
+function toCareerWriteData(data: z.infer<typeof profileCareerSchema>) {
+  return {
+    ...data,
+    startDate: toDateOnlyUtc(data.startDate),
+    endDate: data.endDate ? toDateOnlyUtc(data.endDate) : undefined,
+  };
+}
+
+function toEducationWriteData(data: z.infer<typeof profileEducationSchema>) {
+  return {
+    ...data,
+    startDate: toDateOnlyUtc(data.startDate),
+    endDate: data.endDate ? toDateOnlyUtc(data.endDate) : undefined,
+  };
+}
+
+function toCertificationWriteData(
+  data: z.infer<typeof profileCertificationSchema>
+) {
+  return {
+    ...data,
+    date: toDateOnlyUtc(data.date),
+  };
+}
 
 export async function getFullProfile(userId: string) {
   const profile = await prisma.appUser.findUnique({
@@ -80,7 +112,10 @@ export async function updatePublicProfile(
   userId: string,
   data: z.infer<typeof profilePublicSchema>
 ) {
-  return prisma.profilesPublic.update({ where: { userId }, data });
+  return prisma.profilesPublic.update({
+    where: { userId },
+    data: toPublicProfileWriteData(data),
+  });
 }
 
 export async function updatePrivateProfile(
@@ -94,7 +129,9 @@ export async function addCareer(
   userId: string,
   data: z.infer<typeof profileCareerSchema>
 ) {
-  return prisma.profileCareer.create({ data: { ...data, userId } });
+  return prisma.profileCareer.create({
+    data: { ...toCareerWriteData(data), userId },
+  });
 }
 
 export async function updateCareer(
@@ -106,7 +143,10 @@ export async function updateCareer(
     where: { id, userId },
   });
   if (!existing) throw notFound('경력');
-  return prisma.profileCareer.update({ where: { id }, data });
+  return prisma.profileCareer.update({
+    where: { id },
+    data: toCareerWriteData(data),
+  });
 }
 
 export async function deleteCareer(userId: string, id: string) {
@@ -121,7 +161,9 @@ export async function addEducation(
   userId: string,
   data: z.infer<typeof profileEducationSchema>
 ) {
-  return prisma.profileEducation.create({ data: { ...data, userId } });
+  return prisma.profileEducation.create({
+    data: { ...toEducationWriteData(data), userId },
+  });
 }
 
 export async function updateEducation(
@@ -133,7 +175,10 @@ export async function updateEducation(
     where: { id, userId },
   });
   if (!existing) throw notFound('학력');
-  return prisma.profileEducation.update({ where: { id }, data });
+  return prisma.profileEducation.update({
+    where: { id },
+    data: toEducationWriteData(data),
+  });
 }
 
 export async function deleteEducation(userId: string, id: string) {
@@ -198,7 +243,9 @@ export async function addCertification(
   userId: string,
   data: z.infer<typeof profileCertificationSchema>
 ) {
-  return prisma.profileCertification.create({ data: { ...data, userId } });
+  return prisma.profileCertification.create({
+    data: { ...toCertificationWriteData(data), userId },
+  });
 }
 
 export async function updateCertification(
@@ -210,7 +257,10 @@ export async function updateCertification(
     where: { id, userId },
   });
   if (!existing) throw notFound('자격증');
-  return prisma.profileCertification.update({ where: { id }, data });
+  return prisma.profileCertification.update({
+    where: { id },
+    data: toCertificationWriteData(data),
+  });
 }
 
 export async function deleteCertification(userId: string, id: string) {
