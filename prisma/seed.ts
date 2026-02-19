@@ -66,7 +66,7 @@ const SEED_BUILD_CONFIG: SeedBuildConfig = {
   targetAnnouncementCount: 100,
 };
 
-const CANONICAL_PASSWORD = '@Aaa111';
+const CANONICAL_PASSWORD = '@Aaa111!';
 
 const BASE_SAMPLE_JOB_DESCRIPTIONS: SampleJobDescriptionSeed[] = [
   {
@@ -874,9 +874,9 @@ async function seedSampleCredentialAccounts(users: SampleUserSeed[]) {
 
   console.log('시드 완료: credential 계정 생성/갱신');
   console.log('테스트 로그인 계정');
-  console.log('  candidate: candidate@likelion.net / @Aaa111');
-  console.log('  recruiter: recruiter@likelion.net / @Aaa111');
-  console.log('  admin: likelion@likelion.net / @Aaa111');
+  console.log('  candidate: candidate@likelion.net / @Aaa111!');
+  console.log('  recruiter: recruiter@likelion.net / @Aaa111!');
+  console.log('  admin: likelion@likelion.net / @Aaa111!');
 }
 
 async function seedSampleApplies(applies: SampleApplySeed[]) {
