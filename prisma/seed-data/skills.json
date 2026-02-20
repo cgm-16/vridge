@@ -1,45 +1,137 @@
 [
-  { "id": "javascript", "displayNameEn": "JavaScript", "aliases": ["js"] },
-  { "id": "typescript", "displayNameEn": "TypeScript", "aliases": ["ts"] },
+  {
+    "id": "javascript",
+    "displayNameEn": "JavaScript",
+    "displayNameKo": "자바스크립트",
+    "displayNameVi": "JavaScript",
+    "aliases": ["js"]
+  },
+  {
+    "id": "typescript",
+    "displayNameEn": "TypeScript",
+    "displayNameKo": "타입스크립트",
+    "displayNameVi": "TypeScript",
+    "aliases": ["ts"]
+  },
   {
     "id": "react",
     "displayNameEn": "React",
+    "displayNameKo": "리액트",
+    "displayNameVi": "React",
     "aliases": ["reactjs", "react.js"]
   },
-  { "id": "nextjs", "displayNameEn": "Next.js", "aliases": ["next"] },
-  { "id": "nodejs", "displayNameEn": "Node.js", "aliases": ["node"] },
-  { "id": "python", "displayNameEn": "Python", "aliases": ["py"] },
-  { "id": "java", "displayNameEn": "Java", "aliases": [] },
+  {
+    "id": "nextjs",
+    "displayNameEn": "Next.js",
+    "displayNameKo": "Next.js",
+    "displayNameVi": "Next.js",
+    "aliases": ["next"]
+  },
+  {
+    "id": "nodejs",
+    "displayNameEn": "Node.js",
+    "displayNameKo": "Node.js",
+    "displayNameVi": "Node.js",
+    "aliases": ["node"]
+  },
+  {
+    "id": "python",
+    "displayNameEn": "Python",
+    "displayNameKo": "파이썬",
+    "displayNameVi": "Python",
+    "aliases": ["py"]
+  },
+  {
+    "id": "java",
+    "displayNameEn": "Java",
+    "displayNameKo": "자바",
+    "displayNameVi": "Java",
+    "aliases": []
+  },
   {
     "id": "postgresql",
     "displayNameEn": "PostgreSQL",
+    "displayNameKo": "PostgreSQL",
+    "displayNameVi": "PostgreSQL",
     "aliases": ["postgres", "psql"]
   },
-  { "id": "docker", "displayNameEn": "Docker", "aliases": [] },
-  { "id": "aws", "displayNameEn": "AWS", "aliases": ["amazon-web-services"] },
-  { "id": "figma", "displayNameEn": "Figma", "aliases": [] },
-  { "id": "css", "displayNameEn": "CSS", "aliases": ["css3"] },
+  {
+    "id": "docker",
+    "displayNameEn": "Docker",
+    "displayNameKo": "도커",
+    "displayNameVi": "Docker",
+    "aliases": []
+  },
+  {
+    "id": "aws",
+    "displayNameEn": "AWS",
+    "displayNameKo": "AWS",
+    "displayNameVi": "AWS",
+    "aliases": ["amazon-web-services"]
+  },
+  {
+    "id": "figma",
+    "displayNameEn": "Figma",
+    "displayNameKo": "피그마",
+    "displayNameVi": "Figma",
+    "aliases": []
+  },
+  {
+    "id": "css",
+    "displayNameEn": "CSS",
+    "displayNameKo": "CSS",
+    "displayNameVi": "CSS",
+    "aliases": ["css3"]
+  },
   {
     "id": "tailwindcss",
     "displayNameEn": "Tailwind CSS",
+    "displayNameKo": "테일윈드 CSS",
+    "displayNameVi": "Tailwind CSS",
     "aliases": ["tailwind"]
   },
-  { "id": "graphql", "displayNameEn": "GraphQL", "aliases": ["gql"] },
-  { "id": "rest-api", "displayNameEn": "REST API", "aliases": ["restful"] },
-  { "id": "git", "displayNameEn": "Git", "aliases": [] },
+  {
+    "id": "graphql",
+    "displayNameEn": "GraphQL",
+    "displayNameKo": "GraphQL",
+    "displayNameVi": "GraphQL",
+    "aliases": ["gql"]
+  },
+  {
+    "id": "rest-api",
+    "displayNameEn": "REST API",
+    "displayNameKo": "REST API",
+    "displayNameVi": "REST API",
+    "aliases": ["restful"]
+  },
+  {
+    "id": "git",
+    "displayNameEn": "Git",
+    "displayNameKo": "Git",
+    "displayNameVi": "Git",
+    "aliases": []
+  },
   {
     "id": "agile",
     "displayNameEn": "Agile",
     "displayNameKo": "애자일",
+    "displayNameVi": "Agile",
     "aliases": []
   },
   {
     "id": "scrum",
     "displayNameEn": "Scrum",
     "displayNameKo": "스크럼",
+    "displayNameVi": "Scrum",
     "aliases": []
   },
-  { "id": "jira", "displayNameEn": "Jira", "aliases": [] },
+  {
+    "id": "jira",
+    "displayNameEn": "Jira",
+    "displayNameKo": "Jira",
+    "displayNameVi": "Jira",
+    "aliases": []
+  },
   {
     "id": "data-analysis",
     "displayNameEn": "Data Analysis",
@@ -47,16 +139,32 @@
     "displayNameVi": "Phân tích dữ liệu",
     "aliases": []
   },
-  { "id": "sql", "displayNameEn": "SQL", "aliases": [] },
-  { "id": "excel", "displayNameEn": "Excel", "aliases": ["ms-excel"] },
+  {
+    "id": "sql",
+    "displayNameEn": "SQL",
+    "displayNameKo": "SQL",
+    "displayNameVi": "SQL",
+    "aliases": []
+  },
+  {
+    "id": "excel",
+    "displayNameEn": "Excel",
+    "displayNameKo": "엑셀",
+    "displayNameVi": "Excel",
+    "aliases": ["ms-excel"]
+  },
   {
     "id": "google-analytics",
     "displayNameEn": "Google Analytics",
+    "displayNameKo": "구글 애널리틱스",
+    "displayNameVi": "Google Analytics",
     "aliases": ["ga"]
   },
   {
     "id": "seo",
     "displayNameEn": "SEO",
+    "displayNameKo": "SEO",
+    "displayNameVi": "SEO",
     "aliases": ["search-engine-optimization"]
   },
   {
@@ -94,7 +202,13 @@
     "displayNameVi": "Giải quyết vấn đề",
     "aliases": []
   },
-  { "id": "kubernetes", "displayNameEn": "Kubernetes", "aliases": ["k8s"] },
+  {
+    "id": "kubernetes",
+    "displayNameEn": "Kubernetes",
+    "displayNameKo": "쿠버네티스",
+    "displayNameVi": "Kubernetes",
+    "aliases": ["k8s"]
+  },
   {
     "id": "html",
     "displayNameEn": "HTML",
