@@ -2,7 +2,7 @@
 
 ## 목적
 
-이 문서는 개발자가 `prisma/migrations` 변경분을 Supabase PostgreSQL 운영 DB에 안전하게 반영하는 표준 절차를 정의한다.
+이 문서는 개발자가 `backend/prisma/migrations` 변경분을 Supabase PostgreSQL 운영 DB에 안전하게 반영하는 표준 절차를 정의한다.
 
 v0.1 기준 배포 범위:
 
@@ -33,7 +33,7 @@ pnpm db:test:reset
 3. 배포 대상 마이그레이션 확인
 
 ```bash
-ls prisma/migrations
+ls backend/prisma/migrations
 ```
 
 ## 배포 절차 (운영)
@@ -159,7 +159,7 @@ from generate_series(1, 5);
 
 - `prisma validate` 성공
 - 테스트 DB에서 reset + seed 성공
-- `prisma/migrations` 파일 리뷰 완료
+- `backend/prisma/migrations` 파일 리뷰 완료
 
 배포 중:
 

@@ -5,26 +5,26 @@
 ## 1) 현재 i18n 구조 (소스 오브 트루스)
 
 - 런타임/설정
-  - `lib/i18n/config.ts`
-  - `lib/i18n/runtime.ts`
-  - `lib/i18n/server.ts`
-  - `lib/i18n/client.tsx`
+  - `shared/i18n/config.ts`
+  - `shared/i18n/runtime.ts`
+  - `shared/i18n/server.ts`
+  - `shared/i18n/client.tsx`
 - 메시지 사전
-  - `lib/i18n/messages/en.ts` (기준 키 집합)
-  - `lib/i18n/messages/ko.ts`
-  - `lib/i18n/messages/vi.ts`
+  - `shared/i18n/messages/en.ts` (기준 키 집합)
+  - `shared/i18n/messages/ko.ts`
+  - `shared/i18n/messages/vi.ts`
 - Provider 주입
-  - `components/providers.tsx`
+  - `frontend/components/providers.tsx`
   - `app/layout.tsx`
 - 표현 계층 라벨 헬퍼
-  - `lib/frontend/presentation.ts` (`get*Label`, `get*Options`, `formatSalary`)
+  - `frontend/lib/presentation.ts` (`get*Label`, `get*Options`, `formatSalary`)
 
 ## 2) 신규 UI/기능 추가 필수 절차
 
 - [ ] 사용자 노출 문구를 컴포넌트에 직접 하드코딩하지 않는다.
 - [ ] `en.ts`에 키 추가 후 같은 커밋에서 `ko.ts`, `vi.ts`를 함께 추가한다.
 - [ ] 키 네이밍은 도메인 기준으로 작성한다. (`auth.*`, `jobs.*`, `profile.*`, `form.*`, `common.*`)
-- [ ] enum/상태 라벨은 `lib/frontend/presentation.ts` 헬퍼를 사용한다.
+- [ ] enum/상태 라벨은 `frontend/lib/presentation.ts` 헬퍼를 사용한다.
 - [ ] 기존 키 재사용이 가능하면 신규 키를 만들지 않는다.
 
 ## 3) 서버 컴포넌트 vs 클라이언트 컴포넌트 규칙
