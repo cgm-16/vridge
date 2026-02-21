@@ -44,7 +44,12 @@ next-env.d.ts
 # mcp servers
 /mcp
 
+# storybook
 *storybook.log
 storybook-static
 
+# prisma
 /backend/generated/prisma
+
+# agent memory files
+/.codex-memory-*.md
