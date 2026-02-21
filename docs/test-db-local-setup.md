@@ -39,7 +39,7 @@ DIRECT_URL=postgresql://postgres:postgres@localhost:54329/vridge_test
 `package.json` 스크립트 기준:
 
 - `pnpm db:test:bootstrap`
-  - `prisma/bootstrap.sql` 실행
+  - `backend/prisma/bootstrap.sql` 실행
   - `pgcrypto` extension 및 `public.generate_profile_slug()` 함수 생성
 - `pnpm db:test:push`
   - bootstrap 실행 후 `prisma db push --accept-data-loss`
@@ -60,7 +60,7 @@ pnpm db:test:reset
 
 ## 역할별 시드 로그인 계정
 
-`prisma/seed.ts`에서 email/password 로그인 가능한 credential 계정을 함께 생성합니다.
+`backend/prisma/seed.ts`에서 email/password 로그인 가능한 credential 계정을 함께 생성합니다.
 
 - candidate: `candidate@likelion.net` / `@Aaa111!`
 - recruiter: `recruiter@likelion.net` / `@Aaa111!`

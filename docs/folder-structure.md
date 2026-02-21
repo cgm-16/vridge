@@ -4,9 +4,9 @@
 
 ## 아키텍처 요약
 
-- 백엔드: `lib/domain -> lib/use-cases -> lib/infrastructure -> lib/actions`
-- 프론트엔드: `entities -> features -> widgets -> app` (FSD)
-- i18n: `lib/i18n/*` + `components/providers.tsx` 전역 주입
+- 백엔드: `backend/domain -> backend/use-cases -> backend/infrastructure -> backend/actions`
+- 프론트엔드: `frontend/entities -> frontend/features -> frontend/widgets -> app` (FSD)
+- i18n: `shared/i18n/*` + `frontend/components/providers.tsx` 전역 주입
 - 라우팅: Next.js App Router (`app/`)
 
 ## 루트 구조
@@ -15,16 +15,11 @@
 vridge/
 ├── app/
 ├── .storybook/
-├── lib/
-├── entities/
-├── features/
-├── widgets/
-├── components/
-├── hooks/
-├── prisma/
+├── backend/
+├── frontend/
+├── shared/
 ├── __tests__/
 ├── docs/
-├── stories/
 ├── public/
 ├── proxy.ts
 └── 설정 파일들
@@ -32,7 +27,7 @@ vridge/
 
 - `public/icons/`에 dialcode picker용 국기 아이콘(`flag-vn.svg`, `flag-kr.svg`)이 추가되었습니다.
 - `public/icons/share.svg` 아이콘은 `/jobs/[id]` 상세 공유 CTA에서 사용됩니다.
-- 인증/디자인 정렬용 공통 컴포넌트로 `components/ui/login-field.tsx`, `components/ui/social-ls.tsx`가 추가되었습니다.
+- 인증/디자인 정렬용 공통 컴포넌트로 `frontend/components/ui/login-field.tsx`, `frontend/components/ui/social-ls.tsx`가 추가되었습니다.
 
 ## Next.js 라우트 구조 (`app/`)
 
@@ -80,28 +75,27 @@ app/
 - `/jobs`는 route-local CTA 컴포넌트(`app/jobs/_jobs-list-apply-cta.tsx`)를 통해 목록에서 직접 지원/로그인 유도 상태를 처리합니다.
 - `/jobs/[id]`는 route-local 공유 버튼 컴포넌트(`app/jobs/[id]/_share-job-button.tsx`)를 통해 상세 페이지 공유 CTA를 처리합니다.
 
-## 백엔드 계층 (`lib/`)
+## 백엔드 계층 (`backend/`)
 
 ```text
-lib/
+backend/
 ├── actions/          # 서버 액션 어댑터
 ├── domain/           # 도메인 규칙/에러
 ├── infrastructure/   # Prisma, BetterAuth, auth 유틸
 ├── use-cases/        # 비즈니스 로직
 ├── validations/      # Zod 스키마
-├── i18n/             # 로케일/번역 런타임/사전
-├── frontend/         # 프론트 공용 표현 유틸
-└── generated/prisma/ # Prisma 생성 산출물
+├── generated/prisma/ # Prisma 생성 산출물
+└── prisma/           # schema, migrations, seed
 ```
 
-`lib/actions/_shared.ts`는 액션 공통 에러 매핑(`ActionError`)을 담당합니다.
+`backend/actions/_shared.ts`는 액션 공통 에러 매핑(`ActionError`)을 담당합니다.
 
 ## FSD 구조
 
 ### entities
 
 ```text
-entities/
+frontend/entities/
 ├── profile/ui/
 │   ├── _utils.ts
 │   ├── profile-card.tsx
@@ -126,7 +120,7 @@ entities/
 ### features
 
 ```text
-features/
+frontend/features/
 ├── auth/
 ├── apply/
 ├── job-browse/
@@ -135,12 +129,12 @@ features/
 └── profile-edit/
 ```
 
-`features/job-browse/model/query-state.ts`가 jobs 목록의 `search`, `familyId`, `sort`, `page` 쿼리 규칙의 단일 소유 지점입니다.
+`frontend/features/job-browse/model/query-state.ts`가 jobs 목록의 `search`, `familyId`, `sort`, `page` 쿼리 규칙의 단일 소유 지점입니다.
 
 ### widgets
 
 ```text
-widgets/
+frontend/widgets/
 └── nav/ui/
     ├── main-nav.tsx
     └── user-menu.tsx
@@ -149,7 +143,7 @@ widgets/
 ## i18n 구조
 
 ```text
-lib/i18n/
+shared/i18n/
 ├── config.ts
 ├── types.ts
 ├── runtime.ts
@@ -168,7 +162,7 @@ lib/i18n/
 ## Storybook 구조
 
 ```text
-stories/
+frontend/stories/
 └── ui/
     ├── button.stories.tsx
     ├── chip.stories.tsx
@@ -186,12 +180,12 @@ stories/
     └── toggle-switch.stories.tsx
 ```
 
-- Storybook 스토리 로딩 경로는 `.storybook/main.ts`에서 `stories/**/*.stories.*`를 사용합니다.
-- 기본 스캐폴드 예제(`stories/Button`, `stories/Header`, `stories/Page`)는 제거되었습니다.
+- Storybook 스토리 로딩 경로는 `.storybook/main.ts`에서 `frontend/stories/**/*.stories.*`를 사용합니다.
+- 기본 스캐폴드 예제(`frontend/stories/Button`, `frontend/stories/Header`, `frontend/stories/Page`)는 제거되었습니다.
 
 ## 테스트 구조 (`__tests__/`)
 
-- 소스 구조를 미러링하여 `app/`, `lib/`, `entities/`, `features/`, `widgets/` 단위로 유지
+- 테스트 디렉터리 명명(`__tests__/components`, `__tests__/entities`, `__tests__/features`, `__tests__/lib` 등)을 유지하면서 신규 구조 기준 import 경로를 검증
 - UI 렌더링 테스트 + use-case/action 단위 테스트 + `proxy.ts` node 환경 테스트
 - i18n 클라이언트 컴포넌트는 `__tests__/test-utils/render-with-i18n.tsx`로 감싸서 렌더링
 - 내 프로필 라우트 회귀 테스트: `__tests__/app/candidate-profile-page.test.tsx`

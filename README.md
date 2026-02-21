@@ -47,6 +47,14 @@
 | Component Dev      | Storybook v10                             |
 | Analytics          | GA4 (`@next/third-parties`)               |
 
+## 디렉터리 컨벤션
+
+- 라우팅: `app/` (Next.js App Router 유지)
+- 프론트엔드(FSD): `frontend/entities`, `frontend/features`, `frontend/widgets`, `frontend/components`, `frontend/hooks`
+- 백엔드(Clean Architecture): `backend/domain`, `backend/use-cases`, `backend/infrastructure`, `backend/actions`, `backend/validations`
+- 공용 i18n: `shared/i18n`
+- Prisma: `backend/prisma` + `backend/generated/prisma`
+
 ## 시작하기
 
 ```bash
