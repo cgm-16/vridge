@@ -139,6 +139,12 @@
   --typography-body-2-line-height: 1.5;
   --typography-body-2-letter-spacing: 0;
 
+  --typography-body-3-font-family: var(--font-inter);
+  --typography-body-3-font-size: 1rem;
+  --typography-body-3-font-weight: 500;
+  --typography-body-3-line-height: 1.5;
+  --typography-body-3-letter-spacing: 0;
+
   --typography-caption-1-font-family: var(--font-inter);
   --typography-caption-1-font-size: 0.875rem;
   --typography-caption-1-font-weight: 500;

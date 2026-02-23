@@ -31,10 +31,12 @@ const buttonVariants = cva(
         xs: "h-6 gap-1 rounded-md px-2 text-xs has-[>svg]:px-1.5 [&_svg:not([class*='size-'])]:size-3",
         sm: 'h-8 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5',
         lg: 'h-10 rounded-md px-6 has-[>svg]:px-4',
-        'brand-sm': 'h-[34px] gap-[5px] px-[10px] py-[5px] text-[16px]',
-        'brand-md': 'h-[45px] gap-[5px] px-[20px] py-[5px] text-[16px]',
+        'brand-sm':
+          'h-[34px] gap-[5px] px-[10px] py-[5px] text-[length:var(--typography-body-3-font-size)]',
+        'brand-md':
+          'h-[45px] gap-[5px] px-[20px] py-[5px] text-[length:var(--typography-body-3-font-size)]',
         'brand-lg':
-          'h-[54px] gap-[5px] px-[40px] py-[15px] text-[16px] font-bold',
+          'h-[54px] gap-[5px] px-[40px] py-[15px] text-[length:var(--typography-body-2-font-size)] font-bold',
         icon: 'size-9',
         'icon-xs': "size-6 rounded-md [&_svg:not([class*='size-'])]:size-3",
         'icon-sm': 'size-8',
