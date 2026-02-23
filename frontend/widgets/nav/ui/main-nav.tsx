@@ -63,11 +63,11 @@ export default function MainNav() {
       <div className="flex items-center gap-[40px]">
         <Link
           href="/jobs"
-          className="flex h-[60px] items-center rounded-[80px] bg-white px-[20px] font-[Oswald] text-[32px] leading-none font-semibold tracking-tight shadow-[0_0_15px_rgba(255,149,84,0.2)]"
+          className="flex h-[50px] items-center rounded-[80px] bg-white px-[20px] font-[Oswald] text-[32px] leading-none font-semibold tracking-tight shadow-[0_0_15px_rgba(255,149,84,0.2)]"
         >
           VRIDGE<span className="text-brand">.</span>
         </Link>
-        <div className="flex h-[60px] items-center gap-[50px] rounded-[80px] bg-white px-[30px] py-[10px] shadow-[0_0_15px_rgba(255,149,84,0.2)]">
+        <div className="flex h-[50px] items-center gap-[50px] rounded-[80px] bg-white px-[30px] py-[10px] shadow-[0_0_15px_rgba(255,149,84,0.2)]">
           {navLinks.map(({ label, href }) => {
             const isActive =
               pathname === href || pathname.startsWith(href + '/');
@@ -101,7 +101,7 @@ export default function MainNav() {
             image={user.image}
           />
         ) : (
-          <div className="flex h-[60px] items-center rounded-[80px] bg-white px-[20px] py-[10px] shadow-[0_0_15px_rgba(255,149,84,0.2)]">
+          <div className="flex h-[50px] items-center rounded-[80px] bg-white px-[20px] py-[10px] shadow-[0_0_15px_rgba(255,149,84,0.2)]">
             <button
               type="button"
               onClick={handleOpenLogin}
