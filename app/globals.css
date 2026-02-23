@@ -273,3 +273,13 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer utilities {
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 30px;
+  }
+  .scrollbar-thin {
+    scrollbar-width: thin;
+  }
+}

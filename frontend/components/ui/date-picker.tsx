@@ -41,7 +41,7 @@ function ScrollColumn({
 }) {
   return (
     <div
-      className={`flex h-[194px] flex-col gap-[10px] overflow-y-auto ${widthClass}`}
+      className={`scroll scrollbar-thin flex h-[194px] flex-col gap-[10px] overflow-y-auto ${widthClass}`}
     >
       {items.map((item) => (
         <button
@@ -49,22 +49,14 @@ function ScrollColumn({
           type="button"
           className={`flex h-[41px] w-full items-center justify-center rounded-[5px] px-[10px] text-center text-[14px] font-medium tracking-[-0.21px] ${
             item === selected
-              ? 'bg-[#ffefe5] font-medium text-[#ff6000]'
-              : 'text-[#333] hover:bg-[#fbfbfb]'
+              ? 'font-medium text-brand'
+              : 'text-[#333] hover:bg-brand-sub hover:text-brand'
           }`}
           onClick={() => onSelect(item)}
         >
           {format ? format(item) : item}
         </button>
       ))}
-    </div>
-  );
-}
-
-function ColumnSeparator() {
-  return (
-    <div className="flex h-full items-center">
-      <div className="h-[30px] w-[3px] rounded-[60px] bg-[#ccc]" />
     </div>
   );
 }
@@ -129,8 +121,8 @@ export function DatePicker({
         type="button"
         className={`flex h-[52px] items-center justify-between rounded-[10px] px-[20px] text-left ${triggerWidthClass} ${
           hasValue
-            ? 'border border-[#b3b3b3] bg-white text-[#333]'
-            : 'bg-[#fbfbfb] text-[#666]'
+            ? 'border border-gray-300 bg-white text-[#333]'
+            : 'bg-bg text-[#666]'
         }`}
         onClick={() => setOpen(!open)}
         aria-expanded={open}
@@ -152,7 +144,6 @@ export function DatePicker({
                   widthClass="w-[37px]"
                   format={pad}
                 />
-                <ColumnSeparator />
               </>
             )}
             <ScrollColumn
@@ -162,7 +153,6 @@ export function DatePicker({
               widthClass="w-[81px]"
               format={(month) => monthLabels[month - 1]}
             />
-            <ColumnSeparator />
             <ScrollColumn
               items={YEARS}
               selected={selYear}
@@ -173,7 +163,7 @@ export function DatePicker({
           <div className="mt-[10px] flex justify-end">
             <button
               type="button"
-              className="rounded-[60px] bg-[#ff6000] px-[10px] py-[5px] text-center text-[16px] font-medium text-white"
+              className="rounded-[60px] bg-brand px-[10px] py-[5px] text-center text-[16px] font-medium text-white"
               onClick={handleSelect}
             >
               {t('datePicker.select')}
