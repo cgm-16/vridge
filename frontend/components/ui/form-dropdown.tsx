@@ -23,7 +23,7 @@ function DropdownMenu({
   return (
     <button
       type="button"
-      className="w-full rounded-[5px] px-[20px] py-[10px] text-left text-[14px] font-medium text-[#333] hover:bg-[#ffefe5] hover:text-[#ff6000]"
+      className="w-full rounded-[5px] px-[20px] py-[10px] text-left text-[14px] font-medium tracking-[-0.21px] text-[#333] hover:bg-[#ffefe5] hover:text-[#ff6000]"
       onClick={onSelect}
     >
       {label}
@@ -90,13 +90,13 @@ export function FormDropdown({
       >
         <span
           className={
-            hasValue ? 'text-[16px] font-medium' : 'text-[14px] font-medium'
+            hasValue ? 'text-[16px] font-medium' : 'text-[14px] font-medium tracking-[-0.21px]'
           }
         >
           {selected ? selected.label : placeholder}
         </span>
         <span className="flex items-center gap-[4px]">
-          {required && <Icon name="required" size={10} />}
+          {required && <Icon name="required" size={24} />}
           <Icon name={open ? 'chevron-up' : 'chevron-down'} size={24} />
         </span>
       </button>

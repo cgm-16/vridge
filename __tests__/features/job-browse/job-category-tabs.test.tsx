@@ -22,7 +22,7 @@ describe('JobCategoryTabs', () => {
   it('activeFamilyId 미전달 시 "All" 탭이 활성 상태', () => {
     renderWithI18n(<JobCategoryTabs families={families} query={{}} />);
     const allTab = screen.getByText('All').closest('a');
-    expect(allTab?.className).toContain('ff6000');
+    expect(allTab?.className).toContain('text-brand');
   });
 
   it('activeFamilyId 전달 시 해당 탭이 활성 상태', () => {
@@ -34,10 +34,10 @@ describe('JobCategoryTabs', () => {
       />
     );
     const designTab = screen.getByText('Design').closest('a');
-    expect(designTab?.className).toContain('ff6000');
+    expect(designTab?.className).toContain('text-brand');
 
     const allTab = screen.getByText('All').closest('a');
-    expect(allTab?.className).not.toContain('ff6000');
+    expect(allTab?.className).not.toContain('text-brand');
   });
 
   it('탭 href에 familyId가 포함된다', () => {

@@ -41,7 +41,7 @@ export function DialcodePicker({ value, onChange }: DialcodePickerProps) {
         ) : (
           <span className="h-[18px] w-[20px]" />
         )}
-        <span className="text-[14px] font-medium text-[#666]">{value}</span>
+        <span className="text-[14px] font-medium tracking-[-0.21px] text-[#666]">{value}</span>
         <Icon name={open ? 'chevron-up' : 'chevron-down'} size={18} />
       </button>
       {open && (
@@ -57,7 +57,7 @@ export function DialcodePicker({ value, onChange }: DialcodePickerProps) {
               }}
             >
               <Icon name={option.flag} size={20} />
-              <span className="text-[14px] font-medium text-[#666]">
+              <span className="text-[14px] font-medium tracking-[-0.21px] text-[#666]">
                 {option.code}
               </span>
             </button>

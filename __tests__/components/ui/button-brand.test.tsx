@@ -35,7 +35,7 @@ describe('Button brand variants', () => {
   });
 
   describe('brand sizes', () => {
-    it('brand-sm: h-[34px] px-[10px] py-[5px] text-[16px] gap-[5px]', () => {
+    it('brand-sm: h-[34px] px-[10px] py-[5px] body-3 토큰 gap-[5px]', () => {
       render(
         <Button variant="brand" size="brand-sm">
           SM
@@ -45,11 +45,13 @@ describe('Button brand variants', () => {
       expect(btn).toHaveClass('h-[34px]');
       expect(btn).toHaveClass('px-[10px]');
       expect(btn).toHaveClass('py-[5px]');
-      expect(btn).toHaveClass('text-[16px]');
+      expect(btn).toHaveClass(
+        'text-[length:var(--typography-body-3-font-size)]'
+      );
       expect(btn).toHaveClass('gap-[5px]');
     });
 
-    it('brand-md: h-[45px] px-[20px] py-[5px] text-[20px] gap-[5px]', () => {
+    it('brand-md: h-[45px] px-[20px] py-[5px] body-3 토큰 gap-[5px]', () => {
       render(
         <Button variant="brand" size="brand-md">
           MD
@@ -59,21 +61,25 @@ describe('Button brand variants', () => {
       expect(btn).toHaveClass('h-[45px]');
       expect(btn).toHaveClass('px-[20px]');
       expect(btn).toHaveClass('py-[5px]');
-      expect(btn).toHaveClass('text-[20px]');
+      expect(btn).toHaveClass(
+        'text-[length:var(--typography-body-3-font-size)]'
+      );
       expect(btn).toHaveClass('gap-[5px]');
     });
 
-    it('brand-lg: h-[60px] px-[40px] py-[5px] text-[20px] font-bold gap-[5px]', () => {
+    it('brand-lg: h-[54px] px-[40px] py-[15px] body-2 토큰 font-bold gap-[5px]', () => {
       render(
         <Button variant="brand" size="brand-lg">
           LG
         </Button>
       );
       const btn = screen.getByRole('button', { name: 'LG' });
-      expect(btn).toHaveClass('h-[60px]');
+      expect(btn).toHaveClass('h-[54px]');
       expect(btn).toHaveClass('px-[40px]');
-      expect(btn).toHaveClass('py-[5px]');
-      expect(btn).toHaveClass('text-[20px]');
+      expect(btn).toHaveClass('py-[15px]');
+      expect(btn).toHaveClass(
+        'text-[length:var(--typography-body-2-font-size)]'
+      );
       expect(btn).toHaveClass('font-bold');
       expect(btn).toHaveClass('gap-[5px]');
     });
