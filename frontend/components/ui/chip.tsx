@@ -18,7 +18,7 @@ const VARIANT_CLASS: Record<ChipVariant, string> = {
 };
 
 const SIZE_CLASS: Record<ChipSize, string> = {
-  sm: 'border-[0.5px] px-[8px] py-[6px] rounded-[5px] text-[14px]',
+  sm: 'border-[0.5px] px-[8px] py-[6px] rounded-[5px] text-[14px] tracking-[-0.21px]',
   md: 'border px-[10px] py-[8px] rounded-[8px] text-[16px]',
 };
 

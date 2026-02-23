@@ -24,7 +24,7 @@ const CONFIG = {
 
 const SIZE_CLASS = {
   sm: 'text-[12px]',
-  md: 'text-[14px]',
+  md: 'text-[14px] tracking-[-0.21px]',
 } as const;
 
 export function PostStatus({ status, size = 'sm', label }: PostStatusProps) {

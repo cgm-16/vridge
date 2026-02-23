@@ -22,7 +22,7 @@ const SIZE_CLASS: Record<FormInputSize, string> = {
 };
 
 const baseClass =
-  'w-full rounded-[10px] text-[16px] text-[#333] placeholder:text-[14px] placeholder:text-[#666] outline-none';
+  'w-full rounded-[10px] text-[16px] text-[#333] placeholder:text-[14px] placeholder:tracking-[-0.21px] placeholder:text-[#666] outline-none';
 
 export const FormInput = forwardRef<
   HTMLInputElement | HTMLTextAreaElement,
@@ -51,7 +51,7 @@ export const FormInput = forwardRef<
         className={`inline-flex h-[52px] w-full items-center justify-center gap-[5px] rounded-[10px] bg-[#fbfbfb] px-[20px] ${className ?? ''}`}
       >
         <Icon name="plus" size={24} />
-        <span className="text-[14px] font-medium text-[#666]">{fileText}</span>
+        <span className="text-[14px] font-medium tracking-[-0.21px] text-[#666]">{fileText}</span>
       </span>
     );
   }
@@ -79,7 +79,7 @@ export const FormInput = forwardRef<
       )}
       {required && (
         <span className="pointer-events-none absolute right-3">
-          <Icon name="required" size={10} />
+          <Icon name="required" size={24} />
         </span>
       )}
     </span>

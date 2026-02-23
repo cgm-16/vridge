@@ -47,7 +47,7 @@ function ScrollColumn({
         <button
           key={item}
           type="button"
-          className={`flex h-[41px] w-full items-center justify-center rounded-[5px] px-[10px] text-center text-[14px] font-medium ${
+          className={`flex h-[41px] w-full items-center justify-center rounded-[5px] px-[10px] text-center text-[14px] font-medium tracking-[-0.21px] ${
             item === selected
               ? 'bg-[#ffefe5] font-medium text-[#ff6000]'
               : 'text-[#333] hover:bg-[#fbfbfb]'
@@ -135,10 +135,10 @@ export function DatePicker({
         onClick={() => setOpen(!open)}
         aria-expanded={open}
       >
-        <span className="text-[14px] font-medium">
+        <span className="text-[14px] font-medium tracking-[-0.21px]">
           {hasValue ? formatDate(value, type) : placeholder}
         </span>
-        {required && <Icon name="required" size={10} />}
+        {required && <Icon name="required" size={24} />}
       </button>
       {open && (
         <div className="absolute top-[57px] left-0 z-10 rounded-[10px] bg-white px-[20px] py-[10px] shadow-[0_0_10px_rgba(0,0,0,0.05)]">
