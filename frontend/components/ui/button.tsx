@@ -32,9 +32,9 @@ const buttonVariants = cva(
         sm: 'h-8 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5',
         lg: 'h-10 rounded-md px-6 has-[>svg]:px-4',
         'brand-sm': 'h-[34px] gap-[5px] px-[10px] py-[5px] text-[16px]',
-        'brand-md': 'h-[45px] gap-[5px] px-[20px] py-[5px] text-[20px]',
+        'brand-md': 'h-[45px] gap-[5px] px-[20px] py-[5px] text-[16px]',
         'brand-lg':
-          'h-[60px] gap-[5px] px-[40px] py-[5px] text-[20px] font-bold',
+          'h-[54px] gap-[5px] px-[40px] py-[15px] text-[16px] font-bold',
         icon: 'size-9',
         'icon-xs': "size-6 rounded-md [&_svg:not([class*='size-'])]:size-3",
         'icon-sm': 'size-8',

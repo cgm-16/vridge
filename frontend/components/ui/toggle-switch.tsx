@@ -1,22 +1,47 @@
+type ToggleSwitchSize = 'sm' | 'lg';
+
 type ToggleSwitchProps = {
   checked: boolean;
   onChange: (checked: boolean) => void;
+  size?: ToggleSwitchSize;
 };
 
-export function ToggleSwitch({ checked, onChange }: ToggleSwitchProps) {
+const SIZE_CONFIG: Record<
+  ToggleSwitchSize,
+  { track: string; thumb: string; thumbChecked: string }
+> = {
+  sm: {
+    track: 'h-[14px] w-[28px]',
+    thumb: 'h-[12px] w-[12px]',
+    thumbChecked: 'right-px',
+  },
+  lg: {
+    track: 'h-[16px] w-[32px]',
+    thumb: 'h-[14px] w-[14px]',
+    thumbChecked: 'left-[17px]',
+  },
+};
+
+export function ToggleSwitch({
+  checked,
+  onChange,
+  size = 'lg',
+}: ToggleSwitchProps) {
+  const config = SIZE_CONFIG[size];
+
   return (
     <button
       type="button"
       role="switch"
       aria-checked={checked}
       onClick={() => onChange(!checked)}
-      className={`relative h-[16px] w-[32px] rounded-[999px] transition-colors duration-150 outline-none focus-visible:ring-2 focus-visible:ring-[#ff6000]/40 ${
+      className={`relative rounded-[999px] transition-colors duration-150 outline-none focus-visible:ring-2 focus-visible:ring-[#ff6000]/40 ${config.track} ${
         checked ? 'bg-[#00a600]' : 'bg-[#e6e6e6]'
       }`}
     >
       <span
-        className={`absolute top-px h-[14px] w-[14px] rounded-full bg-white transition-[left] duration-150 ${
-          checked ? 'left-[17px]' : 'left-px'
+        className={`absolute top-px rounded-full bg-white transition-[left,right] duration-150 ${config.thumb} ${
+          checked ? config.thumbChecked : 'left-px'
         }`}
       />
     </button>
