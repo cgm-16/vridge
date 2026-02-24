@@ -40,7 +40,7 @@ export function LangPicker({
       <button
         type="button"
         aria-label={ariaLabel ?? selected?.label ?? value}
-        className="flex h-[60px] w-[89px] items-center justify-center gap-[2px] rounded-[80px] bg-white px-[20px] py-[10px] text-body-2 text-black shadow-[0_0_15px_rgba(255,149,84,0.2)]"
+        className="flex h-[50px] w-[89px] items-center justify-center gap-[2px] rounded-[80px] bg-white px-[20px] py-[10px] text-body-2 text-black shadow-[0_0_15px_rgba(255,149,84,0.2)]"
         onClick={() => setOpen(!open)}
         aria-expanded={open}
       >
