@@ -61,10 +61,77 @@ Rule #1: If you want exception to ANY rule, YOU MUST STOP and get explicit permi
 
 ## Agent Delegation
 
-- The main conversation acts as coordinator; spawned agents handle bounded support tasks
-- Prefer spawning agents for: parallel research, batch operations, verbose output (logs, test suites)
-- Keep in the main conversation: implementation, iterative work, decisions requiring context
-- Agents don't share context with each other — route information through the main conversation
+The main conversation is the COORDINATOR — it plans, decides, synthesizes, and implements.
+Subagents are WORKERS — they research, verify, and report.
+
+### Mandatory Delegation (NEVER do these inline)
+
+1. **Broad codebase exploration**: Searching across >3 files, tracing dependencies, "find where X is used." → `codebase-researcher`
+2. **Test execution**: ALL test runs, including single focused tests for TDD. → `test-runner` (background)
+3. **Type checking and linting**: Any `tsc` or lint command. → `lint-typecheck` (background)
+4. **Figma design research**: Fetching metadata, screenshots, design context. → `figma-researcher`
+5. **Reading long files for research**: Files >200 lines read purely for understanding (not for editing). → `codebase-researcher`
+6. **Git history research**: Log, blame, diff analysis for context gathering. → `codebase-researcher`
+
+### Smart Threshold (inline is OK when)
+
+- Reading ≤3 specific files you already know the paths to
+- Running a single Grep/Glob with predictable short output
+- Quick git status or single-command checks
+- Any task where spawning an agent would take longer than doing it inline
+
+### Parallel Spawning
+
+When multiple independent tasks exist, spawn them ALL in one message:
+
+- 3 modules to understand → 3 parallel `codebase-researcher` agents
+- After implementation → `test-runner` + `lint-typecheck` simultaneously
+- NEVER serialize independent research. Always parallelize.
+
+### Never Delegate
+
+- Architecture decisions and plan approval
+- Git commits, branch management, PR/Issue creation
+- Anything requiring Ori's input or approval
+- Conflict resolution between agent results
+- Implementation (stays in coordinator — subagents are read-only workers, not implementers)
+
+### Information Routing
+
+- Coordinator synthesizes all agent results before proceeding
+- When Agent A's output feeds Agent B, coordinator extracts relevant parts into B's prompt
+- Agent prompts must be self-contained — include all needed context, assume no prior knowledge
+
+### Model Selection
+
+- **Haiku**: codebase-researcher, test-runner, lint-typecheck (fast, cheap, read-only)
+- **Sonnet**: figma-researcher (needs reasoning for design interpretation)
+- **Inherit parent model**: Only when task genuinely requires coordinator-level reasoning
+
+## Plan and Task implementation
+
+### Preflight 1: Feature Branch Creation (BEFORE implementing plan)
+
+- ALWAYS identify the remote default base branch (for example `origin/HEAD` -> `main` or `master`).
+- ALWAYS update the base branch using fetch + fast-forward-only. If sync fails, STOP and ask Ori.
+- ALWAYS create a feature branch using `type/scope-topic` naming.
+- ALWAYS use `git worktree` by default. A normal branch checkout is allowed only when work is single-threaded or worktree setup is blocked.
+- ALWAYS ensure dependencies are ready when needed. Use manager-native strict install only if lock/manifests changed, dependencies are missing, or bootstrap fails (`pnpm install --frozen-lockfile`, `yarn install --immutable`, `npm ci`).
+
+### Preflight 2: Issue Opening (BEFORE implementing plan)
+
+- ALWAYS open an Issue unless Ori explicitly provided an existing issue ID or URL.
+- ALWAYS choose template by intent: defect/debug work uses bug report template; feature/refactor/task work uses feature request template.
+- ALWAYS use a template if one exists.
+- YOU MUST fill all required sections. If a required section is not applicable, write `N/A` with a reason.
+
+### Cleanup: PR Opening
+
+- ALWAYS open a PR for merge-intent changes.
+- ALWAYS use a template if one exists.
+- YOU MUST fill all required sections. If a required section is not applicable, write `N/A` with a reason.
+- ALWAYS keep the linked Issue open during review and close it on merge/completion, not at PR creation.
+- If PR creation is blocked by auth/permission/remote issues, STOP and ask Ori with branch name, commit status, and blocker details.
 
 ## Systematic Debugging Process
 

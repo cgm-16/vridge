@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import { LoginField } from '@/components/ui/login-field';
+import { LoginField } from '@/frontend/components/ui/login-field';
 
 describe('LoginField', () => {
   it('기본 상태 placeholder 톤을 사용한다', () => {
@@ -14,7 +14,7 @@ describe('LoginField', () => {
     );
 
     expect(screen.getByPlaceholderText('Placeholder')).toHaveClass(
-      'text-[#999]'
+      'text-gray-400'
     );
   });
 
@@ -29,7 +29,7 @@ describe('LoginField', () => {
       />
     );
 
-    expect(screen.getByDisplayValue('filled')).toHaveClass('text-[#333]');
+    expect(screen.getByDisplayValue('filled')).toHaveClass('text-gray-800');
   });
 
   it('left icon과 right slot을 렌더링한다', () => {

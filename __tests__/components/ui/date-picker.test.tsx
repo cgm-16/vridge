@@ -1,6 +1,6 @@
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { DatePicker } from '@/components/ui/date-picker';
+import { DatePicker } from '@/frontend/components/ui/date-picker';
 import { renderWithI18n } from '@/__tests__/test-utils/render-with-i18n';
 
 describe('DatePicker', () => {
@@ -14,10 +14,10 @@ describe('DatePicker', () => {
     expect(screen.getByText('MM.YYYY')).toBeInTheDocument();
   });
 
-  it('트리거 기본 스타일: bg-[#fbfbfb] rounded-[10px]', () => {
+  it('트리거 기본 스타일: bg-bg rounded-[10px]', () => {
     renderWithI18n(<DatePicker onChange={() => {}} />);
     const trigger = screen.getByRole('button');
-    expect(trigger).toHaveClass('bg-[#fbfbfb]');
+    expect(trigger).toHaveClass('bg-bg');
     expect(trigger).toHaveClass('rounded-[10px]');
   });
 
@@ -27,7 +27,7 @@ describe('DatePicker', () => {
     );
     const trigger = screen.getByRole('button');
     expect(trigger).toHaveClass('bg-white');
-    expect(trigger).toHaveClass('border-[#b3b3b3]');
+    expect(trigger).toHaveClass('border-gray-300');
   });
 
   it('값이 있을 때 날짜 표시', () => {

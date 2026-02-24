@@ -1,6 +1,6 @@
 import { screen, fireEvent } from '@testing-library/react';
 import DashboardSidebar from '@/app/(dashboard)/dashboard-sidebar';
-import { signOut } from '@/lib/infrastructure/auth-client';
+import { signOut } from '@/backend/infrastructure/auth-client';
 import { renderWithI18n } from '@/__tests__/test-utils/render-with-i18n';
 
 jest.mock('next/navigation', () => ({
@@ -8,7 +8,7 @@ jest.mock('next/navigation', () => ({
   useRouter: jest.fn(),
 }));
 
-jest.mock('@/lib/infrastructure/auth-client', () => ({
+jest.mock('@/backend/infrastructure/auth-client', () => ({
   signOut: jest.fn(),
 }));
 
@@ -44,7 +44,7 @@ describe('DashboardSidebar', () => {
     const inactive = screen.getByRole('link', { name: 'My Jobs' });
 
     expect(active.className).toContain('text-brand');
-    expect(inactive.className).toContain('text-[#666]');
+    expect(inactive.className).toContain('text-text-sub-1');
   });
 
   it('Logout 클릭 시 signOut을 호출한다', () => {

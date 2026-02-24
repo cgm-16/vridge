@@ -68,6 +68,35 @@ Rule #1: If you want exception to ANY rule, YOU MUST STOP and get explicit permi
 - Keep in the main conversation: implementation, iterative work, decisions requiring context
 - Agents don't share context with each other — route information through the main conversation
 
+## Planning and Task handling
+
+- YOU MUST ALWAYS create an executable step-by-step plan where each step includes: action intent, exact command/action, and done-check.
+- YOU MUST NEVER assume executor context. Every handoff MUST include: goal, scope, constraints, exact steps/commands, touched files, and acceptance checks.
+- If new evidence invalidates the plan, YOU MUST pause, publish a plan delta, and continue only after the revised steps are explicit.
+
+### Preflight 1: Feature Branch Creation (BEFORE implementing plan)
+
+- ALWAYS identify the remote default base branch (for example `origin/HEAD` -> `main` or `master`).
+- ALWAYS update the base branch using fetch + fast-forward-only. If sync fails, STOP and ask Ori.
+- ALWAYS create a feature branch using `type/scope-topic` naming.
+- ALWAYS use `git worktree` by default. A normal branch checkout is allowed only when work is single-threaded or worktree setup is blocked.
+- ALWAYS ensure dependencies are ready when needed. Use manager-native strict install only if lock/manifests changed, dependencies are missing, or bootstrap fails (`pnpm install --frozen-lockfile`, `yarn install --immutable`, `npm ci`).
+
+### Preflight 2: Issue Opening (BEFORE implementing plan)
+
+- ALWAYS open an Issue unless Ori explicitly provided an existing issue ID or URL.
+- ALWAYS choose template by intent: defect/debug work uses bug report template; feature/refactor/task work uses feature request template.
+- ALWAYS use a template if one exists.
+- YOU MUST fill all required sections. If a required section is not applicable, write `N/A` with a reason.
+
+### Cleanup: PR Opening
+
+- ALWAYS open a PR for merge-intent changes.
+- ALWAYS use a template if one exists.
+- YOU MUST fill all required sections. If a required section is not applicable, write `N/A` with a reason.
+- ALWAYS keep the linked Issue open during review and close it on merge/completion, not at PR creation.
+- If PR creation is blocked by auth/permission/remote issues, STOP and ask Ori with branch name, commit status, and blocker details.
+
 ## Systematic Debugging Process
 
 YOU MUST ALWAYS find the root cause of any issue you are debugging
@@ -106,6 +135,7 @@ YOU MUST follow this debugging framework for ANY technical issue:
 ## Learning and Memory Management
 
 - Create a temporary markdown file to capture technical insights, failed approaches, and user preferences
+- Repository-local temporary memory files MUST use the `.codex-memory-*.md` naming pattern.
 - Search it before starting complex tasks for relevant past experiences
 - Document architectural decisions and their outcomes
 - Track patterns in user feedback to improve collaboration
@@ -118,3 +148,17 @@ YOU MUST follow this debugging framework for ANY technical issue:
 - Conversation with Ori is in English
 - Skill files (`SKILL.md`) and prompt plan files are instructions optimized for Codex — write them in English for clarity
 - All other written artifacts must be in Korean: PR titles/descriptions, commit messages, code comments, documentation files, and issue descriptions
+- Exceptions: `AGENTS.md` and `docs/agents/*` must be written in English. Files under `docs/legacy/*` may remain in their original language.
+- `docs/` and its subfolders (except `docs/legacy/`) MUST be kept current with the codebase; do not leave outdated content after related changes.
+- `docs/legacy/` contains archived historical documents that may be outdated by design.
+- Move a document to `docs/legacy/` when it is superseded by a newer document OR no longer operationally used.
+- In `docs/legacy/`, preserve original filenames and relative topic grouping (do not add date prefixes to filenames).
+- Every document in `docs/legacy/` MUST include YAML front matter with keys: `archived_on`, `archive_reason`, `replaced_by`.
+- Allowed `archive_reason` values are: `superseded`, `no_longer_operational`, `historical_reference`.
+- `replaced_by` is required when `archive_reason: superseded`, and optional otherwise.
+- `docs/agents/` contains prompt plans and LLM-facing operational documents, and these files should be written in English.
+
+## Sandboxing
+
+- In sandboxed environments, treat `pnpm build` as a concrete example of a script that may require elevated permissions; ask Ori before requesting escalation.
+- In sandboxed environments, assume every `gh` command failure is permission related and ask Ori for permissions before continuing.

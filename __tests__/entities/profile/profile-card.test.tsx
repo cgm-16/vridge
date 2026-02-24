@@ -1,5 +1,5 @@
 import { screen } from '@testing-library/react';
-import { ProfileCard } from '@/entities/profile/ui/profile-card';
+import { ProfileCard } from '@/frontend/entities/profile/ui/profile-card';
 import { renderWithI18n } from '@/__tests__/test-utils/render-with-i18n';
 
 const baseProps = {
@@ -30,7 +30,7 @@ describe('ProfileCard', () => {
     renderWithI18n(<ProfileCard {...baseProps} />);
     const summary = screen.getByText('Building reliable web products');
     expect(summary).toBeInTheDocument();
-    expect(summary).toHaveClass('text-[18px]');
+    expect(summary).toHaveClass('text-body-1');
     expect(
       screen.queryByText('Experienced developer looking for new opportunities')
     ).not.toBeInTheDocument();

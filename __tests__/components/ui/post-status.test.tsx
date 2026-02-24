@@ -1,19 +1,19 @@
 import { screen } from '@testing-library/react';
-import { PostStatus } from '@/components/ui/post-status';
+import { PostStatus } from '@/frontend/components/ui/post-status';
 import { renderWithI18n } from '@/__tests__/test-utils/render-with-i18n';
 
 describe('PostStatus', () => {
   it('recruiting 상태: 초록색 텍스트', () => {
     renderWithI18n(<PostStatus status="recruiting" />);
     const text = screen.getByText('Recruiting');
-    expect(text).toHaveClass('text-[#00a600]');
+    expect(text).toHaveClass('text-success');
     expect(text.parentElement).toHaveClass('gap-[2px]');
   });
 
   it('done 상태: 빨간색 텍스트', () => {
     renderWithI18n(<PostStatus status="done" />);
     const text = screen.getByText('Done');
-    expect(text).toHaveClass('text-[#e50000]');
+    expect(text).toHaveClass('text-error');
   });
 
   it('recruiting 아이콘 렌더링', () => {
@@ -31,13 +31,13 @@ describe('PostStatus', () => {
   it('sm 사이즈: text-[12px]', () => {
     renderWithI18n(<PostStatus status="recruiting" size="sm" />);
     const text = screen.getByText('Recruiting');
-    expect(text).toHaveClass('text-[12px]');
+    expect(text).toHaveClass('text-caption-2');
   });
 
   it('md 사이즈: text-[14px]', () => {
     renderWithI18n(<PostStatus status="recruiting" size="md" />);
     const text = screen.getByText('Recruiting');
-    expect(text).toHaveClass('text-[14px]');
+    expect(text).toHaveClass('text-caption-1');
   });
 
   it('커스텀 label 적용', () => {

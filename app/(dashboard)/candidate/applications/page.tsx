@@ -1,9 +1,9 @@
-import { PostingListItem } from '@/entities/job/ui/posting-list-item';
-import { getMyApplications } from '@/lib/actions/applications';
-import { requireUser } from '@/lib/infrastructure/auth-utils';
-import { getServerI18n } from '@/lib/i18n/server';
-import { getActionErrorMessage } from '@/lib/i18n/action-error';
-import { getLocalizedCatalogName } from '@/lib/i18n/catalog';
+import { PostingListItem } from '@/frontend/entities/job/ui/posting-list-item';
+import { getMyApplications } from '@/backend/actions/applications';
+import { requireUser } from '@/backend/infrastructure/auth-utils';
+import { getServerI18n } from '@/shared/i18n/server';
+import { getActionErrorMessage } from '@/shared/i18n/action-error';
+import { getLocalizedCatalogName } from '@/shared/i18n/catalog';
 
 function toPostingStatus(status: string): 'recruiting' | 'done' {
   if (status === 'rejected' || status === 'withdrawn') return 'done';
@@ -31,33 +31,21 @@ export default async function MyApplicationsPage() {
 
   return (
     <div className="mx-auto flex w-full max-w-[1200px] flex-col gap-[20px]">
-      <h1 className="text-[26px] leading-[1.5] font-bold text-[#1f1d1b]">
-        {t('profile.myJobs')}
-      </h1>
+      <h1 className="text-h1 text-text-title-2">{t('profile.myJobs')}</h1>
 
       <div className="grid grid-cols-1 gap-[10px] md:grid-cols-2">
-        <div className="flex flex-col items-center justify-center gap-[10px] rounded-[20px] bg-[#fbfbfb] px-[40px] py-[50px] text-center">
-          <p className="text-[22px] leading-[1.5] font-bold text-[#1a1a1a]">
-            {t('profile.applied')}
-          </p>
-          <p className="text-[22px] leading-[1.5] font-bold text-[#1a1a1a]">
-            {appliedCount}
-          </p>
+        <div className="flex flex-col items-center justify-center gap-[10px] rounded-[20px] bg-bg px-[40px] py-[50px] text-center">
+          <p className="text-h2 text-text-title-2">{t('profile.applied')}</p>
+          <p className="text-h2 text-text-title-2">{appliedCount}</p>
         </div>
-        <div className="flex flex-col items-center justify-center gap-[10px] rounded-[20px] bg-[#fbfbfb] px-[40px] py-[50px] text-center">
-          <p className="text-[22px] leading-[1.5] font-bold text-[#1a1a1a]">
-            {t('profile.inProgress')}
-          </p>
-          <p className="text-[22px] leading-[1.5] font-bold text-[#1a1a1a]">
-            {inProgressCount}
-          </p>
+        <div className="flex flex-col items-center justify-center gap-[10px] rounded-[20px] bg-bg px-[40px] py-[50px] text-center">
+          <p className="text-h2 text-text-title-2">{t('profile.inProgress')}</p>
+          <p className="text-h2 text-text-title-2">{inProgressCount}</p>
         </div>
       </div>
 
       <section className="flex flex-col gap-[20px] rounded-[20px] bg-white py-[20px]">
-        <h2 className="text-[26px] leading-[1.5] font-bold text-[#1f1d1b]">
-          {t('profile.list')}
-        </h2>
+        <h2 className="text-h1 text-text-title-2">{t('profile.list')}</h2>
 
         {applications.length === 0 ? (
           <p className="text-muted-foreground">{t('jobs.empty')}</p>

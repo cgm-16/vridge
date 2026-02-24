@@ -1,18 +1,18 @@
 import { headers } from 'next/headers';
 import ReactMarkdown from 'react-markdown';
-import { auth } from '@/lib/infrastructure/auth';
-import { getJobDescriptionById } from '@/lib/actions/jd-queries';
-import { getMyApplications } from '@/lib/actions/applications';
-import { PostingTitle } from '@/entities/job/ui/posting-title';
-import { SummaryCard } from '@/entities/job/ui/summary-card';
-import { ApplyButton } from '@/features/apply/ui/apply-button';
+import { auth } from '@/backend/infrastructure/auth';
+import { getJobDescriptionById } from '@/backend/actions/jd-queries';
+import { getMyApplications } from '@/backend/actions/applications';
+import { PostingTitle } from '@/frontend/entities/job/ui/posting-title';
+import { SummaryCard } from '@/frontend/entities/job/ui/summary-card';
+import { ApplyButton } from '@/frontend/features/apply/ui/apply-button';
 import { LoginToApplyCta } from './_login-to-apply-cta';
 import { ShareJobButton } from './_share-job-button';
 import { JobDetailAnalytics } from './_job-detail-analytics';
-import { getServerI18n } from '@/lib/i18n/server';
-import { getActionErrorMessage } from '@/lib/i18n/action-error';
-import { getLocalizedCatalogName } from '@/lib/i18n/catalog';
-import { getWorkArrangementLabel } from '@/lib/frontend/presentation';
+import { getServerI18n } from '@/shared/i18n/server';
+import { getActionErrorMessage } from '@/shared/i18n/action-error';
+import { getLocalizedCatalogName } from '@/shared/i18n/catalog';
+import { getWorkArrangementLabel } from '@/frontend/lib/presentation';
 
 export default async function JobDetailPage({
   params,
@@ -72,8 +72,8 @@ export default async function JobDetailPage({
         />
 
         {jd.descriptionMarkdown && (
-          <div className="w-full rounded-[20px] bg-[#fbfbfb] px-[40px] pt-[20px] pb-[40px]">
-            <div className="text-[18px] leading-[1.5] font-medium text-[#4c4c4c] [&_h2]:mb-[40px] [&_h2]:border-b [&_h2]:border-[#d7d7d7] [&_h2]:pb-[10px] [&_h2]:text-[22px] [&_h2]:leading-[1.5] [&_h2]:font-bold [&_h2]:text-[#1a1a1a] [&_h2:not(:first-of-type)]:mt-[80px] [&_li]:mb-[4px] [&_li:last-child]:mb-0 [&_p]:m-0 [&_ul]:m-0 [&_ul]:list-disc [&_ul]:pl-[27px]">
+          <div className="w-full rounded-[20px] bg-bg px-[40px] pt-[20px] pb-[40px]">
+            <div className="text-body-1 text-text-body-2 [&_h2]:mb-[40px] [&_h2]:border-b [&_h2]:border-gray-200 [&_h2]:pb-[10px] [&_h2]:text-h2 [&_h2]:text-text-title-2 [&_h2:not(:first-of-type)]:mt-[80px] [&_li]:mb-[4px] [&_li:last-child]:mb-0 [&_p]:m-0 [&_ul]:m-0 [&_ul]:list-disc [&_ul]:pl-[27px]">
               <ReactMarkdown>{jd.descriptionMarkdown}</ReactMarkdown>
             </div>
           </div>
