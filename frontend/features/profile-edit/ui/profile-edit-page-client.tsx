@@ -193,7 +193,7 @@ const EMPTY_URL: Omit<DraftUrl, 'id'> = {
 
 const BASE_SECTION_CLASS = 'w-full rounded-[20px] px-[20px]';
 const BASIC_SECTION_CLASS =
-  'w-full rounded-[20px] bg-white px-[40px] py-[20px]';
+  'w-full rounded-[20px] bg-white px-[40px] py-[20px] border-2 border-transparent focus-within:border-brand-sub';
 const TOP_PADDED_SECTION_CLASS = `${BASE_SECTION_CLASS} pt-[20px]`;
 
 const CORE_EDUCATION_ORDER = [
@@ -874,7 +874,7 @@ export function ProfileEditPageClient(props: ProfileEditPageClientProps) {
             {draft.educations.map((education) => (
               <div
                 key={education.id}
-                className="relative rounded-[20px] border-2 border-brand-sub p-[20px]"
+                className="relative rounded-[20px] border-2 border-transparent p-[20px] focus-within:border-brand-sub"
               >
                 <Button
                   type="button"
@@ -1116,7 +1116,10 @@ export function ProfileEditPageClient(props: ProfileEditPageClientProps) {
           />
           <div className="mt-[25px] flex flex-col gap-[25px]">
             {draft.careers.map((career) => (
-              <div key={career.id} className="relative rounded-[20px] p-[20px]">
+              <div
+                key={career.id}
+                className="relative rounded-[20px] border-2 border-transparent p-[20px] focus-within:border-brand-sub"
+              >
                 <Button
                   type="button"
                   variant="ghost"
@@ -1331,7 +1334,7 @@ export function ProfileEditPageClient(props: ProfileEditPageClientProps) {
             {draft.certifications.map((certification) => (
               <div
                 key={certification.id}
-                className="relative rounded-[20px] p-[20px]"
+                className="relative rounded-[20px] border-2 border-transparent p-[20px] focus-within:border-brand-sub"
               >
                 <Button
                   type="button"
@@ -1453,7 +1456,7 @@ export function ProfileEditPageClient(props: ProfileEditPageClientProps) {
             {draft.languages.map((language) => (
               <div
                 key={language.id}
-                className="relative rounded-[20px] p-[20px]"
+                className="relative rounded-[20px] border-2 border-transparent p-[20px] focus-within:border-brand-sub"
               >
                 <Button
                   type="button"
@@ -1592,7 +1595,10 @@ export function ProfileEditPageClient(props: ProfileEditPageClientProps) {
           />
           <div className="mt-[25px] flex flex-col gap-[25px]">
             {draft.urls.map((url) => (
-              <div key={url.id} className="relative rounded-[20px] p-[20px]">
+              <div
+                key={url.id}
+                className="relative rounded-[20px] border-2 border-transparent p-[20px] focus-within:border-brand-sub"
+              >
                 <Button
                   type="button"
                   variant="ghost"
