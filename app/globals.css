@@ -177,7 +177,7 @@
 
 :root {
   --radius: 0.625rem;
-  --background: var(--color-bg);
+  --background: var(--color-white);
   --foreground: var(--color-black);
   --card: var(--color-white);
   --card-foreground: var(--color-black);

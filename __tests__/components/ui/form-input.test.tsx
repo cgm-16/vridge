@@ -22,10 +22,10 @@ describe('FormInput', () => {
     expect(textarea).toHaveClass('h-[130px]');
   });
 
-  it('기본 상태: bg-bg 배경', () => {
+  it('기본 상태: white 배경', () => {
     renderWithI18n(<FormInput placeholder="Test" />);
     const input = screen.getByPlaceholderText('Test');
-    expect(input).toHaveClass('bg-bg');
+    expect(input).toHaveClass('bg-white');
   });
 
   it('filled 상태: bg-white + border', () => {
