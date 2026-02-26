@@ -66,7 +66,6 @@ type DraftPublic = {
   aboutMe: string;
   dateOfBirth?: string;
   location: string;
-  headline: string;
   isOpenToWork: boolean;
 };
 
@@ -138,7 +137,6 @@ type ProfileEditPageClientProps = {
     aboutMe?: string | null;
     dateOfBirth?: string | null;
     location?: string | null;
-    headline?: string | null;
     isOpenToWork?: boolean | null;
   } | null;
   profilePrivate?: { phoneNumber?: string | null } | null;
@@ -293,7 +291,6 @@ function toComparableDraft(draft: ProfileEditDraft) {
       aboutMe: normalizeText(draft.public.aboutMe),
       dateOfBirth: draft.public.dateOfBirth || undefined,
       location: normalizeText(draft.public.location),
-      headline: normalizeText(draft.public.headline),
       isOpenToWork: Boolean(draft.public.isOpenToWork),
     },
     contact: {
@@ -359,7 +356,6 @@ function buildInitialDraft(
       aboutMe: props.profilePublic?.aboutMe ?? '',
       dateOfBirth: props.profilePublic?.dateOfBirth ?? undefined,
       location: props.profilePublic?.location ?? '',
-      headline: props.profilePublic?.headline ?? '',
       isOpenToWork: Boolean(props.profilePublic?.isOpenToWork),
     },
     contact: {
@@ -572,7 +568,6 @@ export function ProfileEditPageClient(props: ProfileEditPageClientProps) {
           aboutMe: normalizeText(draft.public.aboutMe),
           dateOfBirth: draft.public.dateOfBirth || undefined,
           location: normalizeText(draft.public.location),
-          headline: normalizeText(draft.public.headline),
           isOpenToWork: Boolean(draft.public.isOpenToWork),
         });
       }
@@ -826,18 +821,6 @@ export function ProfileEditPageClient(props: ProfileEditPageClientProps) {
                   theme="bg"
                 />
               </div>
-
-              <FormInput
-                required
-                size="lg"
-                placeholder={t('form.headline')}
-                value={draft.public.headline}
-                onChange={(event) =>
-                  updateDraftPublic('headline', event.target.value)
-                }
-                filled={draft.public.headline.length > 0}
-                theme="bg"
-              />
 
               <FormInput
                 size="lg"
