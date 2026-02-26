@@ -119,10 +119,8 @@ export function DatePicker({
     <div ref={ref} className="relative">
       <button
         type="button"
-        className={`flex h-[52px] items-center justify-between rounded-[10px] px-[20px] text-left ${triggerWidthClass} ${
-          hasValue
-            ? 'border border-gray-300 bg-white text-gray-800'
-            : 'bg-bg text-gray-600'
+        className={`flex h-[52px] items-center justify-between rounded-[10px] bg-bg px-[20px] text-left ${triggerWidthClass} ${
+          hasValue ? 'border border-gray-300 text-gray-800' : 'text-gray-600'
         }`}
         onClick={() => setOpen(!open)}
         aria-expanded={open}

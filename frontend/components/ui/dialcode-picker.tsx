@@ -32,7 +32,7 @@ export function DialcodePicker({ value, onChange }: DialcodePickerProps) {
     <div ref={ref} className="relative">
       <button
         type="button"
-        className="flex h-[44px] w-[92px] items-center justify-start gap-[5px] rounded-[10px] bg-bg px-3.5 py-2.5"
+        className="flex h-input-h-sm w-[92px] items-center justify-start gap-[5px] rounded-[10px] bg-bg px-3.5 py-2.5"
         onClick={() => setOpen(!open)}
         aria-expanded={open}
       >

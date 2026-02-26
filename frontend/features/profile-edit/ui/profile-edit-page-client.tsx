@@ -786,7 +786,7 @@ export function ProfileEditPageClient(props: ProfileEditPageClientProps) {
                     onChange={(code) => updateDraftContact('dialCode', code)}
                   />
                   <FormInput
-                    className="h-11"
+                    size="sm"
                     required
                     placeholder={t('form.phoneNumber')}
                     value={draft.contact.phoneNumber}
@@ -801,7 +801,7 @@ export function ProfileEditPageClient(props: ProfileEditPageClientProps) {
                 <div className="flex items-center gap-[10px]">
                   <Icon name="mail" size={20} />
                   <FormInput
-                    className="h-11"
+                    size="sm"
                     placeholder={t('form.email')}
                     value={draft.contact.email}
                     filled
@@ -816,7 +816,7 @@ export function ProfileEditPageClient(props: ProfileEditPageClientProps) {
                 <Icon name="location" size={20} />
                 <FormInput
                   required
-                  className="h-11"
+                  size="sm"
                   placeholder={t('form.location')}
                   value={draft.public.location}
                   onChange={(event) =>
