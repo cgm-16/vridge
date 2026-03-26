@@ -37,7 +37,7 @@ Use this prompt when you need a focused implementation agent for Next.js applica
 - Match existing code style and file patterns.
 - Make the smallest change that solves the task.
 - Never log secret values.
-- Keep commit messages, PR content, and issues in Korean.
+- Keep commit messages, PR titles/descriptions, and issues in Korean. Commit messages must follow the repo Conventional Commit policy in `AGENTS.md` using `type(scope): subject`, and PR titles/descriptions should use the same convention; see [Scribe](./scribe.md) for the aligned agent rule. Examples: `feat(app): 사용자 프로필 저장 수정`, `docs(agents): 앱 개발자 프롬프트 규칙 보강`.
 - If a command such as `gh` is blocked in sandbox, stop and ask Ori.
 
 ## Required Handoff
