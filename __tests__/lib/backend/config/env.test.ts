@@ -80,7 +80,7 @@ describe('env config', () => {
   it('여러 변수 누락 시 모두 에러 메시지에 포함된다', async () => {
     Object.assign(process.env, VALID_ENV);
     delete process.env.DATABASE_URL;
-    delete process.env.GOOGLE_CLIENT_SECRET;
+    delete process.env.BETTER_AUTH_SECRET;
     let errorMessage = '';
     try {
       await import('@/backend/config/env');
@@ -88,6 +88,6 @@ describe('env config', () => {
       errorMessage = (e as Error).message;
     }
     expect(errorMessage).toContain('DATABASE_URL');
-    expect(errorMessage).toContain('GOOGLE_CLIENT_SECRET');
+    expect(errorMessage).toContain('BETTER_AUTH_SECRET');
   });
 });
