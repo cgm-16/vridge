@@ -1,5 +1,5 @@
-// IMPORTANT: jest.mock calls before any imports
-// No mocks needed for this file
+// 중요: jest.mock 호출은 모든 import보다 먼저 와야 합니다
+// 이 파일에는 모의(mock)가 필요 없습니다
 
 import type { Env } from '@/backend/config/env';
 
@@ -17,7 +17,7 @@ const VALID_ENV: Record<string, string> = {
   NEXT_PUBLIC_PRIVACY_POLICY_URL: 'http://localhost/privacy',
 };
 
-describe('env config', () => {
+describe('env 설정', () => {
   let savedEnv: NodeJS.ProcessEnv;
 
   beforeEach(() => {
@@ -66,7 +66,7 @@ describe('env config', () => {
   it('에러 메시지에 시크릿 값이 포함되지 않는다', async () => {
     Object.assign(process.env, VALID_ENV);
     process.env.BETTER_AUTH_SECRET = 'my-super-secret-value';
-    delete process.env.DATABASE_URL; // force an error
+    delete process.env.DATABASE_URL; // 에러를 강제 발생시키기 위해 삭제
     let errorMessage = '';
     try {
       await import('@/backend/config/env');
@@ -89,5 +89,21 @@ describe('env config', () => {
     }
     expect(errorMessage).toContain('DATABASE_URL');
     expect(errorMessage).toContain('BETTER_AUTH_SECRET');
+  });
+
+  it('GOOGLE_CLIENT_ID만 있고 GOOGLE_CLIENT_SECRET 없으면 throw한다', async () => {
+    Object.assign(process.env, VALID_ENV);
+    delete process.env.GOOGLE_CLIENT_SECRET;
+    await expect(import('@/backend/config/env')).rejects.toThrow(
+      /GOOGLE_CLIENT_ID/
+    );
+  });
+
+  it('FACEBOOK_CLIENT_SECRET만 있고 FACEBOOK_CLIENT_ID 없으면 throw한다', async () => {
+    Object.assign(process.env, VALID_ENV);
+    delete process.env.FACEBOOK_CLIENT_ID;
+    await expect(import('@/backend/config/env')).rejects.toThrow(
+      /FACEBOOK_CLIENT/
+    );
   });
 });

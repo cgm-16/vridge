@@ -21,6 +21,7 @@ jest.mock('better-auth/next-js', () => ({
 jest.mock('@/backend/infrastructure/db', () => ({
   prisma: {
     $transaction: jest.fn(),
+    user: { delete: jest.fn() },
   },
 }));
 
@@ -29,6 +30,11 @@ import { auth } from '@/backend/infrastructure/auth';
 import { prisma } from '@/backend/infrastructure/db';
 
 describe('auth', () => {
+  beforeEach(() => {
+    (prisma.$transaction as jest.Mock).mockReset();
+    (prisma.user.delete as jest.Mock).mockReset();
+  });
+
   it('auth 인스턴스가 정의됨', () => {
     expect(auth).toBeDefined();
   });
@@ -41,6 +47,20 @@ describe('auth', () => {
   it('databaseHooks user.create.after 가 설정됨', () => {
     const config = (betterAuth as jest.Mock).mock.calls[0][0];
     expect(config.databaseHooks?.user?.create?.after).toBeInstanceOf(Function);
+  });
+
+  it('프로비저닝 실패 시 보상 삭제 후 에러를 다시 던진다', async () => {
+    const config = (betterAuth as jest.Mock).mock.calls[0][0];
+    const afterHook = config.databaseHooks.user.create.after;
+
+    const provisioningError = new Error('트랜잭션 실패');
+    (prisma.$transaction as jest.Mock).mockRejectedValue(provisioningError);
+    (prisma.user.delete as jest.Mock).mockResolvedValue({});
+
+    await expect(
+      afterHook({ id: 'u2', email: 'b@c.com' }, null)
+    ).rejects.toThrow('트랜잭션 실패');
+    expect(prisma.user.delete).toHaveBeenCalledWith({ where: { id: 'u2' } });
   });
 
   it('databaseHooks user.create.after 가 AppUser + 프로필 3건 트랜잭션 생성', async () => {
