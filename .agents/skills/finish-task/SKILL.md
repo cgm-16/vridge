@@ -19,8 +19,6 @@ Use this skill when Ori wants to wrap up a migration task that is already implem
    - `task`
    - `title`
    - `branch`
-   - `labels`
-   - `milestone`
    - `issue`
 
 3. Confirm the current branch matches the task branch before mutating git state.
@@ -80,7 +78,7 @@ Use this skill when Ori wants to wrap up a migration task that is already implem
    - Include:
      - implementation summary
      - validation commands that passed
-     - linked issue reference for context
+     - linked issue reference for context when `issue` is present
 
 9. Report the result.
    - Print the PR URL.
