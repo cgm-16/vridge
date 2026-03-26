@@ -42,18 +42,22 @@ Use this skill when Ori wants to wrap up a migration task that is already implem
 5. Review the working tree and branch history.
 
    ```bash
-   git status --short
-   git log --oneline origin/dev..HEAD
+   git status --porcelain
+   git rev-list --count origin/dev..HEAD
    ```
 
-   - If there are no working tree changes and no task commits ahead of `dev`, report that there is nothing to finish.
+   - Treat a non-empty `git status --porcelain` result as pending working tree changes.
+   - Treat the `git rev-list --count` result as the number of task commits already ahead of `dev`.
+   - If there are no working tree changes and the ahead count is `0`, report that there is nothing to finish.
+   - If there are no working tree changes and the ahead count is greater than `0`, skip staging and commit creation and report that there is nothing new to commit because the branch is already ahead of `dev`.
 
-6. Stage and commit the task changes.
+6. Stage and commit the task changes only when working tree changes exist.
 
    ```bash
    git add -A
    ```
 
+   - Do not run `git add -A` or create a commit when `git status --porcelain` is empty.
    - Use a Korean Conventional Commit message.
    - Commit type rule:
      - `docs`: docs-only task changes
@@ -82,7 +86,7 @@ Use this skill when Ori wants to wrap up a migration task that is already implem
 
 9. Report the result.
    - Print the PR URL.
-   - Include the commit created, or say that no commit was needed.
+   - Include the commit created, or say that no commit was needed because the branch was already ahead of `dev`.
 
 ## Guardrails
 
