@@ -1,0 +1,6 @@
+apiVersion: v2
+name: vridge
+description: vridge 웹 애플리케이션용 Helm 차트
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
