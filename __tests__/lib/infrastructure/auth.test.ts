@@ -1,3 +1,13 @@
+jest.mock('@/backend/config/env', () => ({
+  env: {
+    BETTER_AUTH_SECRET: 'test-secret',
+    BETTER_AUTH_URL: 'http://localhost:3000',
+    GOOGLE_CLIENT_ID: 'gid',
+    GOOGLE_CLIENT_SECRET: 'gsecret',
+    FACEBOOK_CLIENT_ID: 'fid',
+    FACEBOOK_CLIENT_SECRET: 'fsecret',
+  },
+}));
 jest.mock('better-auth', () => ({
   betterAuth: jest.fn((config: unknown) => ({ options: config })),
 }));
