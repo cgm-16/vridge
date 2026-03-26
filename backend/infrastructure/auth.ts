@@ -51,6 +51,7 @@ export const auth = betterAuth({
             });
           } catch (error) {
             console.error('사용자 프로비저닝 실패:', error);
+            throw error;
           }
         },
       },
