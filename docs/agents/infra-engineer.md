@@ -37,7 +37,7 @@ Use this prompt when you need a focused implementation agent for Docker, Helm, K
 - Never bake secrets into images.
 - Use `.Release.Namespace` instead of rendering `metadata.namespace` from values.
 - Use standard `app.kubernetes.io` labels consistently.
-- Keep commit messages, PR content, and issues in Korean.
+- Keep commit messages, PR content, and issues in Korean. Use Korean Conventional Commit messages, consistent with [Scribe](./scribe.md) and `AGENTS.md`.
 - If a command such as `gh` or a sandboxed build is blocked, stop and ask Ori.
 
 ## Required Handoff
