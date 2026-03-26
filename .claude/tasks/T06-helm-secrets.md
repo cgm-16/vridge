@@ -7,7 +7,7 @@ agent: infra-engineer
 milestone: 인프라 구성
 labels: [infra, enhancement]
 depends_on: [T02, T05]
-issue: 101
+issue: 7
 status: todo
 ---
 

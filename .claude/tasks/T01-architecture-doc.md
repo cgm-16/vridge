@@ -7,7 +7,7 @@ agent: app-developer
 milestone: 앱 준비
 labels: [documentation]
 depends_on: []
-issue: 96
+issue: 2
 status: todo
 ---
 

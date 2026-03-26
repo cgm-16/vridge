@@ -7,7 +7,7 @@ agent: infra-engineer
 milestone: CI/CD 및 배포
 labels: [ci, enhancement]
 depends_on: [T04]
-issue: 103
+issue: 9
 status: todo
 ---
 
