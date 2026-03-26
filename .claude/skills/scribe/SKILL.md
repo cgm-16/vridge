@@ -1,26 +1,26 @@
 ---
 name: scribe
-description: Post-merge doc sync — updates task status and progress tracking on dev
+description: Post-merge doc sync — updates task status and progress tracking via PR to dev
 argument-hint: '<task-number> (e.g., 01, 02, ...10)'
-allowed-tools: Bash(git *), Read, Glob, Grep, Write, Edit
+allowed-tools: Bash(git *), Bash(gh *), Read, Glob, Grep, Write, Edit
 ---
 
 Run post-merge documentation sync for task T$ARGUMENTS.
 
-1. **Verify we are on dev**:
+1. **Ensure we start from latest dev**:
 
+   ```bash
+   git fetch origin dev
+   git checkout dev
+   git merge --ff-only origin/dev
    ```
-   git branch --show-current
-   ```
 
-   If the current branch is not `dev`, **stop immediately**:
+   If ff-only fails, **stop immediately** and report the error.
 
-   > Error: Scribe must run on dev branch. Current branch: {branch}. Switch to dev first.
+2. **Create a docs branch**:
 
-2. **Pull latest dev**:
-
-   ```
-   git pull origin dev
+   ```bash
+   git checkout -b docs/scribe-T$ARGUMENTS
    ```
 
 3. **Find the task file**:
@@ -52,10 +52,11 @@ Run post-merge documentation sync for task T$ARGUMENTS.
    git commit -m "docs: T$ARGUMENTS 결과 반영"
    ```
 
-8. **Push to dev**:
+8. **Push branch and open PR**:
 
-   ```
-   git push origin dev
+   ```bash
+   git push -u origin docs/scribe-T$ARGUMENTS
+   gh pr create --base dev --title "docs: T$ARGUMENTS 결과 반영" --body "T$ARGUMENTS 태스크 완료에 따른 문서 동기화"
    ```
 
-9. **Report** — print what was updated.
+9. **Report** — print the PR URL and what was updated.

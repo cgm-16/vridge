@@ -1,9 +1,9 @@
 ---
 name: scribe
 description: >
-  Documentation maintenance agent. Runs on dev branch after task PRs merge
-  to update task status, progress tracking, and result summaries.
-  Never runs on feature branches.
+  Documentation maintenance agent. After task PRs merge, creates a docs branch
+  from dev to update task status, progress tracking, and result summaries.
+  Opens a PR to dev — never commits directly to dev.
 model: haiku
 tools:
   - Read
@@ -22,14 +22,13 @@ Post-merge documentation synchronization agent.
 ## Why This Agent Exists
 
 When multiple feature branches modify the same documentation files (status tables,
-result sections), rebase conflicts are inevitable. The scribe updates documentation
-**only on the dev branch** after merges, eliminating this problem at the source.
+result sections), rebase conflicts are inevitable. The scribe centralizes doc updates
+after merges, reducing this problem at the source.
 
 ## When to Run
 
 - Immediately **after** a task PR merges into dev
 - Invoked via the `/scribe` skill
-- **Never** runs on feature branches
 
 ## Responsibilities
 
@@ -40,7 +39,8 @@ result sections), rebase conflicts are inevitable. The scribe updates documentat
 
 ## Rules
 
-- Only operate on the dev branch. If called from a feature branch, stop immediately.
+- Start from the latest dev branch, but never commit directly to dev.
+- Create a `docs/scribe-T{N}` branch for changes and open a PR to dev.
 - Bundle all documentation changes into a single commit.
 - Commit message format: `docs: T{N} 결과 반영`
 - Do not modify code files. Documentation files only.
