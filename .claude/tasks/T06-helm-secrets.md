@@ -35,7 +35,7 @@ Teach the vridge Helm chart to consume database config from the CNPG-generated s
 1. Update the Deployment template to wire:
    - DATABASE_URL from vridge-db-app:uri
    - DIRECT_URL from vridge-db-app:uri
-2. Keep app-owned runtime secret injection separate via envFrom or explicit env entries from vridge-env.
+2. Keep app-owned runtime secret injection separate via explicit `env[].valueFrom.secretKeyRef` entries from vridge-env (do not use `envFrom` — it leaks unintended keys).
 3. Make secret names configurable in values, but default to:
    - DB secret: vridge-db-app
    - App secret: vridge-env

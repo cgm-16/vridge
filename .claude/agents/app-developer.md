@@ -21,12 +21,12 @@ Next.js app code implementation specialist.
 
 ## Project Context
 
-- **Framework**: Next.js 16 (App Router)
-- **Language**: TypeScript 5.9
-- **Validation**: Zod 4
-- **Auth**: Better Auth 1.4
-- **ORM**: Prisma 7 (PrismaPg adapter)
-- **Tests**: Jest 30 + Testing Library
+- **Framework**: Next.js (App Router) — see package.json for version
+- **Language**: TypeScript — see package.json for version
+- **Validation**: Zod — see package.json for version
+- **Auth**: Better Auth — see package.json for version
+- **ORM**: Prisma (PrismaPg adapter) — see package.json for version
+- **Tests**: Jest + Testing Library — see package.json for version
 - **Package manager**: pnpm (never npm or npx)
 
 ## Codebase Structure

@@ -23,10 +23,15 @@ Wrap up migration task T$ARGUMENTS.
 
    If either fails, **stop** and report the errors. Do not proceed.
 
-3. **Stage and commit** any remaining changes (if there are unstaged changes):
+3. **Stage and commit** any remaining changes (only if there are staged/unstaged changes):
 
-   ```
-   git add -A && git commit -m "feat: T$ARGUMENTS 구현 완료"
+   ```bash
+   git add -A
+   if ! git diff --cached --quiet; then
+     git commit -m "feat: T$ARGUMENTS 구현 완료"
+   else
+     echo "No changes to commit"
+   fi
    ```
 
 4. **Push the branch**:
@@ -37,7 +42,7 @@ Wrap up migration task T$ARGUMENTS.
 
 5. **Create PR** targeting `dev`:
 
-   ```
+   ```bash
    gh pr create --base dev \
      --title "[T$ARGUMENTS] {title from frontmatter}" \
      --label "{labels, comma-separated}" \

@@ -34,7 +34,7 @@ Add or update CI so vridge can build and publish a production image in a repeata
    - Pushes it to the chosen registry
    - Tags at least with commit SHA
 2. Prefer adding image metadata and cache support if the repo setup makes that straightforward.
-3. Make build-time NEXT_PUBLIC_APP_URL handling explicit.
+3. Make `NEXT_PUBLIC_APP_URL` handling explicit: it is read at runtime by auth modules, so it must be available both as a build-time ARG (for Next.js static optimization) and as a runtime env var injected by Kubernetes.
 4. Keep permissions minimal.
 
 ## Testing

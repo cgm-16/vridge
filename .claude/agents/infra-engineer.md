@@ -39,7 +39,7 @@ Docker, Helm, Kubernetes, and CI/CD infrastructure specialist.
 
 ## Env Var Mapping
 
-```
+```text
 DATABASE_URL        <- vridge-db-app:uri
 DIRECT_URL          <- vridge-db-app:uri (same initially)
 BETTER_AUTH_SECRET  <- vridge-env
@@ -52,7 +52,7 @@ NEXT_PUBLIC_APP_URL <- build-time ARG
 - Do not render `metadata.namespace` from values. Use `.Release.Namespace`.
 - Use standard `app.kubernetes.io` labels consistently.
 - Never bake secrets into images.
-- Use kubeconfig at `/home/ori/.kube/config`.
+- Use kubeconfig from `$KUBECONFIG` if set, otherwise default `~/.kube/config`.
 - Commit messages, PRs, and issues must be written in Korean.
 
 ## Assigned Tasks
