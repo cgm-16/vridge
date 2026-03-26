@@ -14,6 +14,7 @@
 ```text
 vridge/
 ├── app/
+├── deploy/
 ├── .storybook/
 ├── backend/
 ├── frontend/
@@ -21,6 +22,7 @@ vridge/
 ├── __tests__/
 ├── docs/
 ├── public/
+├── scripts/
 ├── proxy.ts
 └── 설정 파일들
 ```
@@ -28,6 +30,8 @@ vridge/
 - `public/icons/`에 dialcode picker용 국기 아이콘(`flag-vn.svg`, `flag-kr.svg`)이 추가되었습니다.
 - `public/icons/share.svg` 아이콘은 `/jobs/[id]` 상세 공유 CTA에서 사용됩니다.
 - 인증/디자인 정렬용 공통 컴포넌트로 `frontend/components/ui/login-field.tsx`, `frontend/components/ui/social-ls.tsx`가 추가되었습니다.
+- `deploy/helm/vridge/`는 k3s 배포용 Helm 차트 스캐폴드를 포함합니다.
+- `scripts/validate-vridge-chart.sh`는 Helm 차트 lint 및 렌더링 검증 진입점입니다.
 
 ## Next.js 라우트 구조 (`app/`)
 

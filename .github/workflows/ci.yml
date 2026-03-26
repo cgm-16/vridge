@@ -48,3 +48,16 @@ jobs:
 
       - name: 테스트 및 커버리지
         run: pnpm test --coverage
+
+  helm-chart:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 코드 체크아웃
+        uses: actions/checkout@v4
+
+      - name: Helm 설정
+        uses: azure/setup-helm@v4
+
+      - name: Helm 차트 검증
+        run: sh scripts/validate-vridge-chart.sh
