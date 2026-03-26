@@ -6,7 +6,7 @@ branch: feat/T02-runtime-config
 agent: app-developer
 milestone: 앱 준비
 labels: [app, enhancement]
-depends_on: []
+depends_on: [T01]
 issue: 3
 status: todo
 ---
@@ -25,6 +25,12 @@ Introduce a small, testable runtime configuration module for the vridge app so r
   - BETTER_AUTH_SECRET
   - BETTER_AUTH_URL
   - NEXT_PUBLIC_APP_URL
+  - GOOGLE_CLIENT_ID
+  - GOOGLE_CLIENT_SECRET
+  - FACEBOOK_CLIENT_ID
+  - FACEBOOK_CLIENT_SECRET
+  - NEXT_PUBLIC_GA_MEASUREMENT_ID
+  - NEXT_PUBLIC_PRIVACY_POLICY_URL
 - DATABASE_URL and DIRECT_URL will initially point to the same CNPG URI.
 - BETTER_AUTH_SECRET and BETTER_AUTH_URL are runtime values.
 - NEXT_PUBLIC_APP_URL is a public URL and may be used at build time as well.

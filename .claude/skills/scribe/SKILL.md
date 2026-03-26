@@ -37,8 +37,8 @@ Run post-merge documentation sync for task T$ARGUMENTS.
 
 5. **Find the merged PR** for this task:
 
-   ```
-   gh pr list --state merged --search "T$ARGUMENTS" --limit 1 --json number,title,url
+   ```bash
+   gh pr list --state merged --base dev --head {branch from frontmatter} --json number,title,url
    ```
 
    Extract the PR number and URL.
@@ -47,8 +47,8 @@ Run post-merge documentation sync for task T$ARGUMENTS.
 
 7. **Commit all documentation changes**:
 
-   ```
-   git add .claude/tasks/
+   ```bash
+   git add {resolved task file path}
    git commit -m "docs: T$ARGUMENTS 결과 반영"
    ```
 

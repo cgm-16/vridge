@@ -17,13 +17,13 @@ Start work on migration task T$ARGUMENTS.
 
 2. **Check dependencies** — for each task in `depends_on`:
 
-   ```
-   gh pr list --state merged --search "T{dep}" --limit 1
+   ```bash
+   gh pr list --state merged --base dev --search "T${dep}" --limit 1
    ```
 
    If any dependency PR is not yet merged to dev, **stop** and report:
 
-   > Blocked: T{dep} has not been merged yet. Merge it first, then retry.
+   > Blocked: T${dep} has not been merged yet. Merge it first, then retry.
 
 3. **Switch to dev and pull latest**:
 

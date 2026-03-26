@@ -25,7 +25,7 @@ Add a short architecture/ADR-style document that captures the agreed migration t
 - No shared tables, no shared database, no shared credentials with "ssemtle".
 - Initial "vridge" DB access is direct to CNPG, without PgBouncer.
 - Namespace should be "vridge" unless an existing repo convention strongly requires a suffix like "vridge-prod".
-- DB envs should come from the CNPG generated secret "vridge-db-app".
+- DB envs should come from the CNPG-generated secret "vridge-db-app".
 - App-only secret values should live in a separate secret like "vridge-env".
 
 ## Deliverables
