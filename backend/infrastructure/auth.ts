@@ -51,6 +51,11 @@ export const auth = betterAuth({
             });
           } catch (error) {
             console.error('사용자 프로비저닝 실패:', error);
+            try {
+              await prisma.user.delete({ where: { id: user.id } });
+            } catch (deleteError) {
+              console.error('보상 삭제 실패:', deleteError);
+            }
             throw error;
           }
         },
