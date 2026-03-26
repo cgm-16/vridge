@@ -25,17 +25,21 @@ Start work on migration task T$ARGUMENTS.
 
    > Blocked: T${dep} has not been merged yet. Merge it first, then retry.
 
-3. **Switch to dev and pull latest**:
+3. **Update dev**:
 
    ```
-   git checkout dev && git pull origin dev
+   git fetch origin dev && git merge --ff-only origin/dev
    ```
 
-4. **Create the feature branch**:
+   If not currently on dev, run this from the main worktree (do not checkout).
+
+4. **Create the feature branch on a new worktree**:
 
    ```
-   git checkout -b {branch from frontmatter}
+   git worktree add ../{branch from frontmatter} -b {branch from frontmatter} dev
    ```
+
+   The worktree will be created as a sibling directory of the repo root. After creation, tell the user the worktree path and remind them to open it in the IDE if needed.
 
 5. **Show linked issue** (if `issue` is set):
 
