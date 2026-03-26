@@ -1,0 +1,4 @@
+interface:
+  display_name: "Finish Task"
+  short_description: "Validate, commit, push, and open a task PR"
+  default_prompt: "Use $finish-task to wrap up task T01, run validation, and open a PR to `dev` with the repo template."

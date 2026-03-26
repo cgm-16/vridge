@@ -1,0 +1,4 @@
+interface:
+  display_name: "Start Task"
+  short_description: "Prepare a tracked task and summarize the scope"
+  default_prompt: "Use $start-task to prepare work for task T01 from `.claude/tasks/` and summarize the exact implementation scope."
