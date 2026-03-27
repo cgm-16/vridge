@@ -67,8 +67,8 @@ pnpm dev
 ## 프로덕션 컨테이너 빌드
 
 프로덕션 이미지는 공개 빌드 변수만 `docker build` 시점에 받습니다.
-런타임 변수(`DATABASE_URL`, `DIRECT_URL`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`)는 컨테이너 실행 시 주입해야 합니다.
-`NEXT_PUBLIC_*` 값은 클라이언트 번들에 빌드 타임에 고정되므로 `docker run -e`로는 바꿀 수 없습니다.
+런타임 변수(`DATABASE_URL`, `DIRECT_URL`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `NEXT_PUBLIC_*`)는 컨테이너 실행 시에도 주입해야 합니다.
+`NEXT_PUBLIC_*` 값은 클라이언트 번들에 빌드 타임에 고정되므로, GitHub Actions 빌드와 Kubernetes 런타임에 동일한 값을 유지해야 합니다.
 
 ```bash
 docker build \
@@ -84,8 +84,14 @@ docker run --rm -p 3000:3000 \
   -e DIRECT_URL=postgresql://postgres:postgres@host.docker.internal:54329/vridge_test \
   -e BETTER_AUTH_SECRET=dev-secret-dev-secret-dev-secret \
   -e BETTER_AUTH_URL=http://localhost:3000 \
+  -e NEXT_PUBLIC_APP_URL=http://localhost:3000 \
+  -e NEXT_PUBLIC_GA_MEASUREMENT_ID=G-LOCALTEST \
+  -e NEXT_PUBLIC_PRIVACY_POLICY_URL=http://localhost/privacy \
   vridge:local
 ```
+
+GitHub Actions `build-image.yml`은 `dev` 브랜치 push 시 `ghcr.io/<owner>/vridge`로 이미지를 푸시합니다.
+이때 `NEXT_PUBLIC_APP_URL`, `NEXT_PUBLIC_GA_MEASUREMENT_ID`, `NEXT_PUBLIC_PRIVACY_POLICY_URL`는 GitHub Repository Variables로 제공해야 합니다.
 
 ## 스크립트
 
