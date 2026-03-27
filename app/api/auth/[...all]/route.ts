@@ -1,12 +1,17 @@
 import { getAuth } from '@/backend/infrastructure/auth';
 import { toNextJsHandler } from 'better-auth/next-js';
 
-const authHandler = toNextJsHandler(getAuth());
+let authHandler: ReturnType<typeof toNextJsHandler> | undefined;
+
+function getHandler() {
+  authHandler ??= toNextJsHandler(getAuth());
+  return authHandler;
+}
 
 export async function GET(request: Request) {
-  return authHandler.GET(request);
+  return getHandler().GET(request);
 }
 
 export async function POST(request: Request) {
-  return authHandler.POST(request);
+  return getHandler().POST(request);
 }
