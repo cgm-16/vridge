@@ -21,8 +21,8 @@ jobs:
     name: k3s에 배포
     runs-on: [self-hosted, k3s]
     if: >-
-      github.event_name == 'workflow_dispatch' ||
-      github.event.workflow_run.conclusion == 'success'
+      github.event.workflow_run.conclusion == 'success' ||
+      (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/production')
     permissions:
       contents: read
 
@@ -39,7 +39,12 @@ jobs:
         id: tag
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "value=${{ inputs.image_tag || 'production' }}" >> "$GITHUB_OUTPUT"
+            RAW_TAG="${{ inputs.image_tag }}"
+            if echo "$RAW_TAG" | grep -qE '^[A-Za-z0-9._-]+$'; then
+              echo "value=$RAW_TAG" >> "$GITHUB_OUTPUT"
+            else
+              echo "value=production" >> "$GITHUB_OUTPUT"
+            fi
           else
             echo "value=sha-${{ github.event.workflow_run.head_sha }}" >> "$GITHUB_OUTPUT"
           fi
@@ -57,7 +62,7 @@ jobs:
           helm upgrade vridge deploy/helm/vridge \
             --install \
             --namespace vridge \
-            --set image.tag=${{ steps.tag.outputs.value }} \
+            --set-string "image.tag=${{ steps.tag.outputs.value }}" \
             --wait \
             --atomic \
             --timeout 5m
