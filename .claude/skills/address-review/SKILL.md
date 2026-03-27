@@ -56,8 +56,8 @@ for i in $(seq 1 6); do
   sleep 30
   RESULT=$(gh api /repos/$REPO/pulls/$PR/reviews \
     --jq '[.[] | select(.user.login | contains("coderabbitai"))] | last | {id: .id, state: .state}')
-  NEW_ID=$(echo "$RESULT" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d['id'])")
-  NEW_STATE=$(echo "$RESULT" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d['state'])")
+  NEW_ID=$(echo "$RESULT" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d['id'] if d else '')")
+  NEW_STATE=$(echo "$RESULT" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d['state'] if d else '')")
   [ "$NEW_ID" != "$PREV_ID" ] && break
 done
 [ "$NEW_ID" = "$PREV_ID" ] && TIMEOUT=1
@@ -121,8 +121,8 @@ Run an autonomous CodeRabbit review-fix loop on PR #{PR} in repo {REPO}. Repeat 
      sleep 30
      RESULT=$(gh api /repos/{REPO}/pulls/{PR}/reviews \
        --jq '[.[] | select(.user.login | contains("coderabbitai"))] | last | {id:.id,state:.state}')
-     NEW_ID=$(echo "$RESULT" | python3 -c "import sys,json;d=json.load(sys.stdin);print(d['id'])")
-     NEW_STATE=$(echo "$RESULT" | python3 -c "import sys,json;d=json.load(sys.stdin);print(d['state'])")
+     NEW_ID=$(echo "$RESULT" | python3 -c "import sys,json;d=json.load(sys.stdin);print(d['id'] if d else '')")
+     NEW_STATE=$(echo "$RESULT" | python3 -c "import sys,json;d=json.load(sys.stdin);print(d['state'] if d else '')")
      [ "$NEW_ID" != "$REVIEW_ID" ] && break
    done
    [ "$NEW_ID" = "$REVIEW_ID" ] && TIMEOUT=1
