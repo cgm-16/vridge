@@ -64,3 +64,13 @@ jobs:
 
       - name: Helm 차트 검증
         run: sh scripts/validate-vridge-chart.sh
+
+  k8s-manifests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 코드 체크아웃
+        uses: actions/checkout@v4
+      - name: yamllint 설치
+        run: pip install yamllint
+      - name: 매니페스트 검증
+        run: sh scripts/validate-k8s-manifests.sh
