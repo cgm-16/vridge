@@ -68,7 +68,7 @@ done
 
 ## If `--background` is in $ARGUMENTS
 
-Resolve REPO and PR using the setup commands above, then spawn a `general-purpose` agent
+Resolve REPO and PR using the setup commands above, then spawn a background agent
 with `run_in_background: true` using the following prompt (substitute real values for
 `{REPO}` and `{PR}`):
 
