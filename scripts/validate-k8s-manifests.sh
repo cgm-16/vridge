@@ -3,12 +3,16 @@ set -eu
 
 ROOT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 
-if ! command -v yamllint >/dev/null 2>&1; then
-  echo "yamllint이 필요합니다: pip install yamllint" >&2
+if command -v yamllint >/dev/null 2>&1; then
+  YAMLLINT=yamllint
+elif command -v uv >/dev/null 2>&1; then
+  YAMLLINT="uv tool run yamllint"
+else
+  echo "yamllint이 필요합니다: uv tool install yamllint" >&2
   exit 1
 fi
 
-yamllint -d '{extends: default, rules: {line-length: {max: 120}, comments-indentation: disable}}' \
+$YAMLLINT -d '{extends: default, rules: {line-length: {max: 120}, comments-indentation: disable}}' \
   "$ROOT_DIR/deploy/k8s/namespace.yaml" \
   "$ROOT_DIR/deploy/k8s/cnpg-cluster.yaml"
 
