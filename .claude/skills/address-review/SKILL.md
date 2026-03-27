@@ -12,7 +12,7 @@ Fix all outstanding CodeRabbit review findings on the current PR.
 ## Setup (run once)
 
 ```bash
-REPO=$(gh repo view --json nameWithOwner --jq .nameWithOwner)
+REPO=$(gh repo view cgm-16/vridge --json nameWithOwner --jq .nameWithOwner)
 PR=$(gh pr view --json number --jq .number)
 ```
 
@@ -156,6 +156,7 @@ Last commit: {sha}
 ---
 
 After spawning the agent, report to the user:
+
 > Background agent launched for PR #$PR. You'll be notified when it completes.
 
 ---
@@ -167,25 +168,18 @@ Run the loop inline. The coordinator does the fix work each round.
 Initialize `ROUND=0` before starting.
 
 **Round start:**
+
 1. Increment ROUND. If ROUND > 5: stop — "Maximum 5 rounds reached — stop."
 2. Fetch the latest CodeRabbit review. Save REVIEW_ID, STATE, and body.
 3. If STATE is `APPROVED`: stop — "CodeRabbit has already approved this PR."
 4. Extract the AI prompt block. If empty: stop — "No actionable prompt found in the latest review."
 5. Print the round header and the full extracted prompt so the coordinator can read it.
 
-**Fix:**
-6. Follow the extracted prompt exactly — verify each finding against current code, fix only
-   what is needed. Delegate tests to `test-runner` and type checking to `lint-typecheck`.
-   Stop and report if either fails.
-7. `git add -A && git commit -m "fix: address CodeRabbit review findings (round $ROUND)"` then `git push`.
+**Fix:** 6. Follow the extracted prompt exactly — verify each finding against current code, fix only
+what is needed. Delegate tests to `test-runner` and type checking to `lint-typecheck`.
+Stop and report if either fails. 7. `git add -A && git commit -m "fix: address CodeRabbit review findings (round $ROUND)"` then `git push`.
 
-**Reply:**
-8. Reply to every inline comment from REVIEW_ID using the reply helper above.
+**Reply:** 8. Reply to every inline comment from REVIEW_ID using the reply helper above.
 
-**Poll:**
-9. Poll for a new review using the poll helper above (PREV_ID = REVIEW_ID).
-10. If TIMEOUT=1: stop — "No new review after 3 minutes. Run `/address-review` again once CodeRabbit responds."
-11. If new STATE is `APPROVED`: stop — "CodeRabbit approved after $ROUND round(s). ✓"
-12. If new STATE is `CHANGES_REQUESTED` and ROUND < 5: print the new findings and ask
-    **"Continue with Round $((ROUND+1))? [Y/n]"** — loop back to Round start if confirmed, otherwise stop.
-13. If new STATE is `CHANGES_REQUESTED` and ROUND = 5: stop — "Maximum 5 rounds reached — stop."
+**Poll:** 9. Poll for a new review using the poll helper above (PREV_ID = REVIEW_ID). 10. If TIMEOUT=1: stop — "No new review after 3 minutes. Run `/address-review` again once CodeRabbit responds." 11. If new STATE is `APPROVED`: stop — "CodeRabbit approved after $ROUND round(s). ✓" 12. If new STATE is `CHANGES_REQUESTED` and ROUND < 5: print the new findings and ask
+**"Continue with Round $((ROUND+1))? [Y/n]"** — loop back to Round start if confirmed, otherwise stop. 13. If new STATE is `CHANGES_REQUESTED` and ROUND = 5: stop — "Maximum 5 rounds reached — stop."
