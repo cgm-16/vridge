@@ -11,7 +11,11 @@ WORKDIR /app
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml prisma.config.ts ./
 COPY backend/prisma ./backend/prisma
 
-RUN pnpm install --frozen-lockfile
+RUN pnpm install --frozen-lockfile \
+ && cp -rL node_modules/prisma /tmp/prisma_resolved \
+ && rm -rf node_modules/prisma && mv /tmp/prisma_resolved node_modules/prisma \
+ && cp -rL node_modules/@prisma /tmp/at_prisma_resolved \
+ && rm -rf node_modules/@prisma && mv /tmp/at_prisma_resolved node_modules/@prisma
 
 FROM base AS builder
 WORKDIR /app
