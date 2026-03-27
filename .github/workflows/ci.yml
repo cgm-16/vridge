@@ -81,7 +81,7 @@ jobs:
     steps:
       - name: 코드 체크아웃
         uses: actions/checkout@v4
-      - name: yamllint 설치
-        run: pip install yamllint
+      - name: uv 설정
+        uses: astral-sh/setup-uv@v5
       - name: 매니페스트 검증
         run: sh scripts/validate-k8s-manifests.sh
