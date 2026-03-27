@@ -71,7 +71,7 @@ rm -f /tmp/vridge-env.env
 1. Build Image 워크플로 (`ci-build.yml`) — 이미지 빌드 후 `ghcr.io/cgm-16/vridge:<tag>`로 push
 2. CD 배포 워크플로 (`cd-deploy.yml`) — Helm으로 클러스터에 배포
 
-> **마이그레이션**: `cd-deploy.yml`이 `helm upgrade`를 실행하면 Helm `pre-upgrade` 훅이 마이그레이션 Job을 자동으로 실행함. 별도 트리거 불필요.
+> **마이그레이션**: `cd-deploy.yml`이 `helm upgrade`를 실행하면 Helm `pre-install, pre-upgrade` 훅이 마이그레이션 Job을 자동으로 실행함. 최초 설치 시에도 마이그레이션이 자동 실행됨. 별도 트리거 불필요.
 
 ### 수동 트리거
 
