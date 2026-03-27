@@ -42,7 +42,7 @@ assert_doc_contains() {
 
 assert_doc_contains "$rendered_file" "Service" "^  type: ClusterIP$" "Service가 기본값 ClusterIP를 렌더링하지 않았습니다."
 assert_doc_contains "$rendered_file" "Ingress" "^  ingressClassName: traefik$" "Ingress가 traefik ingress class를 렌더링하지 않았습니다."
-assert_doc_contains "$rendered_file" "Ingress" '^    - host: "vridge\\.example\\.com"$' "Ingress host가 YAML 안전한 따옴표로 렌더링되지 않았습니다."
+assert_doc_contains "$rendered_file" "Ingress" '^    - host: "vridge\\.xyz"$' "Ingress host가 YAML 안전한 따옴표로 렌더링되지 않았습니다."
 assert_doc_contains "$rendered_file" "Service" "^    app\\.kubernetes\\.io/name: vridge$" "Service selector에 표준 name 레이블이 없습니다."
 assert_doc_contains "$rendered_file" "Service" "^    app\\.kubernetes\\.io/instance: vridge-test$" "Service selector에 release instance 레이블이 없습니다."
 assert_doc_contains "$rendered_file" "Deployment" "^      app\\.kubernetes\\.io/name: vridge$" "Deployment selector에 표준 name 레이블이 없습니다."
