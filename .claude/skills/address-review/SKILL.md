@@ -7,13 +7,22 @@ allowed-tools: Bash, Read, Write, Edit, Grep, Glob, Agent
 
 # address-review
 
-Fix all outstanding CodeRabbit review findings on the current PR.
+Fix all outstanding CodeRabbit review findings on a PR.
+
+If a PR number is passed as an argument (e.g. `/address-review 27`), use that.
+Otherwise, default to the most recently updated open PR.
 
 ## Setup (run once)
 
 ```bash
 REPO=$(gh repo view cgm-16/vridge --json nameWithOwner --jq .nameWithOwner)
-PR=$(gh pr view --json number --jq .number)
+# Use the argument if provided, otherwise pick the latest open PR
+if [ -n "$ARGUMENTS" ] && [[ "$ARGUMENTS" =~ ^[0-9]+$ ]]; then
+  PR="$ARGUMENTS"
+else
+  PR=$(gh pr list -R cgm-16/vridge --state open --json number,updatedAt \
+    --jq 'sort_by(.updatedAt) | last | .number')
+fi
 ```
 
 ## Shared helpers
@@ -44,8 +53,9 @@ print(m.group(1).strip() if m else '')
 SHA=$(git rev-parse --short HEAD)
 REVIEW_ID=<id from fetch step>
 for ID in $(gh api /repos/$REPO/pulls/$PR/reviews/$REVIEW_ID/comments --jq '.[].id'); do
-  gh api /repos/$REPO/pulls/comments/$ID/replies -X POST \
-    -f body="Applied in ${SHA}."
+  gh api /repos/$REPO/pulls/$PR/comments -X POST \
+    -f body="Applied in ${SHA}." \
+    -F in_reply_to="$ID"
 done
 ```
 
@@ -113,7 +123,7 @@ Run an autonomous CodeRabbit review-fix loop on PR #{PR} in repo {REPO}. Repeat 
    ```bash
    SHA=$(git rev-parse --short HEAD)
    for ID in $(gh api /repos/{REPO}/pulls/{PR}/reviews/$REVIEW_ID/comments --jq '.[].id'); do
-     gh api /repos/{REPO}/pulls/comments/$ID/replies -X POST -f body="Applied in ${SHA}."
+     gh api /repos/{REPO}/pulls/{PR}/comments -X POST -f body="Applied in ${SHA}." -F in_reply_to="$ID"
    done
    ```
 
