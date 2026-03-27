@@ -17,8 +17,8 @@ FROM base AS builder
 WORKDIR /app
 
 COPY --from=deps /app/node_modules ./node_modules
-COPY --from=deps /app/backend/generated ./backend/generated
 COPY . .
+COPY --from=deps /app/backend/generated ./backend/generated
 
 ARG NEXT_PUBLIC_APP_URL
 ARG NEXT_PUBLIC_GA_MEASUREMENT_ID
