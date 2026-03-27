@@ -23,56 +23,61 @@ import {
   deleteCertification,
 } from '@/backend/use-cases/profile';
 import { DomainError } from '@/backend/domain/errors';
-import { prisma } from '@/backend/infrastructure/db';
+import { getPrisma } from '@/backend/infrastructure/db';
 
 jest.mock('@/backend/infrastructure/db', () => ({
-  prisma: {
-    appUser: {
-      findUnique: jest.fn(),
-      findFirst: jest.fn(),
-    },
-    profilesPublic: {
-      update: jest.fn(),
-    },
-    profilesPrivate: {
-      update: jest.fn(),
-    },
-    profileCareer: {
-      findFirst: jest.fn(),
-      create: jest.fn(),
-      update: jest.fn(),
-      delete: jest.fn(),
-    },
-    profileEducation: {
-      findFirst: jest.fn(),
-      create: jest.fn(),
-      update: jest.fn(),
-      delete: jest.fn(),
-    },
-    profileLanguage: {
-      findFirst: jest.fn(),
-      create: jest.fn(),
-      update: jest.fn(),
-      delete: jest.fn(),
-    },
-    profileUrl: {
-      findFirst: jest.fn(),
-      create: jest.fn(),
-      update: jest.fn(),
-      delete: jest.fn(),
-    },
-    profileSkill: {
-      create: jest.fn(),
-      deleteMany: jest.fn(),
-    },
-    profileCertification: {
-      findFirst: jest.fn(),
-      create: jest.fn(),
-      update: jest.fn(),
-      delete: jest.fn(),
-    },
-  },
+  getPrisma: (() => {
+    const prisma = {
+      appUser: {
+        findUnique: jest.fn(),
+        findFirst: jest.fn(),
+      },
+      profilesPublic: {
+        update: jest.fn(),
+      },
+      profilesPrivate: {
+        update: jest.fn(),
+      },
+      profileCareer: {
+        findFirst: jest.fn(),
+        create: jest.fn(),
+        update: jest.fn(),
+        delete: jest.fn(),
+      },
+      profileEducation: {
+        findFirst: jest.fn(),
+        create: jest.fn(),
+        update: jest.fn(),
+        delete: jest.fn(),
+      },
+      profileLanguage: {
+        findFirst: jest.fn(),
+        create: jest.fn(),
+        update: jest.fn(),
+        delete: jest.fn(),
+      },
+      profileUrl: {
+        findFirst: jest.fn(),
+        create: jest.fn(),
+        update: jest.fn(),
+        delete: jest.fn(),
+      },
+      profileSkill: {
+        create: jest.fn(),
+        deleteMany: jest.fn(),
+      },
+      profileCertification: {
+        findFirst: jest.fn(),
+        create: jest.fn(),
+        update: jest.fn(),
+        delete: jest.fn(),
+      },
+    };
+    return jest.fn(() => prisma);
+  })(),
 }));
+
+const prisma = getPrisma();
 
 beforeEach(() => jest.clearAllMocks());
 

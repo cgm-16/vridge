@@ -1,23 +1,33 @@
 jest.mock('@/backend/infrastructure/auth', () => ({
-  auth: { api: { getSession: jest.fn() } },
+  getAuth: (() => {
+    const auth = {
+      api: { getSession: jest.fn() },
+    };
+    return jest.fn(() => auth);
+  })(),
 }));
 jest.mock('@/backend/infrastructure/db', () => ({
-  prisma: { appUser: { findUnique: jest.fn() } },
+  getPrisma: (() => {
+    const prisma = {
+      appUser: { findUnique: jest.fn() },
+    };
+    return jest.fn(() => prisma);
+  })(),
 }));
 jest.mock('next/headers', () => ({
   headers: jest.fn().mockResolvedValue(new Headers()),
 }));
 
-import { auth } from '@/backend/infrastructure/auth';
-import { prisma } from '@/backend/infrastructure/db';
+import { getAuth } from '@/backend/infrastructure/auth';
+import { getPrisma } from '@/backend/infrastructure/db';
 import {
   getCurrentUser,
   requireUser,
   requireRole,
 } from '@/backend/infrastructure/auth-utils';
 
-const mockGetSession = auth.api.getSession as unknown as jest.Mock;
-const mockFindUnique = prisma.appUser.findUnique as unknown as jest.Mock;
+const mockGetSession = getAuth().api.getSession as unknown as jest.Mock;
+const mockFindUnique = getPrisma().appUser.findUnique as unknown as jest.Mock;
 
 beforeEach(() => {
   jest.clearAllMocks();

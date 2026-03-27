@@ -2,14 +2,19 @@
  * @jest-environment node
  */
 jest.mock('@/backend/infrastructure/auth', () => ({
-  auth: { api: { getSession: jest.fn() } },
+  getAuth: (() => {
+    const auth = {
+      api: { getSession: jest.fn() },
+    };
+    return jest.fn(() => auth);
+  })(),
 }));
 
 import { NextRequest } from 'next/server';
 import { proxy } from '@/proxy';
-import { auth } from '@/backend/infrastructure/auth';
+import { getAuth } from '@/backend/infrastructure/auth';
 
-const mockGetSession = auth.api.getSession as unknown as jest.Mock;
+const mockGetSession = getAuth().api.getSession as unknown as jest.Mock;
 
 function makeRequest(path: string) {
   return new NextRequest(new URL(path, 'http://localhost:3000'));

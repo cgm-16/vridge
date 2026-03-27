@@ -1,12 +1,17 @@
 jest.mock('@/backend/config/env', () => ({
-  env: {
+  getEnv: jest.fn(() => ({
+    DATABASE_URL: 'postgresql://localhost/test-db',
+    DIRECT_URL: 'postgresql://localhost/test-db',
     BETTER_AUTH_SECRET: 'test-secret',
     BETTER_AUTH_URL: 'http://localhost:3000',
     GOOGLE_CLIENT_ID: 'gid',
     GOOGLE_CLIENT_SECRET: 'gsecret',
     FACEBOOK_CLIENT_ID: 'fid',
     FACEBOOK_CLIENT_SECRET: 'fsecret',
-  },
+    NEXT_PUBLIC_APP_URL: 'http://localhost:3000',
+    NEXT_PUBLIC_GA_MEASUREMENT_ID: 'G-TEST123',
+    NEXT_PUBLIC_PRIVACY_POLICY_URL: 'http://localhost/privacy',
+  })),
 }));
 jest.mock('better-auth', () => ({
   betterAuth: jest.fn((config: unknown) => ({ options: config })),
@@ -19,20 +24,34 @@ jest.mock('better-auth/next-js', () => ({
   toNextJsHandler: jest.fn(),
 }));
 jest.mock('@/backend/infrastructure/db', () => ({
-  prisma: {
-    $transaction: jest.fn(),
-    user: { delete: jest.fn() },
-  },
+  getPrisma: (() => {
+    const prisma = {
+      $transaction: jest.fn(),
+      user: { delete: jest.fn() },
+    };
+    return jest.fn(() => prisma);
+  })(),
 }));
 
 import { betterAuth } from 'better-auth';
-import { auth } from '@/backend/infrastructure/auth';
-import { prisma } from '@/backend/infrastructure/db';
+import { getAuth } from '@/backend/infrastructure/auth';
+import { getPrisma } from '@/backend/infrastructure/db';
+
+const auth = getAuth();
+const prisma = getPrisma();
+const mockConsoleError = jest
+  .spyOn(console, 'error')
+  .mockImplementation(() => undefined);
 
 describe('auth', () => {
   beforeEach(() => {
     (prisma.$transaction as jest.Mock).mockReset();
     (prisma.user.delete as jest.Mock).mockReset();
+    mockConsoleError.mockClear();
+  });
+
+  afterAll(() => {
+    mockConsoleError.mockRestore();
   });
 
   it('auth 인스턴스가 정의됨', () => {

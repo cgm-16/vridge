@@ -1,8 +1,14 @@
 import 'server-only';
 import { z } from 'zod';
 
-const envSchema = z
-  .object({
+const publicEnvSchema = z.object({
+  NEXT_PUBLIC_APP_URL: z.string().url(),
+  NEXT_PUBLIC_GA_MEASUREMENT_ID: z.string().min(1),
+  NEXT_PUBLIC_PRIVACY_POLICY_URL: z.string().url(),
+});
+
+const envSchema = publicEnvSchema
+  .extend({
     DATABASE_URL: z.string().url(),
     DIRECT_URL: z.string().url(),
     BETTER_AUTH_SECRET: z.string().min(1),
@@ -11,9 +17,6 @@ const envSchema = z
     GOOGLE_CLIENT_SECRET: z.string().min(1).optional(),
     FACEBOOK_CLIENT_ID: z.string().min(1).optional(),
     FACEBOOK_CLIENT_SECRET: z.string().min(1).optional(),
-    NEXT_PUBLIC_APP_URL: z.string().url(),
-    NEXT_PUBLIC_GA_MEASUREMENT_ID: z.string().min(1),
-    NEXT_PUBLIC_PRIVACY_POLICY_URL: z.string().url(),
   })
   .superRefine((data, ctx) => {
     if (!!data.GOOGLE_CLIENT_ID !== !!data.GOOGLE_CLIENT_SECRET) {
@@ -35,14 +38,28 @@ const envSchema = z
   });
 
 export type Env = z.infer<typeof envSchema>;
+export type PublicEnv = z.infer<typeof publicEnvSchema>;
 
-const parsed = envSchema.safeParse(process.env);
-
-if (!parsed.success) {
-  const missing = parsed.error.issues.map((i) => i.path.join('.'));
-  throw new Error(
-    `Missing or invalid environment variables: ${missing.join(', ')}`
-  );
+function parseEnv<T>(schema: z.ZodType<T>): T {
+  const parsed = schema.safeParse(process.env);
+  if (!parsed.success) {
+    const missing = parsed.error.issues.map((i) => i.path.join('.'));
+    throw new Error(
+      `Missing or invalid environment variables: ${missing.join(', ')}`
+    );
+  }
+  return parsed.data;
 }
 
-export const env: Env = parsed.data;
+let cachedPublicEnv: PublicEnv | undefined;
+let cachedEnv: Env | undefined;
+
+export function getPublicEnv(): PublicEnv {
+  cachedPublicEnv ??= parseEnv(publicEnvSchema);
+  return cachedPublicEnv;
+}
+
+export function getEnv(): Env {
+  cachedEnv ??= parseEnv(envSchema);
+  return cachedEnv;
+}
