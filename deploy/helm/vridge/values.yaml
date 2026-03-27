@@ -79,3 +79,9 @@ probes:
 nodeSelector: {}
 tolerations: []
 affinity: {}
+
+secrets:
+  db:
+    name: vridge-db-app
+  app:
+    name: vridge-env

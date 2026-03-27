@@ -32,6 +32,27 @@ spec:
         - name: {{ include "vridge.name" . }}
           image: "{{ .Values.image.repository }}:{{ default .Chart.AppVersion .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secrets.db.name }}
+                  key: uri
+            - name: DIRECT_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secrets.db.name }}
+                  key: uri
+            - name: BETTER_AUTH_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secrets.app.name }}
+                  key: BETTER_AUTH_SECRET
+            - name: BETTER_AUTH_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secrets.app.name }}
+                  key: BETTER_AUTH_URL
           ports:
             - name: http
               containerPort: {{ .Values.service.targetPort }}
