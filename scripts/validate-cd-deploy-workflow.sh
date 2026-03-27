@@ -31,7 +31,7 @@ assert_not_contains() {
 
 assert_contains '^[[:space:]]*name: CD Deploy$' "워크플로우 이름이 CD Deploy가 아닙니다."
 assert_contains '^[[:space:]]*workflow_run:$' "워크플로우에 workflow_run 트리거가 없습니다."
-assert_contains '"Build Image"' "워크플로우 트리거에 Build Image 워크플로우 참조가 없습니다."
+assert_contains 'Build Image' "워크플로우 트리거에 Build Image 워크플로우 참조가 없습니다."
 assert_contains 'completed' "workflow_run 트리거에 completed 타입이 없습니다."
 assert_contains 'production' "workflow_run 트리거의 branches에 production이 없습니다."
 assert_contains '^[[:space:]]*workflow_dispatch:$' "워크플로우에 workflow_dispatch 트리거가 없습니다."
