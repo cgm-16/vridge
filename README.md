@@ -68,6 +68,7 @@ pnpm dev
 
 프로덕션 이미지는 공개 빌드 변수만 `docker build` 시점에 받습니다.
 런타임 시크릿(`DATABASE_URL`, `DIRECT_URL`, `BETTER_AUTH_SECRET`)은 컨테이너 실행 시 주입해야 합니다.
+`NEXT_PUBLIC_*` 값은 클라이언트 번들에 빌드 타임에 고정되므로 `docker run -e`로는 바꿀 수 없습니다.
 
 ```bash
 docker build \
@@ -83,9 +84,6 @@ docker run --rm -p 3000:3000 \
   -e DIRECT_URL=postgresql://postgres:postgres@host.docker.internal:54329/vridge_test \
   -e BETTER_AUTH_SECRET=dev-secret-dev-secret-dev-secret \
   -e BETTER_AUTH_URL=http://localhost:3000 \
-  -e NEXT_PUBLIC_APP_URL=http://localhost:3000 \
-  -e NEXT_PUBLIC_GA_MEASUREMENT_ID=G-LOCALTEST \
-  -e NEXT_PUBLIC_PRIVACY_POLICY_URL=http://localhost/privacy \
   vridge:local
 ```
 
