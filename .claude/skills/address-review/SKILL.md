@@ -22,8 +22,10 @@ PR=$(gh pr view --json number --jq .number)
 
 ```bash
 gh api /repos/$REPO/pulls/$PR/reviews \
-  --jq '[.[] | select(.user.login | contains("coderabbitai"))] | last | {id: .id, state: .state, body: .body}'
+  --jq '([.[] | select(.user.login | contains("coderabbitai"))] | last) // empty | {id: .id, state: .state, body: .body}'
 ```
+
+Returns nothing (empty string) when there are no CodeRabbit reviews — callers must guard with `[ -z "$RESULT" ]`.
 
 **Extract the AI prompt block** from a review body (pipe body text into this):
 
@@ -55,9 +57,10 @@ TIMEOUT=0
 for i in $(seq 1 6); do
   sleep 30
   RESULT=$(gh api /repos/$REPO/pulls/$PR/reviews \
-    --jq '[.[] | select(.user.login | contains("coderabbitai"))] | last | {id: .id, state: .state}')
-  NEW_ID=$(echo "$RESULT" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d['id'] if d else '')")
-  NEW_STATE=$(echo "$RESULT" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d['state'] if d else '')")
+    --jq '([.[] | select(.user.login | contains("coderabbitai"))] | last) // empty | {id: .id, state: .state}')
+  if [ -z "$RESULT" ]; then NEW_ID=""; NEW_STATE=""; continue; fi
+  NEW_ID=$(echo "$RESULT" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d['id'])")
+  NEW_STATE=$(echo "$RESULT" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d['state'])")
   [ "$NEW_ID" != "$PREV_ID" ] && break
 done
 [ "$NEW_ID" = "$PREV_ID" ] && TIMEOUT=1
@@ -79,8 +82,9 @@ Run an autonomous CodeRabbit review-fix loop on PR #{PR} in repo {REPO}. Repeat 
 **Each round:**
 
 1. Fetch the latest CodeRabbit review:
-   `gh api /repos/{REPO}/pulls/{PR}/reviews --jq '[.[] | select(.user.login | contains("coderabbitai"))] | last | {id: .id, state: .state, body: .body}'`
-   Save `id` as REVIEW_ID and `state` as STATE.
+   `gh api /repos/{REPO}/pulls/{PR}/reviews --jq '([.[] | select(.user.login | contains("coderabbitai"))] | last) // empty | {id: .id, state: .state, body: .body}'`
+   If the result is empty (no CodeRabbit reviews yet): stop. Report "No CodeRabbit review found."
+   Otherwise save `id` as REVIEW_ID and `state` as STATE.
 
 2. If STATE is `APPROVED`: stop. Report "CodeRabbit approved after N round(s). ✓"
 
@@ -120,9 +124,10 @@ Run an autonomous CodeRabbit review-fix loop on PR #{PR} in repo {REPO}. Repeat 
    for i in $(seq 1 6); do
      sleep 30
      RESULT=$(gh api /repos/{REPO}/pulls/{PR}/reviews \
-       --jq '[.[] | select(.user.login | contains("coderabbitai"))] | last | {id:.id,state:.state}')
-     NEW_ID=$(echo "$RESULT" | python3 -c "import sys,json;d=json.load(sys.stdin);print(d['id'] if d else '')")
-     NEW_STATE=$(echo "$RESULT" | python3 -c "import sys,json;d=json.load(sys.stdin);print(d['state'] if d else '')")
+       --jq '([.[] | select(.user.login | contains("coderabbitai"))] | last) // empty | {id:.id,state:.state}')
+     if [ -z "$RESULT" ]; then NEW_ID=""; NEW_STATE=""; continue; fi
+     NEW_ID=$(echo "$RESULT" | python3 -c "import sys,json;d=json.load(sys.stdin);print(d['id'])")
+     NEW_STATE=$(echo "$RESULT" | python3 -c "import sys,json;d=json.load(sys.stdin);print(d['state'])")
      [ "$NEW_ID" != "$REVIEW_ID" ] && break
    done
    [ "$NEW_ID" = "$REVIEW_ID" ] && TIMEOUT=1
