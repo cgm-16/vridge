@@ -67,7 +67,7 @@ pnpm dev
 ## 프로덕션 컨테이너 빌드
 
 프로덕션 이미지는 공개 빌드 변수만 `docker build` 시점에 받습니다.
-런타임 시크릿(`DATABASE_URL`, `DIRECT_URL`, `BETTER_AUTH_SECRET`)은 컨테이너 실행 시 주입해야 합니다.
+런타임 변수(`DATABASE_URL`, `DIRECT_URL`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`)는 컨테이너 실행 시 주입해야 합니다.
 `NEXT_PUBLIC_*` 값은 클라이언트 번들에 빌드 타임에 고정되므로 `docker run -e`로는 바꿀 수 없습니다.
 
 ```bash
