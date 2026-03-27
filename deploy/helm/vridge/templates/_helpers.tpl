@@ -6,7 +6,12 @@
 {{- if .Values.fullnameOverride -}}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
-{{- printf "%s-%s" .Release.Name (include "vridge.name" .) | trunc 63 | trimSuffix "-" -}}
+{{- $name := include "vridge.name" . -}}
+{{- if eq .Release.Name $name -}}
+{{- $name | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
 {{- end -}}
 {{- end -}}
 
@@ -25,4 +30,19 @@ helm.sh/chart: {{ include "vridge.chart" . }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 app.kubernetes.io/component: web
+{{- end -}}
+
+{{- define "vridge.probe" -}}
+{{- $probeName := .probeName -}}
+{{- $probeValues := .probeValues -}}
+{{- if $probeValues.enabled }}
+{{ $probeName }}:
+  httpGet:
+    path: {{ $probeValues.path }}
+    port: http
+  initialDelaySeconds: {{ $probeValues.initialDelaySeconds }}
+  periodSeconds: {{ $probeValues.periodSeconds }}
+  timeoutSeconds: {{ $probeValues.timeoutSeconds }}
+  failureThreshold: {{ $probeValues.failureThreshold }}
+{{- end -}}
 {{- end -}}
