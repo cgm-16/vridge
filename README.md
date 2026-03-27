@@ -64,6 +64,31 @@ pnpm dev
 
 브라우저에서 `http://localhost:3000`을 열면 됩니다.
 
+## 프로덕션 컨테이너 빌드
+
+프로덕션 이미지는 공개 빌드 변수만 `docker build` 시점에 받습니다.
+런타임 시크릿(`DATABASE_URL`, `DIRECT_URL`, `BETTER_AUTH_SECRET`)은 컨테이너 실행 시 주입해야 합니다.
+
+```bash
+docker build \
+  --build-arg NEXT_PUBLIC_APP_URL=http://localhost:3000 \
+  --build-arg NEXT_PUBLIC_GA_MEASUREMENT_ID=G-LOCALTEST \
+  --build-arg NEXT_PUBLIC_PRIVACY_POLICY_URL=http://localhost/privacy \
+  -t vridge:local .
+```
+
+```bash
+docker run --rm -p 3000:3000 \
+  -e DATABASE_URL=postgresql://postgres:postgres@host.docker.internal:54329/vridge_test \
+  -e DIRECT_URL=postgresql://postgres:postgres@host.docker.internal:54329/vridge_test \
+  -e BETTER_AUTH_SECRET=dev-secret-dev-secret-dev-secret \
+  -e BETTER_AUTH_URL=http://localhost:3000 \
+  -e NEXT_PUBLIC_APP_URL=http://localhost:3000 \
+  -e NEXT_PUBLIC_GA_MEASUREMENT_ID=G-LOCALTEST \
+  -e NEXT_PUBLIC_PRIVACY_POLICY_URL=http://localhost/privacy \
+  vridge:local
+```
+
 ## 스크립트
 
 | Script                   | 설명                           |
