@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1
 FROM node:lts-bookworm-slim AS base
 
 ENV PNPM_HOME="/pnpm"
@@ -11,11 +12,7 @@ WORKDIR /app
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml prisma.config.ts ./
 COPY backend/prisma ./backend/prisma
 
-RUN pnpm install --frozen-lockfile \
- && cp -rL node_modules/prisma /tmp/prisma_resolved \
- && rm -rf node_modules/prisma && mv /tmp/prisma_resolved node_modules/prisma \
- && cp -rL node_modules/@prisma /tmp/at_prisma_resolved \
- && rm -rf node_modules/@prisma && mv /tmp/at_prisma_resolved node_modules/@prisma
+RUN pnpm install --frozen-lockfile
 
 FROM base AS builder
 WORKDIR /app
@@ -45,8 +42,9 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
 # Prisma CLI and schema — used by the Helm pre-upgrade migration Job
-COPY --from=deps --chown=nextjs:nodejs /app/node_modules/prisma ./node_modules/prisma
-COPY --from=deps --chown=nextjs:nodejs /app/node_modules/@prisma ./node_modules/@prisma
+# --follow-symlinks resolves pnpm virtual store symlinks so deps are real files in the image
+COPY --from=deps --follow-symlinks --chown=nextjs:nodejs /app/node_modules/prisma ./node_modules/prisma
+COPY --from=deps --follow-symlinks --chown=nextjs:nodejs /app/node_modules/@prisma ./node_modules/@prisma
 COPY --from=deps --chown=nextjs:nodejs /app/backend/prisma ./backend/prisma
 
 USER nextjs
