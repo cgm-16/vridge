@@ -256,8 +256,8 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 ### 프로덕션 컨테이너 빌드 / 실행
 
 프로덕션 이미지는 `Dockerfile` 기준 멀티스테이지 + non-root 실행으로 구성됩니다.
-공개 빌드 변수만 `docker build` 시점에 전달하고, 런타임 시크릿은 컨테이너 시작 시 주입합니다.
-`NEXT_PUBLIC_*` 값은 클라이언트 번들에 빌드 타임에 고정되므로 `docker run -e`로는 바꿀 수 없습니다.
+공개 빌드 변수는 `docker build` 시점에 전달하고, 런타임 변수(`DATABASE_URL`, `DIRECT_URL`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `NEXT_PUBLIC_*`)는 컨테이너 시작 시 주입합니다.
+`NEXT_PUBLIC_*` 값은 클라이언트 번들에 빌드 타임에 고정되므로, GitHub Actions 빌드와 Kubernetes 런타임에 동일한 값을 유지해야 합니다.
 
 ```bash
 docker build \
@@ -273,6 +273,9 @@ docker run --rm -p 3000:3000 \
   -e DIRECT_URL=postgresql://postgres:postgres@host.docker.internal:54329/vridge_test \
   -e BETTER_AUTH_SECRET=dev-secret-dev-secret-dev-secret \
   -e BETTER_AUTH_URL=http://localhost:3000 \
+  -e NEXT_PUBLIC_APP_URL=http://localhost:3000 \
+  -e NEXT_PUBLIC_GA_MEASUREMENT_ID=G-LOCALTEST \
+  -e NEXT_PUBLIC_PRIVACY_POLICY_URL=http://localhost/privacy \
   vridge:local
 ```
 
@@ -390,10 +393,18 @@ Better Auth v1 기반:
 - **필요 GitHub Secrets**: `DATABASE_URL`, `DIRECT_URL`
 - 동시 실행 방지 (`concurrency` 그룹 설정, 취소 불가)
 
+### `build-image.yml` — GHCR 이미지 빌드/푸시
+
+- **트리거**: `dev` 브랜치 push, 수동 실행 (`workflow_dispatch`)
+- **실행 환경**: `ubuntu-latest`
+- **단계**: 공개 빌드 변수 확인 → Buildx 설정 → GHCR 로그인 → 메타데이터 생성 → 이미지 빌드/푸시
+- **태그**: 브랜치 태그 + `sha-<40자리 커밋 SHA>`
+- **필요 GitHub Repository Variables**: `NEXT_PUBLIC_APP_URL`, `NEXT_PUBLIC_GA_MEASUREMENT_ID`, `NEXT_PUBLIC_PRIVACY_POLICY_URL`
+
 ### Vercel — 프론트엔드 배포
 
 - `main` 브랜치 push 시 자동 배포 (Vercel 대시보드 연동)
-- 별도 GitHub Actions 워크플로우 없음
+- 프론트엔드 배포는 계속 Vercel이 담당
 
 ### 브랜치 전략
 

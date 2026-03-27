@@ -63,18 +63,23 @@
 
 ### 앱 전용 변수 — 앱 관리 시크릿 `vridge-env`
 
-| 환경 변수            | 설명            |
-| -------------------- | --------------- |
-| `BETTER_AUTH_SECRET` | 런타임 시크릿   |
-| `BETTER_AUTH_URL`    | 런타임 공개 URL |
+| 환경 변수                        | 설명                               |
+| -------------------------------- | ---------------------------------- |
+| `BETTER_AUTH_SECRET`             | 런타임 시크릿                      |
+| `BETTER_AUTH_URL`                | 런타임 공개 URL                    |
+| `NEXT_PUBLIC_APP_URL`            | 런타임에도 필요한 공개 URL         |
+| `NEXT_PUBLIC_GA_MEASUREMENT_ID`  | 런타임에도 필요한 GA4 측정 ID      |
+| `NEXT_PUBLIC_PRIVACY_POLICY_URL` | 런타임에도 필요한 개인정보 처리방침 URL |
 
-### 공개 빌드 변수 — 컨테이너 이미지 빌드 시점 주입
+### 공개 빌드 변수 — GitHub Actions 빌드 시점 주입
 
 | 환경 변수                        | 설명                       |
 | -------------------------------- | -------------------------- |
 | `NEXT_PUBLIC_APP_URL`            | 빌드 타임 공개 URL         |
 | `NEXT_PUBLIC_GA_MEASUREMENT_ID`  | GA4 측정 ID                |
 | `NEXT_PUBLIC_PRIVACY_POLICY_URL` | 개인정보 처리방침 공개 URL |
+
+> 런타임 서버 코드도 동일한 `NEXT_PUBLIC_*` 값을 읽으므로, GitHub Repository Variables와 `vridge-env` 시크릿에 같은 값을 유지해야 합니다.
 
 > `ssemtle`의 시크릿 및 자격 증명은 `vridge`와 공유하지 않습니다.
 

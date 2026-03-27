@@ -29,6 +29,9 @@ jobs:
       - name: 코드 체크아웃
         uses: actions/checkout@v4
 
+      - name: 이미지 빌드 워크플로우 검증
+        run: sh scripts/validate-build-image-workflow.sh
+
       - name: pnpm 설정
         uses: pnpm/action-setup@v4
         with:
