@@ -12,6 +12,7 @@ const config = {
     '/.next/',
     '/__tests__/test-utils/',
   ],
+  modulePathIgnorePatterns: ['<rootDir>/.next/'],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/$1',
   },
