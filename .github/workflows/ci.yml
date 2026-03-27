@@ -27,18 +27,18 @@ jobs:
 
     steps:
       - name: 코드 체크아웃
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: 이미지 빌드 워크플로우 검증
         run: sh scripts/validate-build-image-workflow.sh
 
       - name: pnpm 설정
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v5
         with:
           version: 10.28.2
 
       - name: Node.js 설정
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 'lts/*'
           cache: 'pnpm'
@@ -68,10 +68,10 @@ jobs:
 
     steps:
       - name: 코드 체크아웃
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Helm 설정
-        uses: azure/setup-helm@v4
+        uses: azure/setup-helm@v5
 
       - name: Helm 차트 검증
         run: sh scripts/validate-vridge-chart.sh
@@ -80,9 +80,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: 코드 체크아웃
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: uv 설정
-        uses: astral-sh/setup-uv@v5
+        uses: astral-sh/setup-uv@v7
       - name: 매니페스트 검증
         run: sh scripts/validate-k8s-manifests.sh
 
@@ -90,6 +90,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: 코드 체크아웃
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: CD 배포 워크플로우 검증
         run: bash scripts/validate-cd-deploy-workflow.sh
