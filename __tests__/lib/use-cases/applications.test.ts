@@ -6,23 +6,28 @@ import {
   getApplicantStats,
 } from '@/backend/use-cases/applications';
 import { DomainError } from '@/backend/domain/errors';
-import { prisma } from '@/backend/infrastructure/db';
+import { getPrisma } from '@/backend/infrastructure/db';
 
 jest.mock('@/backend/infrastructure/db', () => ({
-  prisma: {
-    apply: {
-      create: jest.fn(),
-      findFirst: jest.fn(),
-      findUnique: jest.fn(),
-      findMany: jest.fn(),
-      update: jest.fn(),
-      groupBy: jest.fn(),
-    },
-    jobDescription: {
-      findUnique: jest.fn(),
-    },
-  },
+  getPrisma: (() => {
+    const prisma = {
+      apply: {
+        create: jest.fn(),
+        findFirst: jest.fn(),
+        findUnique: jest.fn(),
+        findMany: jest.fn(),
+        update: jest.fn(),
+        groupBy: jest.fn(),
+      },
+      jobDescription: {
+        findUnique: jest.fn(),
+      },
+    };
+    return jest.fn(() => prisma);
+  })(),
 }));
+
+const prisma = getPrisma();
 
 beforeEach(() => jest.clearAllMocks());
 

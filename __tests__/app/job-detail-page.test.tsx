@@ -2,7 +2,7 @@ import { screen } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import JobDetailPage from '@/app/jobs/[id]/page';
 import { headers } from 'next/headers';
-import { auth } from '@/backend/infrastructure/auth';
+import { getAuth } from '@/backend/infrastructure/auth';
 import { getJobDescriptionById } from '@/backend/actions/jd-queries';
 import { getMyApplications } from '@/backend/actions/applications';
 import { renderWithI18n } from '@/__tests__/test-utils/render-with-i18n';
@@ -17,11 +17,14 @@ jest.mock('react-markdown', () => ({
 }));
 
 jest.mock('@/backend/infrastructure/auth', () => ({
-  auth: {
-    api: {
-      getSession: jest.fn(),
-    },
-  },
+  getAuth: (() => {
+    const auth = {
+      api: {
+        getSession: jest.fn(),
+      },
+    };
+    return jest.fn(() => auth);
+  })(),
 }));
 
 jest.mock('@/backend/actions/jd-queries', () => ({
@@ -95,7 +98,7 @@ jest.mock('@/shared/i18n/server', () => {
 });
 
 const mockHeaders = headers as unknown as jest.Mock;
-const mockGetSession = auth.api.getSession as unknown as jest.Mock;
+const mockGetSession = getAuth().api.getSession as unknown as jest.Mock;
 const mockGetJobDescriptionById = getJobDescriptionById as unknown as jest.Mock;
 const mockGetMyApplications = getMyApplications as unknown as jest.Mock;
 const JOB_MARKDOWN_FIXTURE = [

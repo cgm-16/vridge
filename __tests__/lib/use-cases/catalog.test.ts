@@ -4,15 +4,20 @@ import {
   searchSkills,
   getSkillById,
 } from '@/backend/use-cases/catalog';
-import { prisma } from '@/backend/infrastructure/db';
+import { getPrisma } from '@/backend/infrastructure/db';
 
 jest.mock('@/backend/infrastructure/db', () => ({
-  prisma: {
-    jobFamily: { findMany: jest.fn() },
-    job: { findMany: jest.fn() },
-    skill: { findMany: jest.fn(), findUnique: jest.fn() },
-  },
+  getPrisma: (() => {
+    const prisma = {
+      jobFamily: { findMany: jest.fn() },
+      job: { findMany: jest.fn() },
+      skill: { findMany: jest.fn(), findUnique: jest.fn() },
+    };
+    return jest.fn(() => prisma);
+  })(),
 }));
+
+const prisma = getPrisma();
 
 beforeEach(() => jest.clearAllMocks());
 

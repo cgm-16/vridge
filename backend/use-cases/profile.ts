@@ -1,4 +1,4 @@
-import { prisma } from '@/backend/infrastructure/db';
+import { getPrisma } from '@/backend/infrastructure/db';
 import { notFound, conflict } from '@/backend/domain/errors';
 import { toDateOnlyUtc } from '@/backend/domain/date-only';
 import type { z } from 'zod';
@@ -55,7 +55,7 @@ function toCertificationWriteData(
 }
 
 export async function getFullProfile(userId: string) {
-  const profile = await prisma.appUser.findUnique({
+  const profile = await getPrisma().appUser.findUnique({
     where: { id: userId },
     include: {
       profilePublic: true,
@@ -87,7 +87,7 @@ export async function getProfileForViewer(
       ? { ...baseInclude, profilePrivate: true, attachments: true }
       : baseInclude;
 
-  const profile = await prisma.appUser.findUnique({
+  const profile = await getPrisma().appUser.findUnique({
     where: { id: candidateId },
     include,
   });
@@ -96,7 +96,7 @@ export async function getProfileForViewer(
 }
 
 export async function getProfileBySlug(slug: string) {
-  const profile = await prisma.appUser.findFirst({
+  const profile = await getPrisma().appUser.findFirst({
     where: {
       profilePublic: {
         is: { publicSlug: slug },
@@ -112,7 +112,7 @@ export async function updatePublicProfile(
   userId: string,
   data: z.infer<typeof profilePublicSchema>
 ) {
-  return prisma.profilesPublic.update({
+  return getPrisma().profilesPublic.update({
     where: { userId },
     data: toPublicProfileWriteData(data),
   });
@@ -122,14 +122,14 @@ export async function updatePrivateProfile(
   userId: string,
   data: z.infer<typeof profilePrivateSchema>
 ) {
-  return prisma.profilesPrivate.update({ where: { userId }, data });
+  return getPrisma().profilesPrivate.update({ where: { userId }, data });
 }
 
 export async function addCareer(
   userId: string,
   data: z.infer<typeof profileCareerSchema>
 ) {
-  return prisma.profileCareer.create({
+  return getPrisma().profileCareer.create({
     data: { ...toCareerWriteData(data), userId },
   });
 }
@@ -139,29 +139,29 @@ export async function updateCareer(
   id: string,
   data: z.infer<typeof profileCareerSchema>
 ) {
-  const existing = await prisma.profileCareer.findFirst({
+  const existing = await getPrisma().profileCareer.findFirst({
     where: { id, userId },
   });
   if (!existing) throw notFound('경력');
-  return prisma.profileCareer.update({
+  return getPrisma().profileCareer.update({
     where: { id },
     data: toCareerWriteData(data),
   });
 }
 
 export async function deleteCareer(userId: string, id: string) {
-  const existing = await prisma.profileCareer.findFirst({
+  const existing = await getPrisma().profileCareer.findFirst({
     where: { id, userId },
   });
   if (!existing) throw notFound('경력');
-  return prisma.profileCareer.delete({ where: { id } });
+  return getPrisma().profileCareer.delete({ where: { id } });
 }
 
 export async function addEducation(
   userId: string,
   data: z.infer<typeof profileEducationSchema>
 ) {
-  return prisma.profileEducation.create({
+  return getPrisma().profileEducation.create({
     data: { ...toEducationWriteData(data), userId },
   });
 }
@@ -171,29 +171,29 @@ export async function updateEducation(
   id: string,
   data: z.infer<typeof profileEducationSchema>
 ) {
-  const existing = await prisma.profileEducation.findFirst({
+  const existing = await getPrisma().profileEducation.findFirst({
     where: { id, userId },
   });
   if (!existing) throw notFound('학력');
-  return prisma.profileEducation.update({
+  return getPrisma().profileEducation.update({
     where: { id },
     data: toEducationWriteData(data),
   });
 }
 
 export async function deleteEducation(userId: string, id: string) {
-  const existing = await prisma.profileEducation.findFirst({
+  const existing = await getPrisma().profileEducation.findFirst({
     where: { id, userId },
   });
   if (!existing) throw notFound('학력');
-  return prisma.profileEducation.delete({ where: { id } });
+  return getPrisma().profileEducation.delete({ where: { id } });
 }
 
 export async function addLanguage(
   userId: string,
   data: z.infer<typeof profileLanguageSchema>
 ) {
-  return prisma.profileLanguage.create({ data: { ...data, userId } });
+  return getPrisma().profileLanguage.create({ data: { ...data, userId } });
 }
 
 export async function updateLanguage(
@@ -201,26 +201,26 @@ export async function updateLanguage(
   id: string,
   data: z.infer<typeof profileLanguageSchema>
 ) {
-  const existing = await prisma.profileLanguage.findFirst({
+  const existing = await getPrisma().profileLanguage.findFirst({
     where: { id, userId },
   });
   if (!existing) throw notFound('언어');
-  return prisma.profileLanguage.update({ where: { id }, data });
+  return getPrisma().profileLanguage.update({ where: { id }, data });
 }
 
 export async function deleteLanguage(userId: string, id: string) {
-  const existing = await prisma.profileLanguage.findFirst({
+  const existing = await getPrisma().profileLanguage.findFirst({
     where: { id, userId },
   });
   if (!existing) throw notFound('언어');
-  return prisma.profileLanguage.delete({ where: { id } });
+  return getPrisma().profileLanguage.delete({ where: { id } });
 }
 
 export async function addUrl(
   userId: string,
   data: z.infer<typeof profileUrlSchema>
 ) {
-  return prisma.profileUrl.create({ data: { ...data, userId } });
+  return getPrisma().profileUrl.create({ data: { ...data, userId } });
 }
 
 export async function updateUrl(
@@ -228,22 +228,26 @@ export async function updateUrl(
   id: string,
   data: z.infer<typeof profileUrlSchema>
 ) {
-  const existing = await prisma.profileUrl.findFirst({ where: { id, userId } });
+  const existing = await getPrisma().profileUrl.findFirst({
+    where: { id, userId },
+  });
   if (!existing) throw notFound('URL');
-  return prisma.profileUrl.update({ where: { id }, data });
+  return getPrisma().profileUrl.update({ where: { id }, data });
 }
 
 export async function deleteUrl(userId: string, id: string) {
-  const existing = await prisma.profileUrl.findFirst({ where: { id, userId } });
+  const existing = await getPrisma().profileUrl.findFirst({
+    where: { id, userId },
+  });
   if (!existing) throw notFound('URL');
-  return prisma.profileUrl.delete({ where: { id } });
+  return getPrisma().profileUrl.delete({ where: { id } });
 }
 
 export async function addCertification(
   userId: string,
   data: z.infer<typeof profileCertificationSchema>
 ) {
-  return prisma.profileCertification.create({
+  return getPrisma().profileCertification.create({
     data: { ...toCertificationWriteData(data), userId },
   });
 }
@@ -253,27 +257,27 @@ export async function updateCertification(
   id: string,
   data: z.infer<typeof profileCertificationSchema>
 ) {
-  const existing = await prisma.profileCertification.findFirst({
+  const existing = await getPrisma().profileCertification.findFirst({
     where: { id, userId },
   });
   if (!existing) throw notFound('자격증');
-  return prisma.profileCertification.update({
+  return getPrisma().profileCertification.update({
     where: { id },
     data: toCertificationWriteData(data),
   });
 }
 
 export async function deleteCertification(userId: string, id: string) {
-  const existing = await prisma.profileCertification.findFirst({
+  const existing = await getPrisma().profileCertification.findFirst({
     where: { id, userId },
   });
   if (!existing) throw notFound('자격증');
-  return prisma.profileCertification.delete({ where: { id } });
+  return getPrisma().profileCertification.delete({ where: { id } });
 }
 
 export async function addSkill(userId: string, skillId: string) {
   try {
-    return await prisma.profileSkill.create({ data: { userId, skillId } });
+    return await getPrisma().profileSkill.create({ data: { userId, skillId } });
   } catch (e) {
     if ((e as { code?: string }).code === 'P2002') {
       throw conflict('이미 추가된 스킬입니다');
@@ -283,5 +287,5 @@ export async function addSkill(userId: string, skillId: string) {
 }
 
 export async function deleteSkill(userId: string, skillId: string) {
-  return prisma.profileSkill.deleteMany({ where: { userId, skillId } });
+  return getPrisma().profileSkill.deleteMany({ where: { userId, skillId } });
 }

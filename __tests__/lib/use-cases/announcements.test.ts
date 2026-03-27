@@ -4,18 +4,23 @@ import {
   getAnnouncementNeighbors,
 } from '@/backend/use-cases/announcements';
 import { DomainError } from '@/backend/domain/errors';
-import { prisma } from '@/backend/infrastructure/db';
+import { getPrisma } from '@/backend/infrastructure/db';
 
 jest.mock('@/backend/infrastructure/db', () => ({
-  prisma: {
-    announcement: {
-      findMany: jest.fn(),
-      count: jest.fn(),
-      findUnique: jest.fn(),
-      findFirst: jest.fn(),
-    },
-  },
+  getPrisma: (() => {
+    const prisma = {
+      announcement: {
+        findMany: jest.fn(),
+        count: jest.fn(),
+        findUnique: jest.fn(),
+        findFirst: jest.fn(),
+      },
+    };
+    return jest.fn(() => prisma);
+  })(),
 }));
+
+const prisma = getPrisma();
 
 beforeEach(() => jest.clearAllMocks());
 

@@ -1,4 +1,4 @@
-import { prisma } from '@/backend/infrastructure/db';
+import { getPrisma } from '@/backend/infrastructure/db';
 import { notFound, conflict } from '@/backend/domain/errors';
 import { assertOwnership } from '@/backend/domain/authorization';
 
@@ -14,17 +14,23 @@ const APPLY_CANDIDATE_INCLUDE = {
 } as const;
 
 export async function createApplication(userId: string, jdId: string) {
-  const jd = await prisma.jobDescription.findUnique({ where: { id: jdId } });
+  const jd = await getPrisma().jobDescription.findUnique({
+    where: { id: jdId },
+  });
   if (!jd) throw notFound('채용공고');
 
-  const existing = await prisma.apply.findFirst({ where: { userId, jdId } });
+  const existing = await getPrisma().apply.findFirst({
+    where: { userId, jdId },
+  });
   if (existing) throw conflict('이미 지원한 채용공고입니다');
 
-  return prisma.apply.create({ data: { userId, jdId, status: 'applied' } });
+  return getPrisma().apply.create({
+    data: { userId, jdId, status: 'applied' },
+  });
 }
 
 export async function withdrawApplication(userId: string, applyId: string) {
-  const apply = await prisma.apply.findUnique({ where: { id: applyId } });
+  const apply = await getPrisma().apply.findUnique({ where: { id: applyId } });
   if (!apply) throw notFound('지원');
 
   assertOwnership(userId, apply.userId);
@@ -33,14 +39,14 @@ export async function withdrawApplication(userId: string, applyId: string) {
     throw conflict('지원 취소는 지원 상태에서만 가능합니다');
   }
 
-  return prisma.apply.update({
+  return getPrisma().apply.update({
     where: { id: applyId },
     data: { status: 'withdrawn' },
   });
 }
 
 export async function getUserApplications(userId: string) {
-  return prisma.apply.findMany({
+  return getPrisma().apply.findMany({
     where: { userId },
     include: {
       jd: {
@@ -56,7 +62,7 @@ export async function getUserApplications(userId: string) {
 }
 
 export async function getApplicationsForJd(jdId: string) {
-  return prisma.apply.findMany({
+  return getPrisma().apply.findMany({
     where: { jdId },
     include: APPLY_CANDIDATE_INCLUDE,
     orderBy: { createdAt: 'desc' },
@@ -64,7 +70,7 @@ export async function getApplicationsForJd(jdId: string) {
 }
 
 export async function getApplicantStats(jdId: string) {
-  return prisma.apply.groupBy({
+  return getPrisma().apply.groupBy({
     by: ['status'],
     where: { jdId },
     _count: { _all: true },

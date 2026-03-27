@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/backend/infrastructure/auth';
+import { getAuth } from '@/backend/infrastructure/auth';
 
 function isStaticAssetPath(pathname: string): boolean {
   return /\.[^/]+$/.test(pathname);
@@ -38,7 +38,7 @@ export async function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const session = await auth.api.getSession({ headers: request.headers });
+  const session = await getAuth().api.getSession({ headers: request.headers });
 
   // 보호 경로 + 미인증 → 로그인 모달 트리거 (Prompt 12)
   if (!session) {

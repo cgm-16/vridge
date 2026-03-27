@@ -1,6 +1,6 @@
 import { headers } from 'next/headers';
-import { auth } from '@/backend/infrastructure/auth';
-import { prisma } from '@/backend/infrastructure/db';
+import { getAuth } from '@/backend/infrastructure/auth';
+import { getPrisma } from '@/backend/infrastructure/db';
 import { AppRole } from '@/backend/generated/prisma/enums';
 
 export type UserContext = {
@@ -11,10 +11,10 @@ export type UserContext = {
 };
 
 export async function getCurrentUser(): Promise<UserContext | null> {
-  const session = await auth.api.getSession({ headers: await headers() });
+  const session = await getAuth().api.getSession({ headers: await headers() });
   if (!session) return null;
 
-  const appUser = await prisma.appUser.findUnique({
+  const appUser = await getPrisma().appUser.findUnique({
     where: { id: session.user.id },
     select: { role: true, orgId: true },
   });

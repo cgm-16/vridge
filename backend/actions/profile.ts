@@ -7,7 +7,7 @@ import {
   type ReachabilityChecker,
 } from '@/backend/domain/authorization';
 import { requireUser } from '@/backend/infrastructure/auth-utils';
-import { prisma } from '@/backend/infrastructure/db';
+import { getPrisma } from '@/backend/infrastructure/db';
 import {
   profilePublicSchema,
   profilePrivateSchema,
@@ -324,8 +324,8 @@ export async function getProfileForRecruiter(
   try {
     const user = await requireUser();
     const checker: ReachabilityChecker = (cId) =>
-      prisma.apply
-        .findFirst({ where: { userId: cId } })
+      getPrisma()
+        .apply.findFirst({ where: { userId: cId } })
         .then((r) => r !== null);
     await assertCanViewCandidate(user.role as AppRole, candidateId, checker);
     const data = await getProfileForViewer(candidateId, 'full');

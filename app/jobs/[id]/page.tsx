@@ -1,6 +1,6 @@
 import { headers } from 'next/headers';
 import ReactMarkdown from 'react-markdown';
-import { auth } from '@/backend/infrastructure/auth';
+import { getAuth } from '@/backend/infrastructure/auth';
 import { getJobDescriptionById } from '@/backend/actions/jd-queries';
 import { getMyApplications } from '@/backend/actions/applications';
 import { PostingTitle } from '@/frontend/entities/job/ui/posting-title';
@@ -22,7 +22,7 @@ export default async function JobDetailPage({
   const { locale, t } = await getServerI18n();
   const { id } = await params;
 
-  const session = await auth.api.getSession({
+  const session = await getAuth().api.getSession({
     headers: await headers(),
   });
 

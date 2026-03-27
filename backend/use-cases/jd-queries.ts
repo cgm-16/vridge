@@ -1,4 +1,4 @@
-import { prisma } from '@/backend/infrastructure/db';
+import { getPrisma } from '@/backend/infrastructure/db';
 import { notFound } from '@/backend/domain/errors';
 import type { z } from 'zod';
 import type { jobDescriptionFilterSchema } from '@/backend/validations/job-description';
@@ -37,21 +37,21 @@ export async function getJobDescriptions(
       : [{ updatedAt: 'desc' as const }, { id: 'desc' as const }];
 
   const [items, total] = await Promise.all([
-    prisma.jobDescription.findMany({
+    getPrisma().jobDescription.findMany({
       where,
       include: JD_INCLUDE,
       orderBy,
       skip: (page - 1) * pageSize,
       take: pageSize,
     }),
-    prisma.jobDescription.count({ where }),
+    getPrisma().jobDescription.count({ where }),
   ]);
 
   return { items, total, page, pageSize };
 }
 
 export async function getJobDescriptionById(id: string) {
-  const jd = await prisma.jobDescription.findUnique({
+  const jd = await getPrisma().jobDescription.findUnique({
     where: { id },
     include: JD_INCLUDE,
   });

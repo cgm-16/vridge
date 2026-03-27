@@ -3,17 +3,22 @@ import {
   getJobDescriptionById,
 } from '@/backend/use-cases/jd-queries';
 import { DomainError } from '@/backend/domain/errors';
-import { prisma } from '@/backend/infrastructure/db';
+import { getPrisma } from '@/backend/infrastructure/db';
 
 jest.mock('@/backend/infrastructure/db', () => ({
-  prisma: {
-    jobDescription: {
-      findMany: jest.fn(),
-      count: jest.fn(),
-      findUnique: jest.fn(),
-    },
-  },
+  getPrisma: (() => {
+    const prisma = {
+      jobDescription: {
+        findMany: jest.fn(),
+        count: jest.fn(),
+        findUnique: jest.fn(),
+      },
+    };
+    return jest.fn(() => prisma);
+  })(),
 }));
+
+const prisma = getPrisma();
 
 beforeEach(() => jest.clearAllMocks());
 

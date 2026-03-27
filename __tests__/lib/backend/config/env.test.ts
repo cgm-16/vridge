@@ -1,7 +1,7 @@
 // 중요: jest.mock 호출은 모든 import보다 먼저 와야 합니다
 // 이 파일에는 모의(mock)가 필요 없습니다
 
-import type { Env } from '@/backend/config/env';
+import type { Env, PublicEnv } from '@/backend/config/env';
 
 const VALID_ENV: Record<string, string> = {
   DATABASE_URL: 'postgresql://localhost/db',
@@ -32,44 +32,66 @@ describe('env 설정', () => {
     Object.assign(process.env, savedEnv);
   });
 
-  it('모든 변수가 있으면 env 객체를 내보낸다', async () => {
+  it('모든 변수가 있으면 getEnv가 전체 env 객체를 반환한다', async () => {
     Object.assign(process.env, VALID_ENV);
-    const { env } = (await import('@/backend/config/env')) as { env: Env };
+    const { getEnv } = (await import('@/backend/config/env')) as {
+      getEnv: () => Env;
+    };
+    const env = getEnv();
     expect(env.DATABASE_URL).toBe(VALID_ENV.DATABASE_URL);
     expect(env.NEXT_PUBLIC_GA_MEASUREMENT_ID).toBe('G-TEST123');
+  });
+
+  it('공개 변수만 있으면 getPublicEnv가 공개 env 객체를 반환한다', async () => {
+    Object.assign(process.env, {
+      NEXT_PUBLIC_APP_URL: VALID_ENV.NEXT_PUBLIC_APP_URL,
+      NEXT_PUBLIC_GA_MEASUREMENT_ID: VALID_ENV.NEXT_PUBLIC_GA_MEASUREMENT_ID,
+      NEXT_PUBLIC_PRIVACY_POLICY_URL: VALID_ENV.NEXT_PUBLIC_PRIVACY_POLICY_URL,
+    });
+    const { getPublicEnv } = (await import('@/backend/config/env')) as {
+      getPublicEnv: () => PublicEnv;
+    };
+    const env = getPublicEnv();
+    expect(env.NEXT_PUBLIC_APP_URL).toBe(VALID_ENV.NEXT_PUBLIC_APP_URL);
   });
 
   it('DATABASE_URL 누락 시 throw한다', async () => {
     Object.assign(process.env, VALID_ENV);
     delete process.env.DATABASE_URL;
-    await expect(import('@/backend/config/env')).rejects.toThrow(
-      /DATABASE_URL/
-    );
+    const { getEnv } = (await import('@/backend/config/env')) as {
+      getEnv: () => Env;
+    };
+    expect(() => getEnv()).toThrow(/DATABASE_URL/);
   });
 
   it('BETTER_AUTH_SECRET 누락 시 throw한다', async () => {
     Object.assign(process.env, VALID_ENV);
     delete process.env.BETTER_AUTH_SECRET;
-    await expect(import('@/backend/config/env')).rejects.toThrow(
-      /BETTER_AUTH_SECRET/
-    );
+    const { getEnv } = (await import('@/backend/config/env')) as {
+      getEnv: () => Env;
+    };
+    expect(() => getEnv()).toThrow(/BETTER_AUTH_SECRET/);
   });
 
   it('NEXT_PUBLIC_APP_URL이 URL 형식이 아니면 throw한다', async () => {
     Object.assign(process.env, VALID_ENV);
     process.env.NEXT_PUBLIC_APP_URL = 'not-a-url';
-    await expect(import('@/backend/config/env')).rejects.toThrow(
-      /NEXT_PUBLIC_APP_URL/
-    );
+    const { getPublicEnv } = (await import('@/backend/config/env')) as {
+      getPublicEnv: () => PublicEnv;
+    };
+    expect(() => getPublicEnv()).toThrow(/NEXT_PUBLIC_APP_URL/);
   });
 
   it('에러 메시지에 시크릿 값이 포함되지 않는다', async () => {
     Object.assign(process.env, VALID_ENV);
     process.env.BETTER_AUTH_SECRET = 'my-super-secret-value';
     delete process.env.DATABASE_URL; // 에러를 강제 발생시키기 위해 삭제
+    const { getEnv } = (await import('@/backend/config/env')) as {
+      getEnv: () => Env;
+    };
     let errorMessage = '';
     try {
-      await import('@/backend/config/env');
+      getEnv();
     } catch (e) {
       errorMessage = (e as Error).message;
     }
@@ -81,9 +103,12 @@ describe('env 설정', () => {
     Object.assign(process.env, VALID_ENV);
     delete process.env.DATABASE_URL;
     delete process.env.BETTER_AUTH_SECRET;
+    const { getEnv } = (await import('@/backend/config/env')) as {
+      getEnv: () => Env;
+    };
     let errorMessage = '';
     try {
-      await import('@/backend/config/env');
+      getEnv();
     } catch (e) {
       errorMessage = (e as Error).message;
     }
@@ -94,16 +119,18 @@ describe('env 설정', () => {
   it('GOOGLE_CLIENT_ID만 있고 GOOGLE_CLIENT_SECRET 없으면 throw한다', async () => {
     Object.assign(process.env, VALID_ENV);
     delete process.env.GOOGLE_CLIENT_SECRET;
-    await expect(import('@/backend/config/env')).rejects.toThrow(
-      /GOOGLE_CLIENT_ID/
-    );
+    const { getEnv } = (await import('@/backend/config/env')) as {
+      getEnv: () => Env;
+    };
+    expect(() => getEnv()).toThrow(/GOOGLE_CLIENT_ID/);
   });
 
   it('FACEBOOK_CLIENT_SECRET만 있고 FACEBOOK_CLIENT_ID 없으면 throw한다', async () => {
     Object.assign(process.env, VALID_ENV);
     delete process.env.FACEBOOK_CLIENT_ID;
-    await expect(import('@/backend/config/env')).rejects.toThrow(
-      /FACEBOOK_CLIENT/
-    );
+    const { getEnv } = (await import('@/backend/config/env')) as {
+      getEnv: () => Env;
+    };
+    expect(() => getEnv()).toThrow(/FACEBOOK_CLIENT/);
   });
 });
