@@ -27,7 +27,15 @@ describe('auth route', () => {
     mockToNextJsHandler.mockClear();
   });
 
-  it('모듈 로드 시 Next.js 핸들러를 1회만 생성한다', async () => {
+  it('모듈 import 시 Auth 핸들러를 생성하지 않는다', async () => {
+    const route = await import('@/app/api/auth/[...all]/route');
+
+    expect(route).toBeDefined();
+    expect(mockGetAuth).not.toHaveBeenCalled();
+    expect(mockToNextJsHandler).not.toHaveBeenCalled();
+  });
+
+  it('첫 요청 시 핸들러를 생성하고 이후 요청에서는 재사용한다', async () => {
     const route = await import('@/app/api/auth/[...all]/route');
     const getRequest = new Request('http://localhost/api/auth/session');
     const postRequest = new Request('http://localhost/api/auth/sign-in', {
