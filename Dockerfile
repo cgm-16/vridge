@@ -1,4 +1,4 @@
-FROM node:22-bookworm-slim AS base
+FROM node:lts-bookworm-slim AS base
 
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
@@ -17,6 +17,7 @@ FROM base AS builder
 WORKDIR /app
 
 COPY --from=deps /app/node_modules ./node_modules
+COPY --from=deps /app/backend/generated ./backend/generated
 COPY . .
 
 ARG NEXT_PUBLIC_APP_URL
@@ -29,7 +30,7 @@ ENV NEXT_PUBLIC_PRIVACY_POLICY_URL="${NEXT_PUBLIC_PRIVACY_POLICY_URL}"
 
 RUN pnpm build
 
-FROM node:22-bookworm-slim AS runner
+FROM node:lts-bookworm-slim AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
