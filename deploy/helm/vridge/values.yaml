@@ -1,11 +1,11 @@
-nameOverride: ""
-fullnameOverride: ""
+nameOverride: ''
+fullnameOverride: ''
 
 replicaCount: 1
 
 image:
   repository: ghcr.io/cgm-16/vridge
-  tag: ""
+  tag: ''
   pullPolicy: IfNotPresent
 
 imagePullSecrets: []
@@ -32,13 +32,22 @@ service:
 ingress:
   enabled: true
   className: traefik
-  annotations: {}
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-http
   hosts:
-    - host: vridge.example.com
+    - host: vridge.xyz
       paths:
         - path: /
           pathType: Prefix
-  tls: []
+    - host: www.vridge.xyz
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - hosts:
+        - vridge.xyz
+        - www.vridge.xyz
+      secretName: vridge-tls
 
 resources:
   requests:
