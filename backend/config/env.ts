@@ -45,7 +45,7 @@ function parseEnv<T>(schema: z.ZodType<T>): T {
   if (!parsed.success) {
     const missing = parsed.error.issues.map((i) => i.path.join('.'));
     throw new Error(
-      `Missing or invalid environment variables: ${missing.join(', ')}`
+      `필수 환경 변수가 없거나 형식이 올바르지 않습니다: ${missing.join(', ')}`
     );
   }
   return parsed.data;

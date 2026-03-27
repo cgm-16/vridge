@@ -112,6 +112,9 @@ describe('env 설정', () => {
     } catch (e) {
       errorMessage = (e as Error).message;
     }
+    expect(errorMessage).toContain(
+      '필수 환경 변수가 없거나 형식이 올바르지 않습니다'
+    );
     expect(errorMessage).toContain('DATABASE_URL');
     expect(errorMessage).toContain('BETTER_AUTH_SECRET');
   });
