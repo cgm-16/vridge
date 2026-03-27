@@ -2,7 +2,7 @@ name: CD Deploy
 
 on:
   workflow_run:
-    workflows: ["Build Image"]
+    workflows: ['Build Image']
     types: [completed]
     branches: [production]
   workflow_dispatch:
@@ -29,6 +29,8 @@ jobs:
     steps:
       - name: 코드 체크아웃
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
 
       - name: Helm 설정
         uses: azure/setup-helm@v4
@@ -39,7 +41,7 @@ jobs:
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             echo "value=${{ inputs.image_tag || 'production' }}" >> "$GITHUB_OUTPUT"
           else
-            echo "value=production" >> "$GITHUB_OUTPUT"
+            echo "value=sha-${{ github.event.workflow_run.head_sha }}" >> "$GITHUB_OUTPUT"
           fi
 
       - name: 차트 린트
