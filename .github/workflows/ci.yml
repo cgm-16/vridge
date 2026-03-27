@@ -27,18 +27,18 @@ jobs:
 
     steps:
       - name: 코드 체크아웃
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
 
       - name: 이미지 빌드 워크플로우 검증
         run: sh scripts/validate-build-image-workflow.sh
 
       - name: pnpm 설정
-        uses: pnpm/action-setup@v5
+        uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320
         with:
           version: 10.28.2
 
       - name: Node.js 설정
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:
           node-version: 'lts/*'
           cache: 'pnpm'
@@ -68,10 +68,10 @@ jobs:
 
     steps:
       - name: 코드 체크아웃
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
 
       - name: Helm 설정
-        uses: azure/setup-helm@v5
+        uses: azure/setup-helm@dda3372f752e03dde6b3237bc9431cdc2f7a02a2
 
       - name: Helm 차트 검증
         run: sh scripts/validate-vridge-chart.sh
@@ -80,9 +80,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: 코드 체크아웃
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
       - name: uv 설정
-        uses: astral-sh/setup-uv@v7
+        uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78
       - name: 매니페스트 검증
         run: sh scripts/validate-k8s-manifests.sh
 
@@ -90,6 +90,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: 코드 체크아웃
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
       - name: CD 배포 워크플로우 검증
         run: bash scripts/validate-cd-deploy-workflow.sh

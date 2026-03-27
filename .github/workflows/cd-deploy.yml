@@ -28,12 +28,12 @@ jobs:
 
     steps:
       - name: 코드 체크아웃
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           ref: ${{ github.event.workflow_run.head_sha || github.sha }}
 
       - name: Helm 설정
-        uses: azure/setup-helm@v5
+        uses: azure/setup-helm@dda3372f752e03dde6b3237bc9431cdc2f7a02a2
 
       - name: 이미지 태그 결정
         id: tag
