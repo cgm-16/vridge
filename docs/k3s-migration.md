@@ -63,12 +63,12 @@
 
 ### 앱 전용 변수 — 앱 관리 시크릿 `vridge-env`
 
-| 환경 변수                        | 설명                               |
-| -------------------------------- | ---------------------------------- |
-| `BETTER_AUTH_SECRET`             | 런타임 시크릿                      |
-| `BETTER_AUTH_URL`                | 런타임 공개 URL                    |
-| `NEXT_PUBLIC_APP_URL`            | 런타임에도 필요한 공개 URL         |
-| `NEXT_PUBLIC_GA_MEASUREMENT_ID`  | 런타임에도 필요한 GA4 측정 ID      |
+| 환경 변수                        | 설명                                    |
+| -------------------------------- | --------------------------------------- |
+| `BETTER_AUTH_SECRET`             | 런타임 시크릿                           |
+| `BETTER_AUTH_URL`                | 런타임 공개 URL                         |
+| `NEXT_PUBLIC_APP_URL`            | 런타임에도 필요한 공개 URL              |
+| `NEXT_PUBLIC_GA_MEASUREMENT_ID`  | 런타임에도 필요한 GA4 측정 ID           |
 | `NEXT_PUBLIC_PRIVACY_POLICY_URL` | 런타임에도 필요한 개인정보 처리방침 URL |
 
 ### 공개 빌드 변수 — GitHub Actions 빌드 시점 주입
@@ -80,7 +80,8 @@
 | `NEXT_PUBLIC_PRIVACY_POLICY_URL` | 개인정보 처리방침 공개 URL |
 
 > 런타임 서버 코드도 동일한 `NEXT_PUBLIC_*` 값을 읽으므로, GitHub Repository Variables와 `vridge-env` 시크릿에 같은 값을 유지해야 합니다.
-
+> `NEXT_PUBLIC_*` 값은 민감 정보가 아니지만, 현재는 Kubernetes 런타임 설정 소스를 `vridge-env` 하나로 유지하기 위해 같은 시크릿에서 관리합니다.
+> GitHub Repository Variables와 `vridge-env` 값은 자동으로 동기화되지 않습니다.
 > `ssemtle`의 시크릿 및 자격 증명은 `vridge`와 공유하지 않습니다.
 
 ---

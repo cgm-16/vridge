@@ -257,7 +257,8 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 
 프로덕션 이미지는 `Dockerfile` 기준 멀티스테이지 + non-root 실행으로 구성됩니다.
 공개 빌드 변수는 `docker build` 시점에 전달하고, 런타임 변수(`DATABASE_URL`, `DIRECT_URL`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `NEXT_PUBLIC_*`)는 컨테이너 시작 시 주입합니다.
-`NEXT_PUBLIC_*` 값은 클라이언트 번들에 빌드 타임에 고정되므로, GitHub Actions 빌드와 Kubernetes 런타임에 동일한 값을 유지해야 합니다.
+`NEXT_PUBLIC_*` 값은 민감 정보가 아니지만, 현재는 Kubernetes 런타임 설정 소스를 `vridge-env` 하나로 유지하기 위해 같은 Secret에서 주입합니다.
+`NEXT_PUBLIC_*` 값은 클라이언트 번들에 빌드 타임에 고정되므로, GitHub Repository Variables와 `vridge-env` 값은 자동으로 동기화되지 않으며 운영자가 동일한 값을 유지해야 합니다.
 
 ```bash
 docker build \
