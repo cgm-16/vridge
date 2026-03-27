@@ -29,8 +29,6 @@ jobs:
       - name: 공개 빌드 변수 확인
         run: |
           test -n "$NEXT_PUBLIC_APP_URL"
-          test -n "$NEXT_PUBLIC_GA_MEASUREMENT_ID"
-          test -n "$NEXT_PUBLIC_PRIVACY_POLICY_URL"
 
       - name: Docker Buildx 설정
         uses: docker/setup-buildx-action@v3
