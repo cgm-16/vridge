@@ -1,0 +1,61 @@
+name: CD Deploy
+
+on:
+  workflow_run:
+    workflows: ["Build Image"]
+    types: [completed]
+    branches: [production]
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: '배포할 이미지 태그 (기본값: production)'
+        required: false
+        default: 'production'
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: k3s에 배포
+    runs-on: [self-hosted, k3s]
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      github.event.workflow_run.conclusion == 'success'
+    permissions:
+      contents: read
+
+    steps:
+      - name: 코드 체크아웃
+        uses: actions/checkout@v4
+
+      - name: Helm 설정
+        uses: azure/setup-helm@v4
+
+      - name: 이미지 태그 결정
+        id: tag
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "value=${{ inputs.image_tag || 'production' }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "value=production" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: 차트 린트
+        run: helm lint deploy/helm/vridge
+
+      - name: 차트 렌더링 검증
+        run: helm template vridge deploy/helm/vridge --namespace vridge > /dev/null
+
+      - name: 배포
+        env:
+          KUBECONFIG: /home/ori/.kube/config
+        run: |
+          helm upgrade vridge deploy/helm/vridge \
+            --install \
+            --namespace vridge \
+            --set image.tag=${{ steps.tag.outputs.value }} \
+            --wait \
+            --atomic \
+            --timeout 5m

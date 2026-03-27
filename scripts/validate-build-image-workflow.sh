@@ -22,6 +22,7 @@ assert_contains() {
 assert_contains '^[[:space:]]*name: Build Image$' "워크플로우 이름이 Build Image가 아닙니다."
 assert_contains '^[[:space:]]*push:$' "워크플로우가 push 트리거를 정의하지 않았습니다."
 assert_contains '^[[:space:]]*-[[:space:]]dev$' "워크플로우가 dev 브랜치 push를 트리거하지 않습니다."
+assert_contains '^[[:space:]]*-[[:space:]]production$' "워크플로우가 production 브랜치 push를 트리거하지 않습니다."
 assert_contains '^[[:space:]]*workflow_dispatch:$' "워크플로우에 workflow_dispatch 트리거가 없습니다."
 assert_contains '^[[:space:]]*contents:[[:space:]]*read$' "워크플로우 권한에 contents: read가 없습니다."
 assert_contains '^[[:space:]]*packages:[[:space:]]*write$' "워크플로우 권한에 packages: write가 없습니다."
