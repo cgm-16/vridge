@@ -16,8 +16,7 @@ RUN pnpm install --frozen-lockfile
 # Separate stage with hoisted linker so Prisma packages are real directories, not pnpm symlinks.
 # Used by the runner stage to copy a self-contained Prisma CLI for the migration Job.
 FROM deps AS prisma-migration-deps
-WORKDIR /app
-RUN echo "node-linker=hoisted" > .npmrc && pnpm install --frozen-lockfile
+RUN echo "node-linker=hoisted" >> .npmrc && pnpm install --frozen-lockfile
 
 FROM base AS builder
 WORKDIR /app
