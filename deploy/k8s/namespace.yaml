@@ -1,0 +1,9 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: vridge
+  labels:
+    app.kubernetes.io/name: vridge
+    app.kubernetes.io/instance: vridge
+    app.kubernetes.io/managed-by: kubectl

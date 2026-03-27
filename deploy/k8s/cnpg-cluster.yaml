@@ -1,0 +1,36 @@
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: vridge-db
+  namespace: vridge
+  labels:
+    app.kubernetes.io/name: vridge
+    app.kubernetes.io/instance: vridge
+    app.kubernetes.io/managed-by: kubectl
+    app.kubernetes.io/component: database
+spec:
+  instances: 1
+  imageName: ghcr.io/cloudnative-pg/postgresql:16
+
+  bootstrap:
+    initdb:
+      database: vridge
+      owner: vridge
+      # CNPG automatically creates the secret "vridge-db-app" from this owner/database pair.
+      # It contains keys: uri, jdbc-uri, pgpass, password, username.
+      # The vridge Helm chart reads vridge-db-app:uri for DATABASE_URL and DIRECT_URL.
+
+  storage:
+    size: 1Gi
+    # storageClass is intentionally omitted: inherits cluster default (local-path on k3s).
+    # Set explicitly if deploying to a cluster with multiple storage classes.
+    # Note: k3s local-path does not support volume expansion — provision enough upfront.
+
+  monitoring:
+    enablePodMonitor: false
+
+  # No PgBouncer — deferred to a later phase.
+  # No backup — deferred; add a ScheduledBackup resource in a separate task.
+  # No postgresql.parameters — CNPG defaults are appropriate for 1 instance / 1Gi.
+  # No resources block — add after observing baseline usage.
