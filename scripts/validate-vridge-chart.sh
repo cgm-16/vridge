@@ -63,3 +63,5 @@ assert_doc_contains "$rendered_file" "Deployment" "^                  name: vrid
 assert_doc_contains "$rendered_file" "Deployment" "^                  key: NEXT_PUBLIC_APP_URL$" "NEXT_PUBLIC_APP_URL이 vridge-env 시크릿 키를 참조하지 않습니다."
 assert_doc_contains "$rendered_file" "Deployment" "^                  key: NEXT_PUBLIC_GA_MEASUREMENT_ID$" "NEXT_PUBLIC_GA_MEASUREMENT_ID가 vridge-env 시크릿 키를 참조하지 않습니다."
 assert_doc_contains "$rendered_file" "Deployment" "^                  key: NEXT_PUBLIC_PRIVACY_POLICY_URL$" "NEXT_PUBLIC_PRIVACY_POLICY_URL이 vridge-env 시크릿 키를 참조하지 않습니다."
+assert_doc_contains "$rendered_file" "Job" "helm\\.sh/hook: pre-install,pre-upgrade" "Migration Job hook annotation이 없습니다."
+assert_doc_contains "$rendered_file" "Job" "migrate" "Migration Job에 prisma migrate deploy 명령이 없습니다."

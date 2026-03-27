@@ -71,6 +71,8 @@ rm -f /tmp/vridge-env.env
 1. Build Image 워크플로 (`ci-build.yml`) — 이미지 빌드 후 `ghcr.io/cgm-16/vridge:<tag>`로 push
 2. CD 배포 워크플로 (`cd-deploy.yml`) — Helm으로 클러스터에 배포
 
+> **마이그레이션**: `cd-deploy.yml`이 `helm upgrade`를 실행하면 Helm `pre-upgrade` 훅이 마이그레이션 Job을 자동으로 실행함. 별도 트리거 불필요.
+
 ### 수동 트리거
 
 GitHub Actions 탭 → `cd-deploy.yml` → `Run workflow` 버튼 클릭. 선택적으로 `image_tag` 값 입력 가능.
@@ -91,7 +93,7 @@ helm upgrade vridge deploy/helm/vridge \
 
 ## 4. 인그레스 / DNS / 공개 URL
 
-- 차트 기본 호스트: `vridge.example.com` — 실제 호스트로 반드시 교체 필요
+- 차트 기본 호스트: `vridge.xyz` 및 `www.vridge.xyz`
 - 인그레스 클래스: `traefik` (k3s 기본값)
 - TLS: 기본 미설정. 필요 시 `ingress.tls` 섹션 설정 필요
 
@@ -173,3 +175,4 @@ rm -f /tmp/vridge-env.env
 - **PgBouncer**: 커넥션 풀링 미적용. 앱이 `vridge-db` CNPG 클러스터에 직접 연결 중.
 - **스테이징 네임스페이스**: 미생성. 현재 단일 네임스페이스(`vridge`) 사용.
 - **DB 백업 정책**: CNPG `ScheduledBackup` 리소스 미정의.
+- **마이그레이션 Job 이미지 크기**: runner 스테이지에 Prisma CLI(`node_modules/prisma`, `node_modules/@prisma`) 포함으로 이미지 크기가 증가함. 필요 시 별도 migration 이미지로 분리 가능.

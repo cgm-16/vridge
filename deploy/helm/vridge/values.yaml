@@ -94,3 +94,6 @@ secrets:
     name: vridge-db-app
   app:
     name: vridge-env
+
+migrations:
+  enabled: true
