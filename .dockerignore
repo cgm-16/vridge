@@ -1,0 +1,12 @@
+.git
+.github
+.next
+.worktrees
+coverage
+docs
+node_modules
+.env
+.env.*
+.codex-memory-*.md
+npm-debug.log*
+pnpm-debug.log*

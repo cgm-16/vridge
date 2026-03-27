@@ -253,6 +253,31 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 | `pnpm storybook`         | Storybook 실행 (포트 6006)                           |
 | `pnpm build-storybook`   | Storybook 정적 빌드                                  |
 
+### 프로덕션 컨테이너 빌드 / 실행
+
+프로덕션 이미지는 `Dockerfile` 기준 멀티스테이지 + non-root 실행으로 구성됩니다.
+공개 빌드 변수만 `docker build` 시점에 전달하고, 런타임 시크릿은 컨테이너 시작 시 주입합니다.
+
+```bash
+docker build \
+  --build-arg NEXT_PUBLIC_APP_URL=http://localhost:3000 \
+  --build-arg NEXT_PUBLIC_GA_MEASUREMENT_ID=G-LOCALTEST \
+  --build-arg NEXT_PUBLIC_PRIVACY_POLICY_URL=http://localhost/privacy \
+  -t vridge:local .
+```
+
+```bash
+docker run --rm -p 3000:3000 \
+  -e DATABASE_URL=postgresql://postgres:postgres@host.docker.internal:54329/vridge_test \
+  -e DIRECT_URL=postgresql://postgres:postgres@host.docker.internal:54329/vridge_test \
+  -e BETTER_AUTH_SECRET=dev-secret-dev-secret-dev-secret \
+  -e BETTER_AUTH_URL=http://localhost:3000 \
+  -e NEXT_PUBLIC_APP_URL=http://localhost:3000 \
+  -e NEXT_PUBLIC_GA_MEASUREMENT_ID=G-LOCALTEST \
+  -e NEXT_PUBLIC_PRIVACY_POLICY_URL=http://localhost/privacy \
+  vridge:local
+```
+
 ### 테스트 실행 시 필수 환경 변수
 
 ```bash
