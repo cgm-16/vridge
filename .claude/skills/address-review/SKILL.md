@@ -31,7 +31,7 @@ gh api /repos/$REPO/pulls/$PR/reviews \
 python3 -c "
 import sys, re
 body = sys.stdin.read()
-m = re.search(r'Prompt for all review comments.*?\x60\x60\x60\n(.*?)\x60\x60\x60', body, re.DOTALL)
+m = re.search(r'Prompt for all review comments.*?\x60\x60\x60\w*\r?\n(.*?)\x60\x60\x60', body, re.DOTALL)
 print(m.group(1).strip() if m else '')
 "
 ```
@@ -90,7 +90,7 @@ Run an autonomous CodeRabbit review-fix loop on PR #{PR} in repo {REPO}. Repeat 
    python3 -c "
    import sys, re
    body = sys.stdin.read()
-   m = re.search(r'Prompt for all review comments.*?\x60\x60\x60\n(.*?)\x60\x60\x60', body, re.DOTALL)
+   m = re.search(r'Prompt for all review comments.*?\x60\x60\x60\w*\r?\n(.*?)\x60\x60\x60', body, re.DOTALL)
    print(m.group(1).strip() if m else '')
    "
    ```
@@ -122,6 +122,7 @@ Run an autonomous CodeRabbit review-fix loop on PR #{PR} in repo {REPO}. Repeat 
      RESULT=$(gh api /repos/{REPO}/pulls/{PR}/reviews \
        --jq '[.[] | select(.user.login | contains("coderabbitai"))] | last | {id:.id,state:.state}')
      NEW_ID=$(echo "$RESULT" | python3 -c "import sys,json;d=json.load(sys.stdin);print(d['id'])")
+     NEW_STATE=$(echo "$RESULT" | python3 -c "import sys,json;d=json.load(sys.stdin);print(d['state'])")
      [ "$NEW_ID" != "$REVIEW_ID" ] && break
    done
    [ "$NEW_ID" = "$REVIEW_ID" ] && TIMEOUT=1
