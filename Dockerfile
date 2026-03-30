@@ -40,6 +40,8 @@ ENV NODE_ENV=production
 ENV HOSTNAME=0.0.0.0
 ENV PORT=3000
 
+RUN apt-get update -y && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
+
 RUN groupadd --system --gid 1001 nodejs \
   && useradd --system --uid 1001 --gid nodejs nextjs
 
@@ -51,6 +53,7 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 # Copied from prisma-migration-deps (hoisted linker) so packages are real directories, not pnpm symlinks
 COPY --from=prisma-migration-deps --chown=nextjs:nodejs /migration-install/node_modules ./node_modules
 COPY --from=deps --chown=nextjs:nodejs /app/backend/prisma ./backend/prisma
+COPY --from=builder --chown=nextjs:nodejs /app/prisma.config.ts ./prisma.config.ts
 
 USER nextjs
 
