@@ -56,6 +56,35 @@ spec:
                   name: {{ .Values.secrets.db.name }}
                   key: uri
       {{- end }}
+      {{- if .Values.seed.enabled }}
+        - name: seed
+          image: "{{ .Values.image.repository }}:{{ default .Chart.AppVersion .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command:
+            - ./node_modules/.bin/prisma
+            - db
+            - seed
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+          env:
+            - name: HOME
+              value: /tmp
+            - name: SEED_SCOPE
+              value: {{ .Values.seed.scope }}
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secrets.db.name }}
+                  key: uri
+            - name: DIRECT_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secrets.db.name }}
+                  key: uri
+      {{- end }}
       containers:
         - name: {{ include "vridge.name" . }}
           image: "{{ .Values.image.repository }}:{{ default .Chart.AppVersion .Values.image.tag }}"
