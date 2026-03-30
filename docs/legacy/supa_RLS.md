@@ -1,3 +1,9 @@
+---
+archived_on: 2026-03-31
+archive_reason: historical_reference
+replaced_by: null
+---
+
 # Supabase RLS 감사 및 정렬 문서 (v0.1)
 
 ## 1) 문서 목적

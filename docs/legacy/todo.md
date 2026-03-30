@@ -1,3 +1,9 @@
+---
+archived_on: 2026-03-31
+archive_reason: no_longer_operational
+replaced_by: null
+---
+
 # 프로젝트 진행 현황
 
 > 마지막 업데이트: 2026-02-16
@@ -49,7 +55,7 @@
 
 ## Phase 5: Figma MVP 정렬
 
-> 상세 계획: [docs/legacy/implementation-plan-p5.md](docs/legacy/implementation-plan-p5.md)
+> 상세 계획: [docs/legacy/implementation-plan-p5.md](implementation-plan-p5.md)
 
 | #   | 프롬프트                               | 범위                                               | 의존성        | 상태 |
 | --- | -------------------------------------- | -------------------------------------------------- | ------------- | ---- |

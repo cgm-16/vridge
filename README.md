@@ -28,13 +28,13 @@
 
 ### 인프라
 
-|          |                       |
-| -------- | --------------------- |
-| Database | Supabase (PostgreSQL) |
-| ORM      | Prisma v7             |
-| Storage  | AWS S3 Standard       |
-| Hosting  | Vercel                |
-| CI/CD    | GitHub Actions        |
+|          |                              |
+| -------- | ---------------------------- |
+| Database | PostgreSQL (CNPG / 로컬 Docker) |
+| ORM      | Prisma v7                    |
+| Storage  | AWS S3 Standard              |
+| Hosting  | k3s + Helm + Traefik         |
+| CI/CD    | GitHub Actions               |
 
 ### DX / 테스트
 
@@ -64,18 +64,17 @@ pnpm dev
 
 브라우저에서 `http://localhost:3000`을 열면 됩니다.
 
+로컬 DB 초기화와 시드 계정은 [`docs/test-db-local-setup.md`](docs/test-db-local-setup.md)를 기준으로 확인합니다.
+
 ## 프로덕션 컨테이너 빌드
 
-프로덕션 이미지는 공개 빌드 변수만 `docker build` 시점에 받습니다.
-런타임 변수(`DATABASE_URL`, `DIRECT_URL`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `NEXT_PUBLIC_*`)는 컨테이너 실행 시에도 주입해야 합니다.
-`NEXT_PUBLIC_*` 값은 민감 정보가 아니지만, 현재는 Kubernetes 런타임 설정 소스를 `vridge-env` 하나로 유지하기 위해 같은 Secret에서 주입합니다.
-`NEXT_PUBLIC_*` 값은 클라이언트 번들에 빌드 타임에 고정되므로, GitHub Repository Variables와 `vridge-env` 값은 자동으로 동기화되지 않으며 운영자가 동일한 값을 유지해야 합니다.
+프로덕션 이미지는 현재 `NEXT_PUBLIC_APP_URL`만 `docker build` 시점에 받습니다.
+런타임 변수는 Kubernetes에서 주입하며, Helm 차트 기준 필수 계약은 `DATABASE_URL`, `DIRECT_URL`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `NEXT_PUBLIC_APP_URL`입니다.
+분석/개인정보처리방침 관련 `NEXT_PUBLIC_*` 값은 앱 코드에서 optional이지만, 현재 기본 이미지 빌드/배포 계약에는 포함되어 있지 않습니다.
 
 ```bash
 docker build \
   --build-arg NEXT_PUBLIC_APP_URL=http://localhost:3000 \
-  --build-arg NEXT_PUBLIC_GA_MEASUREMENT_ID=G-LOCALTEST \
-  --build-arg NEXT_PUBLIC_PRIVACY_POLICY_URL=http://localhost/privacy \
   -t vridge:local .
 ```
 
@@ -86,13 +85,11 @@ docker run --rm -p 3000:3000 \
   -e BETTER_AUTH_SECRET=dev-secret-dev-secret-dev-secret \
   -e BETTER_AUTH_URL=http://localhost:3000 \
   -e NEXT_PUBLIC_APP_URL=http://localhost:3000 \
-  -e NEXT_PUBLIC_GA_MEASUREMENT_ID=G-LOCALTEST \
-  -e NEXT_PUBLIC_PRIVACY_POLICY_URL=http://localhost/privacy \
   vridge:local
 ```
 
-GitHub Actions `build-image.yml`은 `dev` 브랜치 push 시 `ghcr.io/<owner>/vridge`로 이미지를 푸시합니다.
-이때 `NEXT_PUBLIC_APP_URL`, `NEXT_PUBLIC_GA_MEASUREMENT_ID`, `NEXT_PUBLIC_PRIVACY_POLICY_URL`는 GitHub Repository Variables로 제공해야 하며, Kubernetes `vridge-env`에도 같은 값을 유지해야 합니다.
+GitHub Actions [`build-image.yml`](.github/workflows/build-image.yml)은 `dev`와 `production` 브랜치 push, 그리고 수동 실행에서 `ghcr.io/<owner>/vridge` 이미지를 빌드/푸시합니다.
+배포 플로우와 시크릿 계약은 [`docs/runbook-deploy.md`](docs/runbook-deploy.md), 배포 아키텍처는 [`docs/k3s-migration.md`](docs/k3s-migration.md)를 기준으로 확인합니다.
 
 ## 스크립트
 
@@ -118,7 +115,9 @@ GitHub Actions `build-image.yml`은 `dev` 브랜치 push 시 `ghcr.io/<owner>/vr
 - URL 구조: 로케일 프리픽스 미사용
 - 번역 누락: 영어 사전으로 폴백
 
-## 현재 품질 지표
+## 주요 문서
 
-- 테스트: `85` suite, `542` tests 통과
-- 타입 체크: `pnpm exec tsc --noEmit` 통과
+- [`docs/project-state.md`](docs/project-state.md): 구현 범위와 현재 상태 요약
+- [`docs/test-db-local-setup.md`](docs/test-db-local-setup.md): 로컬 개발/테스트 DB 초기화
+- [`docs/runbook-deploy.md`](docs/runbook-deploy.md): k3s 배포 절차와 운영 체크리스트
+- [`docs/k3s-migration.md`](docs/k3s-migration.md): 현재 배포 아키텍처와 환경 변수 계약

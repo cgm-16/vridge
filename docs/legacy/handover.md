@@ -1,3 +1,9 @@
+---
+archived_on: 2026-03-31
+archive_reason: historical_reference
+replaced_by: null
+---
+
 # vridge 인수인계 문서
 
 > 대상: 신규 투입 개발자 / 팀 멤버
@@ -449,13 +455,13 @@ Better Auth v1 기반:
 
 | 문서                                                                            | 내용                               |
 | ------------------------------------------------------------------------------- | ---------------------------------- |
-| [`docs/project-state.md`](project-state.md)                                     | 구현 상태 상세 (Phase별, 라우트별) |
-| [`docs/folder-structure.md`](folder-structure.md)                               | 디렉터리 구조 상세                 |
-| [`docs/test-db-local-setup.md`](test-db-local-setup.md)                         | 로컬 DB 온보딩 가이드              |
-| [`docs/i18n-checklist.md`](i18n-checklist.md)                                   | i18n 추가/변경 체크리스트          |
+| [`docs/project-state.md`](../project-state.md)                                  | 구현 상태 상세 (Phase별, 라우트별) |
+| [`docs/folder-structure.md`](../folder-structure.md)                            | 디렉터리 구조 상세                 |
+| [`docs/test-db-local-setup.md`](../test-db-local-setup.md)                      | 로컬 DB 온보딩 가이드              |
+| [`docs/i18n-checklist.md`](../i18n-checklist.md)                                | i18n 추가/변경 체크리스트          |
 | [`docs/supabase-migration-v0.1-runbook.md`](supabase-migration-v0.1-runbook.md) | 프로덕션 DB 마이그레이션 런북      |
-| [`supa_RLS.md`](../supa_RLS.md)                                                 | Supabase RLS 감사 문서             |
-| [`todo.md`](../todo.md)                                                         | Phase별 진행 현황                  |
+| [`supa_RLS.md`](supa_RLS.md)                                                    | Supabase RLS 감사 문서             |
+| [`todo.md`](todo.md)                                                            | Phase별 진행 현황                  |
 
 ---
 

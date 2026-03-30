@@ -1,3 +1,9 @@
+---
+archived_on: 2026-03-31
+archive_reason: historical_reference
+replaced_by: null
+---
+
 # Supabase 운영 마이그레이션 가이드 (v0.1)
 
 ## 목적

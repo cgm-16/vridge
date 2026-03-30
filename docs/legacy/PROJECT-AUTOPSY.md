@@ -1,3 +1,9 @@
+---
+archived_on: 2026-03-31
+archive_reason: historical_reference
+replaced_by: null
+---
+
 # vridge 프로젝트 부검
 
 > 기준 브랜치: `dev` | 기준일: 2026-03-04 | 버전: v0.1.0 (MVP)
