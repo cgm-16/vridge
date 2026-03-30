@@ -17,13 +17,8 @@ jobs:
       DIRECT_URL: postgresql://localhost/ci_db
       BETTER_AUTH_SECRET: ci-build-secret-ci-build-secret
       BETTER_AUTH_URL: http://localhost:3000
-      GOOGLE_CLIENT_ID: ci-google-client-id
-      GOOGLE_CLIENT_SECRET: ci-google-client-secret
-      FACEBOOK_CLIENT_ID: ci-facebook-client-id
-      FACEBOOK_CLIENT_SECRET: ci-facebook-client-secret
+      # 소셜 로그인 미사용 (Google, Facebook)
       NEXT_PUBLIC_APP_URL: http://localhost:3000
-      NEXT_PUBLIC_GA_MEASUREMENT_ID: G-CITEST123
-      NEXT_PUBLIC_PRIVACY_POLICY_URL: http://localhost/privacy
 
     steps:
       - name: 코드 체크아웃
@@ -31,6 +26,12 @@ jobs:
 
       - name: 이미지 빌드 워크플로우 검증
         run: sh scripts/validate-build-image-workflow.sh
+
+      - name: Docker hub 로그인
+        uses: docker/login-action@b45d80f862d83dbcd57f89517bcf500b2ab88fb2
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: pnpm 설정
         uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320
@@ -56,8 +57,6 @@ jobs:
         run: |
           docker build \
             --build-arg NEXT_PUBLIC_APP_URL="${NEXT_PUBLIC_APP_URL}" \
-            --build-arg NEXT_PUBLIC_GA_MEASUREMENT_ID="${NEXT_PUBLIC_GA_MEASUREMENT_ID}" \
-            --build-arg NEXT_PUBLIC_PRIVACY_POLICY_URL="${NEXT_PUBLIC_PRIVACY_POLICY_URL}" \
             -t vridge:ci .
 
       - name: 테스트 및 커버리지

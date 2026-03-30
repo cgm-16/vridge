@@ -40,5 +40,3 @@ assert_contains '^[[:space:]]*push:[[:space:]]*true$' "워크플로우가 이미
 assert_contains '^[[:space:]]*cache-from:[[:space:]]*type=gha$' "워크플로우가 GitHub Actions 캐시를 사용하지 않습니다."
 assert_contains '^[[:space:]]*cache-to:[[:space:]]*type=gha,mode=max$' "워크플로우가 GitHub Actions 캐시 저장을 설정하지 않았습니다."
 assert_contains '^[[:space:]]*NEXT_PUBLIC_APP_URL=\$\{\{ env\.NEXT_PUBLIC_APP_URL \}\}$' "NEXT_PUBLIC_APP_URL 빌드 인자가 없습니다."
-assert_contains '^[[:space:]]*NEXT_PUBLIC_GA_MEASUREMENT_ID=\$\{\{ env\.NEXT_PUBLIC_GA_MEASUREMENT_ID \}\}$' "NEXT_PUBLIC_GA_MEASUREMENT_ID 빌드 인자가 없습니다."
-assert_contains '^[[:space:]]*NEXT_PUBLIC_PRIVACY_POLICY_URL=\$\{\{ env\.NEXT_PUBLIC_PRIVACY_POLICY_URL \}\}$' "NEXT_PUBLIC_PRIVACY_POLICY_URL 빌드 인자가 없습니다."
