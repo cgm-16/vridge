@@ -39,14 +39,11 @@ describe('env 설정', () => {
     };
     const env = getEnv();
     expect(env.DATABASE_URL).toBe(VALID_ENV.DATABASE_URL);
-    expect(env.NEXT_PUBLIC_GA_MEASUREMENT_ID).toBe('G-TEST123');
   });
 
   it('공개 변수만 있으면 getPublicEnv가 공개 env 객체를 반환한다', async () => {
     Object.assign(process.env, {
       NEXT_PUBLIC_APP_URL: VALID_ENV.NEXT_PUBLIC_APP_URL,
-      NEXT_PUBLIC_GA_MEASUREMENT_ID: VALID_ENV.NEXT_PUBLIC_GA_MEASUREMENT_ID,
-      NEXT_PUBLIC_PRIVACY_POLICY_URL: VALID_ENV.NEXT_PUBLIC_PRIVACY_POLICY_URL,
     });
     const { getPublicEnv } = (await import('@/backend/config/env')) as {
       getPublicEnv: () => PublicEnv;

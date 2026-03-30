@@ -3,8 +3,6 @@ import { z } from 'zod';
 
 const publicEnvSchema = z.object({
   NEXT_PUBLIC_APP_URL: z.string().url(),
-  NEXT_PUBLIC_GA_MEASUREMENT_ID: z.string().min(1),
-  NEXT_PUBLIC_PRIVACY_POLICY_URL: z.string().url(),
 });
 
 const envSchema = publicEnvSchema
