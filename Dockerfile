@@ -49,7 +49,7 @@ COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
-# Prisma CLI and schema — used by the Helm pre-upgrade migration Job
+# Prisma CLI and schema — used by the Deployment initContainer migration step
 # Copied from prisma-migration-deps (hoisted linker) so packages are real directories, not pnpm symlinks
 COPY --from=prisma-migration-deps --chown=nextjs:nodejs /migration-install/node_modules ./node_modules
 COPY --from=deps --chown=nextjs:nodejs /app/backend/prisma ./backend/prisma
