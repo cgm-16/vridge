@@ -47,7 +47,7 @@ assert_contains 'helm upgrade' "워크플로우에 helm upgrade 단계가 없습
 assert_contains '\-\-install' "helm upgrade에 --install 플래그가 없습니다."
 assert_contains '\-\-namespace vridge' "helm upgrade에 --namespace vridge 플래그가 없습니다."
 assert_contains '\-\-wait' "helm upgrade에 --wait 플래그가 없습니다."
-assert_contains '\-\-atomic' "helm upgrade에 --atomic 플래그가 없습니다."
+assert_contains '\-\-rollback-on-failure' "helm upgrade에 --rollback-on-failure 플래그가 없습니다."
 assert_contains '\-\-timeout' "helm upgrade에 --timeout 플래그가 없습니다."
 assert_contains 'KUBECONFIG:[[:space:]]*/home/ori/\.kube/config' "KUBECONFIG 환경 변수가 /home/ori/.kube/config로 설정되어 있지 않습니다."
 assert_contains 'image\.tag=' "배포 단계에 image.tag= --set 플래그가 없습니다."
