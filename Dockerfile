@@ -8,6 +8,8 @@ RUN corepack enable
 FROM base AS deps
 WORKDIR /app
 
+RUN apt-get update -y && apt-get install -y --no-install-recommends openssl && rm -rf /var/lib/apt/lists/*
+
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml prisma.config.ts .npmrc ./
 COPY tools ./tools
 COPY backend/prisma ./backend/prisma
@@ -17,8 +19,12 @@ RUN pnpm install --frozen-lockfile
 # Deploy the migration workspace package into an isolated directory.
 # pnpm deploy resolves the complete Prisma transitive dep tree from the workspace lockfile.
 # node-linker=hoisted (tools/migration/.npmrc) ensures real directories for Docker COPY.
+# Prisma downloads the native schema engine during install; pnpm deploy rehydrates packages
+# from the store, so copy the materialized engines back into the deployed bundle.
 FROM deps AS prisma-migration-deps
 RUN pnpm --filter=migration deploy --prod /migration-install
+RUN cp -a /app/node_modules/.pnpm/@prisma+engines@*/node_modules/@prisma/engines/. \
+  /migration-install/node_modules/.pnpm/@prisma+engines@*/node_modules/@prisma/engines/
 
 FROM base AS builder
 WORKDIR /app
