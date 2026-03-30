@@ -8,15 +8,17 @@ RUN corepack enable
 FROM base AS deps
 WORKDIR /app
 
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml prisma.config.ts ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml prisma.config.ts .npmrc ./
+COPY tools ./tools
 COPY backend/prisma ./backend/prisma
 
 RUN pnpm install --frozen-lockfile
 
-# Separate stage with hoisted linker so Prisma packages are real directories, not pnpm symlinks.
-# Used by the runner stage to copy a self-contained Prisma CLI for the migration Job.
+# Deploy the migration workspace package into an isolated directory.
+# pnpm deploy resolves the complete Prisma transitive dep tree from the workspace lockfile.
+# node-linker=hoisted (tools/migration/.npmrc) ensures real directories for Docker COPY.
 FROM deps AS prisma-migration-deps
-RUN echo "node-linker=hoisted" >> .npmrc && pnpm install --frozen-lockfile
+RUN pnpm --filter=migration deploy --prod /migration-install
 
 FROM base AS builder
 WORKDIR /app
@@ -47,8 +49,7 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
 # Prisma CLI and schema — used by the Helm pre-upgrade migration Job
 # Copied from prisma-migration-deps (hoisted linker) so packages are real directories, not pnpm symlinks
-COPY --from=prisma-migration-deps --chown=nextjs:nodejs /app/node_modules/prisma ./node_modules/prisma
-COPY --from=prisma-migration-deps --chown=nextjs:nodejs /app/node_modules/@prisma ./node_modules/@prisma
+COPY --from=prisma-migration-deps --chown=nextjs:nodejs /migration-install/node_modules ./node_modules
 COPY --from=deps --chown=nextjs:nodejs /app/backend/prisma ./backend/prisma
 
 USER nextjs
