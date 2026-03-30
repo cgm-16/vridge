@@ -80,8 +80,9 @@ function resolveSeedScope(rawScope: string | undefined): SeedScope {
     return rawScope;
   }
 
-  console.warn(`알 수 없는 SEED_SCOPE(${rawScope})로 full 모드를 사용합니다.`);
-  return 'full';
+  throw new Error(
+    `알 수 없는 SEED_SCOPE(${rawScope})입니다. 허용 값: full, prod_v0_1_core3, prod_v0_1_demo`
+  );
 }
 
 const BASE_SAMPLE_JOB_DESCRIPTIONS: SampleJobDescriptionSeed[] = [
