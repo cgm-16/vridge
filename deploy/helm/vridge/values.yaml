@@ -97,7 +97,3 @@ secrets:
 
 migrations:
   enabled: true
-
-seed:
-  enabled: true
-  scope: prod_v0_1_demo

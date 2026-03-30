@@ -28,9 +28,8 @@ spec:
       {{- end }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
-      {{- if or .Values.migrations.enabled .Values.seed.enabled }}
+      {{- if .Values.migrations.enabled }}
       initContainers:
-        {{- if .Values.migrations.enabled }}
         - name: migrate
           image: "{{ .Values.image.repository }}:{{ default .Chart.AppVersion .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
@@ -56,36 +55,6 @@ spec:
                 secretKeyRef:
                   name: {{ .Values.secrets.db.name }}
                   key: uri
-        {{- end }}
-        {{- if .Values.seed.enabled }}
-        - name: seed
-          image: "{{ .Values.image.repository }}:{{ default .Chart.AppVersion .Values.image.tag }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
-          command:
-            - ./node_modules/.bin/prisma
-            - db
-            - seed
-          securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
-          volumeMounts:
-            - name: tmp
-              mountPath: /tmp
-          env:
-            - name: HOME
-              value: /tmp
-            - name: SEED_SCOPE
-              value: {{ .Values.seed.scope }}
-            - name: DATABASE_URL
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.secrets.db.name }}
-                  key: uri
-            - name: DIRECT_URL
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.secrets.db.name }}
-                  key: uri
-        {{- end }}
       {{- end }}
       containers:
         - name: {{ include "vridge.name" . }}
@@ -140,7 +109,7 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- if or .Values.migrations.enabled .Values.seed.enabled }}
+      {{- if .Values.migrations.enabled }}
       volumes:
         - name: tmp
           emptyDir: {}
