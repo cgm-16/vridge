@@ -60,4 +60,4 @@ assert_doc_contains "$rendered_file" "Deployment" "^            - name: NEXT_PUB
 assert_doc_contains "$rendered_file" "Deployment" "^                  name: vridge-env$" "앱 시크릿 vridge-env가 Deployment에 참조되지 않습니다."
 assert_doc_contains "$rendered_file" "Deployment" "^                  key: NEXT_PUBLIC_APP_URL$" "NEXT_PUBLIC_APP_URL이 vridge-env 시크릿 키를 참조하지 않습니다."
 assert_doc_contains "$rendered_file" "Deployment" "^      initContainers:$" "Deployment에 initContainers 섹션이 없습니다."
-assert_doc_contains "$rendered_file" "Deployment" "node_modules/prisma/build/index\\.js" "Deployment initContainer에 prisma migrate deploy 명령이 없습니다."
+assert_doc_contains "$rendered_file" "Deployment" "node_modules/\\.bin/prisma" "Deployment initContainer에 prisma migrate deploy 명령이 없습니다."
