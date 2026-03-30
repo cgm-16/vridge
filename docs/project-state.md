@@ -4,12 +4,12 @@
 
 ## 현재 스냅샷
 
-- 브랜치: `dev`
-- 테스트: `85` suite, `542` tests 통과
-- 타입 체크: `pnpm exec tsc --noEmit` 통과
+- 기준 브랜치: `dev`
+- 품질 게이트: `ci.yml`에서 lint / build / test 경로 검증
 - 앱 라우팅: Next.js App Router (`app/`)
 - 인증: Better Auth + `proxy.ts` 기반 라우트 보호
 - 다국어: `vi` 기본, `en`/`ko` 지원, 쿠키 기반 로케일 유지
+- 배포: k3s + Helm + CloudNativePG(`vridge-db`) + GitHub Actions(`build-image.yml`, `cd-deploy.yml`)
 - Storybook: Prompt 20 Tier-1 공통 컴포넌트 문서화 완료(`frontend/stories/ui/*`)
 
 ## 완료 범위
@@ -129,5 +129,5 @@
 - 구현 계획: `docs/legacy/implementation-plan-p5.md`
 - 폴더 구조: `docs/folder-structure.md`
 - i18n 체크리스트: `docs/i18n-checklist.md`
-- 진행 현황: `todo.md`
-- 기존 상세 요구사항 체크리스트(아카이브): `docs/project-state-requirements.md`
+- 진행 현황(아카이브): `docs/legacy/todo.md`
+- 기존 상세 요구사항 체크리스트(아카이브): `docs/legacy/project-state-requirements.md`

@@ -1,3 +1,9 @@
+---
+archived_on: 2026-03-31
+archive_reason: no_longer_operational
+replaced_by: null
+---
+
 1.
 
 - route: app/(dashboard)/candidate/profile

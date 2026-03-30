@@ -46,8 +46,6 @@ cat > /tmp/vridge-env.env <<'EOF'
 BETTER_AUTH_SECRET=<값>
 BETTER_AUTH_URL=<값>
 NEXT_PUBLIC_APP_URL=<값>
-NEXT_PUBLIC_GA_MEASUREMENT_ID=<값>
-NEXT_PUBLIC_PRIVACY_POLICY_URL=<값>
 EOF
 chmod 600 /tmp/vridge-env.env
 
@@ -68,10 +66,10 @@ rm -f /tmp/vridge-env.env
 ### 일반 경로 (자동)
 
 `production` 브랜치에 push하면 GitHub Actions가 순서대로 실행됨:
-1. Build Image 워크플로 (`ci-build.yml`) — 이미지 빌드 후 `ghcr.io/cgm-16/vridge:<tag>`로 push
+1. Build Image 워크플로 (`build-image.yml`) — 이미지 빌드 후 `ghcr.io/cgm-16/vridge:<tag>`로 push
 2. CD 배포 워크플로 (`cd-deploy.yml`) — Helm으로 클러스터에 배포
 
-> **마이그레이션**: `cd-deploy.yml`이 `helm upgrade`를 실행하면 Helm `pre-install, pre-upgrade` 훅이 마이그레이션 Job을 자동으로 실행함. 최초 설치 시에도 마이그레이션이 자동 실행됨. 별도 트리거 불필요.
+> **마이그레이션**: `cd-deploy.yml`이 `helm upgrade`를 실행하면 Deployment의 initContainer가 `prisma migrate deploy`를 먼저 수행합니다. 별도 Helm hook Job은 사용하지 않습니다.
 
 ### 수동 트리거
 
@@ -85,7 +83,7 @@ helm upgrade vridge deploy/helm/vridge \
   --namespace vridge \
   --set-string "image.tag=sha-<커밋SHA>" \
   --wait \
-  --atomic \
+  --rollback-on-failure \
   --timeout 5m
 ```
 
@@ -94,8 +92,8 @@ helm upgrade vridge deploy/helm/vridge \
 ## 4. 인그레스 / DNS / 공개 URL
 
 - 차트 기본 호스트: `vridge.xyz` 및 `www.vridge.xyz`
-- 인그레스 클래스: `traefik` (k3s 기본값)
-- TLS: 기본 미설정. 필요 시 `ingress.tls` 섹션 설정 필요
+- 인그레스 클래스: `traefik`
+- TLS: 기본 활성화. `cert-manager.io/cluster-issuer=letsencrypt-http` 어노테이션과 `vridge-tls` 시크릿을 사용
 
 배포 시 호스트 오버라이드 방법:
 ```bash
@@ -105,7 +103,7 @@ helm upgrade vridge deploy/helm/vridge \
   --set-string "image.tag=<TAG>" \
   --set "ingress.hosts[0].host=<실제호스트>" \
   --wait \
-  --atomic \
+  --rollback-on-failure \
   --timeout 5m
 ```
 
@@ -124,14 +122,12 @@ kubectl get pods -n vridge
 kubectl get ingress -n vridge
 # 기대값: vridge 인그레스가 올바른 호스트로 표시됨
 
-# 3. 헬스체크 엔드포인트 확인 (TLS 미설정 시 http://, TLS 설정 시 https://)
-curl -sf http://<호스트>/healthz       # TLS 미설정 환경
-# curl -sf https://<호스트>/healthz    # TLS 사용 시
+# 3. 헬스체크 엔드포인트 확인
+curl -sf https://<호스트>/healthz
 # 기대값: {"status":"ok"}
 
-# 4. 레디니스 엔드포인트 확인 (TLS 미설정 시 http://, TLS 설정 시 https://)
-curl -sf http://<호스트>/readyz        # TLS 미설정 환경
-# curl -sf https://<호스트>/readyz     # TLS 사용 시
+# 4. 레디니스 엔드포인트 확인
+curl -sf https://<호스트>/readyz
 # 기대값: {"status":"ok"}
 
 # 5. DB 연동 정상 기동 확인 (에러 없으면 정상)
@@ -154,8 +150,6 @@ cat > /tmp/vridge-env.env <<'EOF'
 BETTER_AUTH_SECRET=<새값>
 BETTER_AUTH_URL=<새값>
 NEXT_PUBLIC_APP_URL=<새값>
-NEXT_PUBLIC_GA_MEASUREMENT_ID=<새값>
-NEXT_PUBLIC_PRIVACY_POLICY_URL=<새값>
 EOF
 chmod 600 /tmp/vridge-env.env
 
@@ -175,4 +169,4 @@ rm -f /tmp/vridge-env.env
 - **PgBouncer**: 커넥션 풀링 미적용. 앱이 `vridge-db` CNPG 클러스터에 직접 연결 중.
 - **스테이징 네임스페이스**: 미생성. 현재 단일 네임스페이스(`vridge`) 사용.
 - **DB 백업 정책**: CNPG `ScheduledBackup` 리소스 미정의.
-- **마이그레이션 Job 이미지 크기**: runner 스테이지에 Prisma CLI(`node_modules/prisma`, `node_modules/@prisma`) 포함으로 이미지 크기가 증가함. 필요 시 별도 migration 이미지로 분리 가능.
+- **마이그레이션 의존성 포함 이미지 크기**: runner 스테이지에 Prisma CLI가 포함되어 있다. 필요 시 별도 migration 이미지로 분리 가능.
