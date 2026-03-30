@@ -86,16 +86,6 @@ spec:
                 secretKeyRef:
                   name: {{ .Values.secrets.app.name }}
                   key: NEXT_PUBLIC_APP_URL
-            - name: NEXT_PUBLIC_GA_MEASUREMENT_ID
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.secrets.app.name }}
-                  key: NEXT_PUBLIC_GA_MEASUREMENT_ID
-            - name: NEXT_PUBLIC_PRIVACY_POLICY_URL
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.secrets.app.name }}
-                  key: NEXT_PUBLIC_PRIVACY_POLICY_URL
           ports:
             - name: http
               containerPort: {{ .Values.service.targetPort }}
