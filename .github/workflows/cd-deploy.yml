@@ -64,5 +64,5 @@ jobs:
             --namespace vridge \
             --set-string "image.tag=${{ steps.tag.outputs.value }}" \
             --wait \
-            --atomic \
+            --rollback-on-failure \
             --timeout 5m
