@@ -6,3 +6,4 @@ build
 coverage
 lib/generated/prisma
 pnpm-lock.yaml
+deploy/helm/**
