@@ -297,12 +297,12 @@ INSERT INTO "job_description" (
   '00000000-0000-0000-0000-000000000101',
   'frontend-engineer',
   'Frontend Engineer (Next.js)',
-  'recruiting'::"JobPostingStatus",
-  'full_time'::"EmploymentType",
-  'remote'::"WorkArrangement",
+  'recruiting'::"job_posting_status",
+  'full_time'::"employment_type",
+  'remote'::"work_arrangement",
   2,
-  'higher_bachelor'::"EducationTypeVn",
-  30000000, 45000000, 'VND', 'month'::"SalaryPeriod", false,
+  'higher_bachelor'::"education_type_vn",
+  30000000, 45000000, 'VND', 'month'::"salary_period", false,
   $$## About Us
 
 Vridge Demo Org is building practical ATS workflows for hiring teams. This role (Frontend Engineer (Next.js)) joins a cross-functional group focused on product quality and delivery consistency.
@@ -343,12 +343,12 @@ INSERT INTO "job_description" (
   '00000000-0000-0000-0000-000000000101',
   'backend-engineer',
   'Backend Engineer (Node.js)',
-  'recruiting'::"JobPostingStatus",
-  'full_time'::"EmploymentType",
-  'hybrid'::"WorkArrangement",
+  'recruiting'::"job_posting_status",
+  'full_time'::"employment_type",
+  'hybrid'::"work_arrangement",
   3,
-  'higher_bachelor'::"EducationTypeVn",
-  35000000, 55000000, 'VND', 'month'::"SalaryPeriod", true,
+  'higher_bachelor'::"education_type_vn",
+  35000000, 55000000, 'VND', 'month'::"salary_period", true,
   $$## About Us
 
 Vridge Demo Org is building practical ATS workflows for hiring teams. This role (Backend Engineer (Node.js)) joins a cross-functional group focused on product quality and delivery consistency.
@@ -389,12 +389,12 @@ INSERT INTO "job_description" (
   '00000000-0000-0000-0000-000000000101',
   'product-manager',
   'Product Manager (ATS)',
-  'recruiting'::"JobPostingStatus",
-  'full_time'::"EmploymentType",
-  'onsite'::"WorkArrangement",
+  'recruiting'::"job_posting_status",
+  'full_time'::"employment_type",
+  'onsite'::"work_arrangement",
   4,
-  'higher_bachelor'::"EducationTypeVn",
-  40000000, 65000000, 'VND', 'month'::"SalaryPeriod", true,
+  'higher_bachelor'::"education_type_vn",
+  40000000, 65000000, 'VND', 'month'::"salary_period", true,
   $$## About Us
 
 Vridge Demo Org is building practical ATS workflows for hiring teams. This role (Product Manager (ATS)) joins a cross-functional group focused on product quality and delivery consistency.
@@ -435,12 +435,12 @@ INSERT INTO "job_description" (
   '00000000-0000-0000-0000-000000000101',
   'content-marketer',
   'Content Marketer',
-  'done'::"JobPostingStatus",
-  'intern'::"EmploymentType",
-  'onsite'::"WorkArrangement",
+  'done'::"job_posting_status",
+  'intern'::"employment_type",
+  'onsite'::"work_arrangement",
   NULL,
-  'higher_bachelor'::"EducationTypeVn",
-  NULL, NULL, 'VND', 'month'::"SalaryPeriod", true,
+  'higher_bachelor'::"education_type_vn",
+  NULL, NULL, 'VND', 'month'::"salary_period", true,
   $$## About Us
 
 Vridge Demo Org is building practical ATS workflows for hiring teams. This role (Content Marketer) joins a cross-functional group focused on product quality and delivery consistency.
