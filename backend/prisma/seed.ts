@@ -68,11 +68,15 @@ const SEED_BUILD_CONFIG: SeedBuildConfig = {
 };
 
 const CANONICAL_PASSWORD = '@Aaa111!';
-type SeedScope = 'full' | 'prod_v0_1_core3';
+type SeedScope = 'full' | 'prod_v0_1_core3' | 'prod_v0_1_demo';
 
 function resolveSeedScope(rawScope: string | undefined): SeedScope {
   if (!rawScope) return 'full';
-  if (rawScope === 'full' || rawScope === 'prod_v0_1_core3') {
+  if (
+    rawScope === 'full' ||
+    rawScope === 'prod_v0_1_core3' ||
+    rawScope === 'prod_v0_1_demo'
+  ) {
     return rawScope;
   }
 
@@ -950,6 +954,26 @@ async function main() {
 
     console.log(
       `seed scope(${seedScope}) 완료: families ${families.length}, jobs ${families.reduce((sum, f) => sum + f.jobs.length, 0)}, skills ${skills.length}, users ${coreUsers.length}`
+    );
+    return;
+  }
+
+  if (seedScope === 'prod_v0_1_demo') {
+    const coreUsers = buildCanonicalUsers({
+      orgId: SAMPLE_IDS.org,
+      password: CANONICAL_PASSWORD,
+    });
+
+    await seedJobFamilies(families);
+    await seedSkills(skills);
+    await seedSampleOrg();
+    await seedSampleJobDescriptions(SAMPLE_JOB_DESCRIPTIONS);
+    await seedAnnouncements(SAMPLE_ANNOUNCEMENTS);
+    await seedSampleUsers(coreUsers);
+    await seedSampleCredentialAccounts(coreUsers);
+
+    console.log(
+      `seed scope(${seedScope}) 완료: families ${families.length}, jobs ${families.reduce((sum, f) => sum + f.jobs.length, 0)}, skills ${skills.length}, jds ${SAMPLE_JOB_DESCRIPTIONS.length}, announcements ${SAMPLE_ANNOUNCEMENTS.length}, users ${coreUsers.length}`
     );
     return;
   }
