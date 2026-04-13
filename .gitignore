@@ -52,6 +52,3 @@ storybook-static
 
 # prisma
 /backend/generated/prisma
-
-# agent memory files
-/.codex-memory-*.md
