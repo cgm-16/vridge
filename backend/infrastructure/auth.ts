@@ -1,4 +1,4 @@
-import { betterAuth } from 'better-auth';
+import { betterAuth, type BetterAuthOptions } from 'better-auth';
 import { prismaAdapter } from 'better-auth/adapters/prisma';
 import { nextCookies } from 'better-auth/next-js';
 import { getPrisma } from '@/backend/infrastructure/db';
@@ -38,7 +38,7 @@ export function getAuth(): Auth {
   const prisma = getPrisma();
   const socialProviders = getSocialProviders(env);
 
-  authInstance = betterAuth({
+  authInstance = betterAuth<BetterAuthOptions>({
     database: prismaAdapter(prisma, { provider: 'postgresql' }),
     advanced: {
       database: {
