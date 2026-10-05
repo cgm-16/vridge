@@ -41,6 +41,8 @@ assert_contains "$ROOT_DIR/deploy/k8s/cnpg-cluster.yaml" "namespace: vridge" "cn
 assert_contains "$ROOT_DIR/deploy/k8s/cnpg-cluster.yaml" "database: vridge" "cnpg-cluster.yaml에 database: vridge 포함"
 assert_contains "$ROOT_DIR/deploy/k8s/cnpg-cluster.yaml" "owner: vridge" "cnpg-cluster.yaml에 owner: vridge 포함"
 assert_contains "$ROOT_DIR/deploy/k8s/cnpg-cluster.yaml" "instances: 1" "cnpg-cluster.yaml에 instances: 1 포함"
+# CNPG in-place 메이저 업그레이드는 같은 OS 이미지끼리만 된다: 기존 bullseye 데이터는 bullseye 이미지로만 올린다.
+assert_contains "$ROOT_DIR/deploy/k8s/cnpg-cluster.yaml" "imageName: ghcr.io/cloudnative-pg/postgresql:18.6-standard-bullseye" "cnpg-cluster.yaml에 PostgreSQL 18 bullseye 이미지 고정"
 
 if [ "$failures" -gt 0 ]; then
   echo "${failures}개의 검증이 실패했습니다." >&2
